@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Cadence signature gradient: Soft Iris & Electric Cyan to Vibrant Orchid -->
+    <linearGradient id="cadence-grad" x1="60" y1="60" x2="440" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="35%" stop-color="#0284C7"/>
+      <stop offset="70%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+
+    <!-- Inner soundwave gradient -->
+    <linearGradient id="wave-grad" x1="220" y1="160" x2="380" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F766E"/>
+      <stop offset="50%" stop-color="#327C88"/>
+      <stop offset="100%" stop-color="#4338CA"/>
+    </linearGradient>
+
+    <!-- Subtle drop filter for premium tactile feel -->
+    <filter id="subtle-shadow" x="40" y="45" width="432" height="432" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0284C7" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#subtle-shadow)">
+    <!-- Cadence C-shaped outer resonator mark -->
+    <path
+      d="M390 112
+         C348 78 299 60 247 60
+         C143 60 60 144 60 247
+         C60 350 143 434 247 434
+         C299 434 348 416 390 382
+         L341 319
+         C314 340 282 351 247 351
+         C189 351 142 305 142 247
+         C142 189 189 143 247 143
+         C282 143 314 154 341 175
+         Z"
+      fill="url(#cadence-grad)"
+    />
+
+    <!-- Sound waveform bars in Cadence deep teal/azure palette -->
+    <rect x="222" y="191" width="22" height="112" rx="11" fill="url(#wave-grad)"/>
+    <rect x="258" y="168" width="22" height="158" rx="11" fill="url(#wave-grad)"/>
+    <rect x="294" y="190" width="22" height="114" rx="11" fill="url(#wave-grad)"/>
+    <rect x="330" y="214" width="22" height="66" rx="11" fill="url(#wave-grad)"/>
+    <path d="M369 233 L389 247 L369 261 Z" fill="url(#wave-grad)"/>
+  </g>
+</svg>
