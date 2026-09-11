@@ -63,7 +63,7 @@ export function TextInputPanel() {
         {/* Action bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3">
           <span className="text-xs text-slate-400 hidden sm:inline-block">
-            Powered by Cadence 24kHz High-Fidelity Neural Flow
+            Powered by Chatterbox High-Fidelity Neural Flow
           </span>
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             {text.length > 0 && (

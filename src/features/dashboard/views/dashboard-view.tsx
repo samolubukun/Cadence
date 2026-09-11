@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -118,7 +118,7 @@ export function DashboardView() {
               👋
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Create, clone, and scale AI voices for content, products, and marketing.
+              Architect, synthesize, and bring hyper-realistic voices to life.
             </p>
           </div>
           <Button
@@ -154,7 +154,7 @@ export function DashboardView() {
                 Natural Speech
               </p>
               <p className="text-white/70 text-xs mb-4">
-                Powered by Cadence 24kHz Neural Flow Matching
+                Powered by Chatterbox High-Fidelity Neural Flow
               </p>
               <span className="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 transition-colors text-white text-xs font-semibold rounded-full px-4 py-2">
                 Start Creating
