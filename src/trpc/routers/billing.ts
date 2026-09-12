@@ -17,7 +17,7 @@ export const billingRouter = createTRPCRouter({
     const orgId = ctx.orgId;
 
     // Fetch records concurrently
-    const [balance, generations, transcriptions, songs, sfxList, mediaList] =
+    const [balance, generations, transcriptions, songs, sfxList, mediaList, stemList, singingList] =
       await Promise.all([
         convexClient.query(api.credits.getBalance, { orgId }),
         convexClient.query(api.generations.list, { orgId }),
@@ -25,12 +25,14 @@ export const billingRouter = createTRPCRouter({
         convexClient.query(api.studio.listSongs, { orgId }),
         convexClient.query(api.studio.listSoundEffects, { orgId }),
         convexClient.query(api.studio.listMediaGenerations, { orgId }),
+        convexClient.query(api.studio.listStems, { orgId }),
+        convexClient.query(api.studio.listSingingCovers, { orgId }),
       ]);
 
     // Format transaction ledger items
     type Transaction = {
       id: string;
-      category: "tts" | "stt" | "beats" | "songs" | "sfx" | "media";
+      category: "tts" | "stt" | "beats" | "songs" | "sfx" | "media" | "stems" | "singing";
       title: string;
       detail: string;
       credits: number;
@@ -120,11 +122,41 @@ export const billingRouter = createTRPCRouter({
       });
     }
 
+    // 6. Stems Separation: 30 credits
+    let stemsCredits = 0;
+    for (const st of stemList) {
+      const cost = 30;
+      stemsCredits += cost;
+      transactions.push({
+        id: `stem-${st._id}`,
+        category: "stems",
+        title: `Stems: ${st.sourceFileName.slice(0, 32)}`,
+        detail: "4-Track Separation • Demucs v4",
+        credits: cost,
+        timestamp: st._creationTime,
+      });
+    }
+
+    // 7. AI Singing Covers: 50 credits
+    let singingCredits = 0;
+    for (const sc of singingList) {
+      const cost = 50;
+      singingCredits += cost;
+      transactions.push({
+        id: `singing-${sc._id}`,
+        category: "singing",
+        title: `Singing: ${sc.title.slice(0, 32)}`,
+        detail: `Pitch ${sc.pitchShift >= 0 ? "+" : ""}${sc.pitchShift}st • RVC v2`,
+        credits: cost,
+        timestamp: sc._creationTime,
+      });
+    }
+
     // Sort transactions by newest first
     transactions.sort((a, b) => b.timestamp - a.timestamp);
 
     const totalCreditsSpent =
-      ttsCredits + sttCredits + beatsCredits + songsCredits + sfxCredits + mediaCredits;
+      ttsCredits + sttCredits + beatsCredits + songsCredits + sfxCredits + mediaCredits + stemsCredits + singingCredits;
 
     const totalGenerationsCount = transactions.length;
 

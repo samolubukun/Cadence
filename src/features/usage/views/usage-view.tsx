@@ -17,6 +17,7 @@ import {
   Drum,
   Volume2,
   Clapperboard,
+  AudioLines,
 } from "lucide-react";
 import {
   AreaChart,
@@ -71,6 +72,16 @@ const CATEGORY_META = {
     label: "Visual / Video",
     icon: Clapperboard,
     badgeColor: "bg-pink-500/10 text-pink-500 border-pink-500/20",
+  },
+  stems: {
+    label: "Stem Separation",
+    icon: Layers,
+    badgeColor: "bg-cyan-500/10 text-cyan-500 border-cyan-500/20",
+  },
+  singing: {
+    label: "AI Singing Cover",
+    icon: AudioLines,
+    badgeColor: "bg-rose-500/10 text-rose-500 border-rose-500/20",
   },
 } as const;
 
