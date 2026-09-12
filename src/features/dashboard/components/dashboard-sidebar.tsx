@@ -36,6 +36,7 @@ import {
   Sparkles,
   Clapperboard,
   Activity,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { UsageContainer } from "@/features/billing/components/usage-container";
@@ -220,8 +221,20 @@ export function DashboardSidebar() {
         />
       </SidebarContent>
       <div className="border-b border-dashed border-border" />
-      <SidebarFooter className="p-3">
+      <SidebarFooter className="p-3 gap-2">
         <UsageContainer />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => clerk.signOut({ redirectUrl: "/" })}
+              tooltip="Log out"
+              className="h-9 px-3 py-2 text-[13px] tracking-tight font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full justify-start"
+            >
+              <LogOut className="size-4 shrink-0" />
+              <span className="group-data-[collapsible=icon]:hidden">Log out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
