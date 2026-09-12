@@ -9,6 +9,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { PageHeader } from "@/components/page-header";
 import { formatDistanceToNow } from "date-fns";
+import { AudioPreprocessorToggle } from "@/components/audio-preprocessor-toggle";
 
 export default function VoiceChangerPage() {
   const trpc = useTRPC();
@@ -20,6 +21,7 @@ export default function VoiceChangerPage() {
   const [targetBase64, setTargetBase64] = useState<string | null>(null);
   const [sourceFileName, setSourceFileName] = useState<string | null>(null);
   const [sourceBase64, setSourceBase64] = useState<string | null>(null);
+  const [isolateVocals, setIsolateVocals] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const { data: voicesData } = useQuery(trpc.voices.getAll.queryOptions());
@@ -124,6 +126,15 @@ export default function VoiceChangerPage() {
                 max={12}
                 step={1}
                 onValueChange={([val]) => setPitchShift(val)}
+              />
+            </div>
+
+            {/* Smart Demucs Vocal Isolation Toggle */}
+            <div className="pt-2">
+              <AudioPreprocessorToggle
+                variant="isolate-vocals"
+                enabled={isolateVocals}
+                onChange={setIsolateVocals}
               />
             </div>
           </div>

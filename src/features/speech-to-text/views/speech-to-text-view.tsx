@@ -25,6 +25,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { formatDistanceToNow } from "date-fns";
+import { AudioPreprocessorToggle } from "@/components/audio-preprocessor-toggle";
 
 interface WordTimestamp {
   word: string;
@@ -49,6 +50,7 @@ export function SpeechToTextView() {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [diarize, setDiarize] = useState(false);
+  const [isolateSpeech, setIsolateSpeech] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -308,6 +310,15 @@ export function SpeechToTextView() {
                     />
                   </div>
                 )}
+
+                {/* Smart Demucs Speech Isolation */}
+                <div className="pt-2">
+                  <AudioPreprocessorToggle
+                    variant="isolate-vocals"
+                    enabled={isolateSpeech}
+                    onChange={setIsolateSpeech}
+                  />
+                </div>
 
                 <Button
                   onClick={handleTranscribe}

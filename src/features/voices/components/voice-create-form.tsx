@@ -63,6 +63,7 @@ import {
   VOICE_CATEGORY_LABELS,
 } from "@/features/voices/data/voice-categories";
 import { VoiceRecorder } from "./voice-recorder";
+import { AudioPreprocessorToggle } from "@/components/audio-preprocessor-toggle";
 
 const LANGUAGE_OPTIONS = locales.all
   .filter((l) => l.tag && l.tag.includes("-") && l.name)
@@ -300,6 +301,9 @@ export function VoiceCreateForm({
     },
   });
 
+  const [isolateVocals, setIsolateVocals] = useState(false);
+  const [studioEnhance, setStudioEnhance] = useState(false);
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -392,6 +396,20 @@ export function VoiceCreateForm({
                 </Tabs>
                 {isInvalid 
                   && <FieldError errors={field.state.meta.errors} />}
+
+                {/* Smart Audio Preprocessing Toggles */}
+                <div className="space-y-2 pt-2">
+                  <AudioPreprocessorToggle
+                    variant="isolate-vocals"
+                    enabled={isolateVocals}
+                    onChange={setIsolateVocals}
+                  />
+                  <AudioPreprocessorToggle
+                    variant="studio-enhance"
+                    enabled={studioEnhance}
+                    onChange={setStudioEnhance}
+                  />
+                </div>
               </Field>
             );
           }}
