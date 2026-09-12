@@ -134,7 +134,7 @@ export function LandingVoices() {
             >
               VCTK corpus
             </a>
-            . Every timbre is calibrated for zero-shot cloning, speech-to-speech, and neural TTS.
+            . Every timbre is calibrated for zero-shot cloning, speech-to-speech, and Chatterbox Turbo neural TTS.
           </p>
         </div>
 

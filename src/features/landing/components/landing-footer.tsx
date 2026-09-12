@@ -79,7 +79,21 @@ export function LandingFooter() {
         </div>
 
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:"1.5rem", display:"flex", flexWrap:"wrap", justifyContent:"space-between", alignItems:"center", gap:"0.75rem" }}>
-          <span style={{ fontSize:"0.78rem" }}>2026 Cadence. All rights reserved.</span>
+          <span style={{ fontSize:"0.78rem" }} className="flex items-center gap-1.5 flex-wrap">
+            <span>2026 Cadence.</span>
+            <span className="text-slate-500">•</span>
+            <span>
+              Designed &amp; Built by{" "}
+              <a 
+                href="https://samuelolubukun.com/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-white font-medium hover:underline hover:text-indigo-400 transition-colors"
+              >
+                Samuel Olubukun
+              </a>
+            </span>
+          </span>
           <div style={{ display:"flex", gap:"0.5rem" }}>
             {["#6366F1","#A855F7","#0EA5E9","#10B981"].map(c => (
               <div key={c} style={{ width:8, height:8, borderRadius:"9999px", background:c, opacity:0.65 }} />

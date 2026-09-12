@@ -360,6 +360,14 @@ cadence/
 
 ---
 
+## 👨‍💻 Creator
+
+Designed & Built with precision by **[Samuel Olubukun](https://samuelolubukun.com/)**  
+[![Portfolio](https://img.shields.io/badge/Portfolio-samuelolubukun.com-black?style=for-the-badge&logo=google-chrome&logoColor=white)](https://samuelolubukun.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-samolubukun-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/samolubukun)
+
+---
+
 <p align="center">
   <sub>Built for reliable, high-performance, private generative voice, music, speech & media intelligence.</sub>
 </p>
