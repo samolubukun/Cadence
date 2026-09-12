@@ -10,15 +10,20 @@ import {
   Disc3,
   Radio,
   Volume2,
+  Clock,
+  Play,
+  Download,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { PageHeader } from "@/components/page-header";
+import { formatDistanceToNow } from "date-fns";
 
 type Mode = "beats" | "song" | "sfx";
 
@@ -90,6 +95,10 @@ export default function MusicStudioPage() {
   const isSong = mode === "song";
   const isSfx = mode === "sfx";
 
+  // Queries for past creations
+  const { data: songsList, refetch: refetchSongs } = useQuery(trpc.studio.listSongs.queryOptions());
+  const { data: sfxList, refetch: refetchSfx } = useQuery(trpc.studio.listSoundEffects.queryOptions());
+
   const beatsMutation = useMutation(trpc.studio.generateBeats.mutationOptions());
   const songMutation = useMutation(trpc.studio.generateSong.mutationOptions());
   const soundMutation = useMutation(trpc.studio.generateSound.mutationOptions());
@@ -113,16 +122,19 @@ export default function MusicStudioPage() {
         toast.info("Composing instrumental on Modal GPU via MusicGen…");
         const res = await beatsMutation.mutateAsync({ prompt, duration });
         if (res.url) setAudioUrl(res.url);
+        refetchSongs();
         toast.success("Beats generated!");
       } else if (isSong) {
         toast.info("Generating full song on Modal GPU via ACE-Step 1.5…");
         const res = await songMutation.mutateAsync({ prompt, lyrics, duration });
         if (res.url) setAudioUrl(res.url);
+        refetchSongs();
         toast.success("Song generated!");
       } else {
         toast.info("Synthesizing Foley sound effect via AudioGen…");
         const res = await soundMutation.mutateAsync({ prompt, duration });
         if (res.url) setAudioUrl(res.url);
+        refetchSfx();
         toast.success("Sound effect generated!");
       }
     } catch (err: any) {
@@ -132,10 +144,42 @@ export default function MusicStudioPage() {
     }
   };
 
+  // Filter history relevant to current mode
+  const currentHistory = isSfx
+    ? (sfxList ?? []).map((s) => ({
+        id: s._id,
+        title: s.prompt,
+        duration: s.duration,
+        url: s.url,
+        createdAt: s._creationTime,
+        tag: "SFX",
+      }))
+    : isBeats
+    ? (songsList ?? [])
+        .filter((s) => s.title.startsWith("[Beat]"))
+        .map((s) => ({
+          id: s._id,
+          title: s.prompt,
+          duration: s.duration,
+          url: s.url,
+          createdAt: s._creationTime,
+          tag: "Beat",
+        }))
+    : (songsList ?? [])
+        .filter((s) => !s.title.startsWith("[Beat]"))
+        .map((s) => ({
+          id: s._id,
+          title: s.title || s.prompt,
+          duration: s.duration,
+          url: s.url,
+          createdAt: s._creationTime,
+          tag: "Song",
+        }));
+
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       <PageHeader title="Music & Sound Studio" />
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-8">
         {/* Header Banner */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border pb-6">
           <div>
@@ -184,10 +228,10 @@ export default function MusicStudioPage() {
           </button>
         </div>
 
+        {/* Generation Workspace */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left controls */}
           <div className="md:col-span-2 space-y-4">
-            {/* Style prompt */}
             <div className="space-y-2">
               <label className="text-sm font-semibold flex items-center gap-1.5">
                 <Wand2 className={`h-4 w-4 ${isBeats ? "text-violet-500" : isSong ? "text-indigo-500" : "text-amber-500"}`} />
@@ -214,10 +258,8 @@ export default function MusicStudioPage() {
                 <Textarea
                   value={lyrics}
                   onChange={(e) => setLyrics(e.target.value)}
-                  rows={8}
-                  placeholder={
-                    "[Verse]\nWrite your verse...\n\n[Chorus]\nWrite your chorus..."
-                  }
+                  rows={7}
+                  placeholder="[Verse]\nWrite your verse...\n\n[Chorus]\nWrite your chorus..."
                   className="font-mono text-xs bg-background"
                 />
               </div>
@@ -328,6 +370,79 @@ export default function MusicStudioPage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* History Card for Active Mode */}
+        <div className="rounded-xl border bg-card p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+            <div className="flex items-center gap-2">
+              <Clock className={`h-4 w-4 ${isBeats ? "text-violet-500" : isSong ? "text-indigo-500" : "text-amber-500"}`} />
+              <h2 className="text-base font-semibold text-foreground">
+                Past {isBeats ? "Instrumental Beats" : isSong ? "Full Songs" : "Sound Effects"}
+              </h2>
+            </div>
+            <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              {currentHistory.length} saved
+            </span>
+          </div>
+
+          {currentHistory.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-xs">
+              No previous {isBeats ? "beats" : isSong ? "songs" : "sound effects"} found for your organization.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {currentHistory.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col justify-between p-3.5 rounded-xl border border-border/60 bg-muted/15 hover:bg-muted/30 transition gap-3"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
+                        {item.tag}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground flex items-center gap-1 font-mono">
+                        <Calendar className="h-3 w-3" />
+                        {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-foreground line-clamp-2 leading-relaxed">
+                      {item.title}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
+                    <span className="text-[11px] font-mono text-muted-foreground">
+                      {item.duration}s
+                    </span>
+                    {item.url && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs gap-1 text-primary hover:bg-primary/10"
+                          onClick={() => setAudioUrl(item.url)}
+                        >
+                          <Play className="h-3 w-3" /> Play
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="h-7 px-2 text-xs gap-1"
+                        >
+                          <a href={item.url} download target="_blank" rel="noreferrer">
+                            <Download className="h-3 w-3" />
+                          </a>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

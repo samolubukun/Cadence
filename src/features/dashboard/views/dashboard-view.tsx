@@ -16,19 +16,24 @@ import {
   ArrowRight,
   Play,
   Clock,
+  Music,
+  Clapperboard,
+  Sparkles,
+  Drum,
+  Video,
 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { VoiceAvatar } from "@/components/voice-avatar/voice-avatar";
 import { cn } from "@/lib/utils";
 
-// ── Services (only TTS, STT, Voice Clone) ─────────────────────────────────────
+// ── Services ───────────────────────────────────────────────────────────────────
 
 const POPULAR_SERVICES = [
   {
     id: "tts",
     label: "Text to Speech",
-    description: "Generate studio-quality audio from any text",
+    description: "Generate studio-quality speech with Chatterbox Turbo",
     icon: AudioLines,
     color: "bg-violet-100 text-violet-600",
     href: "/text-to-speech",
@@ -36,18 +41,34 @@ const POPULAR_SERVICES = [
   {
     id: "stt",
     label: "Speech to Text",
-    description: "Transcribe & diarise audio with Whisper v3",
+    description: "Transcribe audio & timestamps with Whisper large-v3",
     icon: Headphones,
     color: "bg-sky-100 text-sky-600",
     href: "/transcribe",
   },
   {
+    id: "music",
+    label: "Music & Sound Studio",
+    description: "Full vocal songs, beats, and Foley sound effects",
+    icon: Music,
+    color: "bg-indigo-100 text-indigo-600",
+    href: "/music",
+  },
+  {
     id: "clone",
     label: "Voice Cloning",
-    description: "Clone any voice with zero-shot flow matching",
+    description: "Instant zero-shot timbre cloning from reference audio",
     icon: Mic2,
     color: "bg-amber-100 text-amber-600",
     href: "/voice-clone",
+  },
+  {
+    id: "media",
+    label: "Visuals & Video",
+    description: "SDXL-Turbo cover art & Wan2.1 video visualizers",
+    icon: Clapperboard,
+    color: "bg-cyan-100 text-cyan-600",
+    href: "/media",
   },
 ];
 
@@ -94,9 +115,84 @@ export function DashboardView() {
 
   const { data: voicesData } = useQuery(trpc.voices.getAll.queryOptions());
   const { data: generationsData } = useQuery(trpc.generations.getAll.queryOptions());
+  const { data: transcriptionsData } = useQuery(trpc.transcriptions.getAll.queryOptions());
+  const { data: songsData } = useQuery(trpc.studio.listSongs.queryOptions());
+  const { data: sfxData } = useQuery(trpc.studio.listSoundEffects.queryOptions());
+  const { data: mediaData } = useQuery(trpc.studio.listMediaGenerations.queryOptions());
 
   const allVoices = [...(voicesData?.system ?? []), ...(voicesData?.custom ?? [])];
-  const recentGens = (generationsData ?? []).slice(0, 5);
+
+  // Aggregate recent generations across all tools
+  type UnifiedItem = {
+    id: string;
+    type: "tts" | "stt" | "song" | "beat" | "sfx" | "media";
+    title: string;
+    subtitle: string;
+    href: string;
+    date: Date;
+    badgeText: string;
+    badgeColor: string;
+  };
+
+  const unifiedList: UnifiedItem[] = [
+    ...(generationsData ?? []).map((g) => ({
+      id: `tts-${g.id}`,
+      type: "tts" as const,
+      title: g.text?.slice(0, 60) + ((g.text?.length ?? 0) > 60 ? "…" : ""),
+      subtitle: `${g.voiceName} • ${(g.text?.length ?? 0).toLocaleString()} chars`,
+      href: `/text-to-speech/${g.id}`,
+      date: new Date(g.createdAt),
+      badgeText: "TTS Voice",
+      badgeColor: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+    })),
+    ...(transcriptionsData ?? []).map((t) => ({
+      id: `stt-${t.id}`,
+      type: "stt" as const,
+      title: t.fileName,
+      subtitle: `${t.duration ? `${t.duration.toFixed(0)}s` : "Audio"} • ${t.text?.slice(0, 45)}…`,
+      href: "/transcribe",
+      date: new Date(t.createdAt),
+      badgeText: "Transcript",
+      badgeColor: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
+    })),
+    ...(songsData ?? []).map((s) => {
+      const isBeat = s.title.startsWith("[Beat]");
+      return {
+        id: `song-${s._id}`,
+        type: (isBeat ? "beat" : "song") as const,
+        title: s.prompt?.slice(0, 60) || s.title,
+        subtitle: `${s.duration}s • ${isBeat ? "MusicGen Beats" : "ACE-Step Vocal Song"}`,
+        href: "/music",
+        date: new Date(s._creationTime),
+        badgeText: isBeat ? "Beat" : "Song",
+        badgeColor: isBeat
+          ? "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300"
+          : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
+      };
+    }),
+    ...(sfxData ?? []).map((s) => ({
+      id: `sfx-${s._id}`,
+      type: "sfx" as const,
+      title: s.prompt?.slice(0, 60),
+      subtitle: `${s.duration}s • AudioGen Foley SFX`,
+      href: "/music",
+      date: new Date(s._creationTime),
+      badgeText: "Sound FX",
+      badgeColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+    })),
+    ...(mediaData ?? []).map((m) => ({
+      id: `media-${m._id}`,
+      type: "media" as const,
+      title: m.prompt?.slice(0, 60),
+      subtitle: m.type === "video" ? `${m.duration ?? 4}s • Wan2.1 Video` : "1024x1024 • SDXL Cover",
+      href: "/media",
+      date: new Date(m._creationTime),
+      badgeText: m.type === "video" ? "Video" : "Artwork",
+      badgeColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300",
+    })),
+  ]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 8);
 
   const voiceCarousel = useCarousel(allVoices.length, 6);
   const visibleVoices = allVoices.slice(voiceCarousel.idx, voiceCarousel.idx + 6);
@@ -118,7 +214,7 @@ export function DashboardView() {
               👋
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Architect, synthesize, and bring hyper-realistic voices to life.
+              Architect, synthesize, and bring hyper-realistic voices and multi-modal audio to life.
             </p>
           </div>
           <Button
@@ -136,7 +232,7 @@ export function DashboardView() {
           {/* Hero Banner */}
           <Link
             href="/text-to-speech"
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 p-6 flex flex-col justify-end min-h-[200px] group cursor-pointer"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 p-6 flex flex-col justify-end min-h-[220px] group cursor-pointer"
           >
             <div className="absolute top-3 right-6 flex gap-1">
               <span className="size-5 rounded-full bg-white/30" />
@@ -144,17 +240,17 @@ export function DashboardView() {
             </div>
             <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1 text-white text-[11px] font-medium">
               <span className="size-1.5 rounded-full bg-white animate-pulse" />
-              AI · Voice
+              Neural Generative Studio
             </div>
             <div className="relative z-10">
               <p className="text-white/90 text-xl font-bold leading-tight mb-0.5">
-                Turn Any Script Into
+                Voice, Music, Speech &amp; Media
               </p>
               <p className="text-white text-2xl font-extrabold italic leading-tight mb-3">
-                Natural Speech
+                Synthesize Everything
               </p>
               <p className="text-white/70 text-xs mb-4">
-                Powered by Chatterbox High-Fidelity Neural Flow
+                Chatterbox Turbo · ACE-Step 1.5 · MusicGen · Whisper · SDXL
               </p>
               <span className="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 transition-colors text-white text-xs font-semibold rounded-full px-4 py-2">
                 Start Creating
@@ -163,30 +259,30 @@ export function DashboardView() {
             </div>
           </Link>
 
-          {/* Popular Services — TTS, STT, Voice Clone */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col gap-4">
+          {/* Popular Services */}
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col gap-3">
             <h2 className="text-sm font-bold text-gray-900">Studio Tools</h2>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {POPULAR_SERVICES.map((svc) => {
                 const Icon = svc.icon;
                 return (
                   <Link
                     key={svc.id}
                     href={svc.href}
-                    className="flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all group"
+                    className="flex items-center gap-3.5 p-2.5 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all group"
                   >
-                    <div className={cn("size-10 rounded-xl flex items-center justify-center shrink-0", svc.color)}>
-                      <Icon className="size-5" />
+                    <div className={cn("size-9 rounded-xl flex items-center justify-center shrink-0", svc.color)}>
+                      <Icon className="size-4.5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                         {svc.label}
                       </p>
-                      <p className="text-[11px] text-gray-400 leading-snug mt-0.5">
+                      <p className="text-[11px] text-gray-400 leading-snug mt-0.5 truncate">
                         {svc.description}
                       </p>
                     </div>
-                    <ArrowRight className="size-4 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
+                    <ArrowRight className="size-3.5 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
                   </Link>
                 );
               })}
@@ -243,7 +339,6 @@ export function DashboardView() {
                     href={`/text-to-speech?voiceId=${voice.id}`}
                     className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all group cursor-pointer"
                   >
-                    {/* Same DiceBear glass avatar used on the Voice Library page */}
                     <VoiceAvatar
                       seed={voice.id}
                       name={voice.name}
@@ -267,14 +362,14 @@ export function DashboardView() {
           )}
         </div>
 
-        {/* ── Recent Generations ──────────────────────────────────────── */}
+        {/* ── Recent Generations Across All Studios ────────────────────── */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-gray-900">Recent Generations</h2>
-              <Link href="/text-to-speech" className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5">
-                New generation <ArrowRight className="size-3" />
-              </Link>
+              <h2 className="text-sm font-bold text-gray-900">Recent Studio Generations</h2>
+              <span className="text-[11px] text-gray-400">
+                (Voice, Transcripts, Songs, Beats &amp; Media)
+              </span>
             </div>
             <Clock className="size-3.5 text-gray-400" />
           </div>
@@ -291,7 +386,7 @@ export function DashboardView() {
                 </div>
               ))}
             </div>
-          ) : recentGens.length === 0 ? (
+          ) : unifiedList.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 gap-2 text-gray-400">
               <AudioLines className="size-8 opacity-30" />
               <p className="text-xs font-medium">No generations yet</p>
@@ -299,31 +394,39 @@ export function DashboardView() {
                 href="/text-to-speech"
                 className="text-xs text-blue-500 hover:underline font-medium"
               >
-                Create your first →
+                Create your first speech or music track →
               </Link>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              {recentGens.map((gen) => (
+            <div className="space-y-2">
+              {unifiedList.map((item) => (
                 <Link
-                  key={gen.id}
-                  href={`/text-to-speech/${gen.id}`}
+                  key={item.id}
+                  href={item.href}
                   className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all group"
                 >
-                  <div className="size-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 group-hover:bg-indigo-100 transition-colors">
-                    <Play className="size-3.5 text-indigo-500" />
-                  </div>
+                  <span
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shrink-0",
+                      item.badgeColor
+                    )}
+                  >
+                    {item.badgeText}
+                  </span>
+
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                      {gen.text?.slice(0, 60)}{(gen.text?.length ?? 0) > 60 ? "..." : ""}
+                      {item.title}
                     </p>
-                    <p className="text-[11px] text-gray-400 mt-0.5">
-                      {gen.voiceName} · {gen.text?.length?.toLocaleString() ?? 0} chars
+                    <p className="text-[11px] text-gray-400 mt-0.5 truncate">
+                      {item.subtitle}
                     </p>
                   </div>
+
                   <span className="text-[10px] text-gray-400 shrink-0 font-mono">
-                    {timeAgo(new Date(gen.createdAt))}
+                    {timeAgo(item.date)}
                   </span>
+                  <ArrowRight className="size-3 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
                 </Link>
               ))}
             </div>

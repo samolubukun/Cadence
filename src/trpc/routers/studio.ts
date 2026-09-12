@@ -62,7 +62,13 @@ export const studioRouter = createTRPCRouter({
   // 1b. Full Song Generation with Vocals (ACE-Step 1.5 Turbo)
   // ---------------------------------------------------------------------------
   listSongs: orgProcedure.query(async ({ ctx }) => {
-    return await convexClient.query(api.studio.listSongs, { orgId: ctx.orgId });
+    const songs = await convexClient.query(api.studio.listSongs, { orgId: ctx.orgId });
+    return await Promise.all(
+      songs.map(async (song) => ({
+        ...song,
+        url: song.r2ObjectKey ? await getSignedAudioUrl(song.r2ObjectKey) : null,
+      }))
+    );
   }),
 
   generateSong: orgProcedure
@@ -119,7 +125,13 @@ export const studioRouter = createTRPCRouter({
   // 2. Sound Effects (SFX)
   // ---------------------------------------------------------------------------
   listSoundEffects: orgProcedure.query(async ({ ctx }) => {
-    return await convexClient.query(api.studio.listSoundEffects, { orgId: ctx.orgId });
+    const sfxList = await convexClient.query(api.studio.listSoundEffects, { orgId: ctx.orgId });
+    return await Promise.all(
+      sfxList.map(async (sfx) => ({
+        ...sfx,
+        url: sfx.r2ObjectKey ? await getSignedAudioUrl(sfx.r2ObjectKey) : null,
+      }))
+    );
   }),
 
   generateSound: orgProcedure
@@ -167,7 +179,13 @@ export const studioRouter = createTRPCRouter({
   // 3. Speech-to-Speech & Voice Changer
   // ---------------------------------------------------------------------------
   listVoiceConversions: orgProcedure.query(async ({ ctx }) => {
-    return await convexClient.query(api.studio.listVoiceConversions, { orgId: ctx.orgId });
+    const list = await convexClient.query(api.studio.listVoiceConversions, { orgId: ctx.orgId });
+    return await Promise.all(
+      list.map(async (item) => ({
+        ...item,
+        url: item.r2ObjectKey ? await getSignedAudioUrl(item.r2ObjectKey) : null,
+      }))
+    );
   }),
 
   convertVoice: orgProcedure
@@ -210,14 +228,21 @@ export const studioRouter = createTRPCRouter({
         contentType: "audio/wav",
       });
 
-      return { id: conversionId, r2Key };
+      const signedUrl = await getSignedAudioUrl(r2Key);
+      return { id: conversionId, r2Key, url: signedUrl };
     }),
 
   // ---------------------------------------------------------------------------
   // 4. Media (Images & Videos)
   // ---------------------------------------------------------------------------
   listMediaGenerations: orgProcedure.query(async ({ ctx }) => {
-    return await convexClient.query(api.studio.listMediaGenerations, { orgId: ctx.orgId });
+    const list = await convexClient.query(api.studio.listMediaGenerations, { orgId: ctx.orgId });
+    return await Promise.all(
+      list.map(async (item) => ({
+        ...item,
+        url: item.r2ObjectKey ? await getSignedAudioUrl(item.r2ObjectKey) : null,
+      }))
+    );
   }),
 
   generateImage: orgProcedure
@@ -258,7 +283,8 @@ export const studioRouter = createTRPCRouter({
         contentType: "image/png",
       });
 
-      return { id: mediaId, r2Key };
+      const signedUrl = await getSignedAudioUrl(r2Key);
+      return { id: mediaId, r2Key, url: signedUrl };
     }),
 
   generateVideo: orgProcedure
@@ -299,6 +325,7 @@ export const studioRouter = createTRPCRouter({
         contentType: "video/mp4",
       });
 
-      return { id: mediaId, r2Key };
+      const signedUrl = await getSignedAudioUrl(r2Key);
+      return { id: mediaId, r2Key, url: signedUrl };
     }),
 });

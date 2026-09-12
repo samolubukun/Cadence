@@ -100,7 +100,20 @@ export const transcriptionsRouter = createTRPCRouter({
           }>;
         };
 
+        // Persist to Convex database
+        const transcriptionId = await convexClient.mutation(api.transcriptions.create, {
+          orgId: ctx.orgId,
+          audioKey,
+          fileName: input.fileName,
+          language: result.language,
+          duration: result.duration,
+          text: result.text,
+          status: "completed",
+          segments: result.segments,
+        });
+
         return {
+          id: transcriptionId,
           audioKey,
           fileName: input.fileName,
           language: result.language,
@@ -117,4 +130,21 @@ export const transcriptionsRouter = createTRPCRouter({
         });
       }
     }),
+
+  getAll: orgProcedure.query(async ({ ctx }) => {
+    const list = await convexClient.query(api.transcriptions.list, {
+      orgId: ctx.orgId,
+    });
+    return list.map((item) => ({
+      id: item._id as string,
+      audioKey: item.audioKey,
+      fileName: item.fileName,
+      language: item.language,
+      duration: item.duration,
+      text: item.text,
+      status: item.status,
+      segments: item.segments,
+      createdAt: new Date(item._creationTime),
+    }));
+  }),
 });
