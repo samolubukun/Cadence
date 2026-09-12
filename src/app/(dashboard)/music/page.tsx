@@ -302,13 +302,16 @@ export default function MusicStudioPage() {
                     : "Synthesizing Foley…"}
                 </span>
               ) : (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <IconComp className="h-5 w-5" />
                   {isBeats
                     ? "Generate Beats"
                     : isSong
                     ? "Generate Full Song"
                     : "Generate Sound FX"}
+                  <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white/90">
+                    {isBeats ? "50 credits" : isSong ? "150 credits" : "25 credits"}
+                  </span>
                 </span>
               )}
             </Button>
