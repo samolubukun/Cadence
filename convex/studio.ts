@@ -127,3 +127,75 @@ export const createMediaGeneration = mutation({
     return await ctx.db.insert("mediaGenerations", args);
   },
 });
+
+// ---------------------------------------------------------------------------
+// Stems Separation (Demucs v4)
+// ---------------------------------------------------------------------------
+export const listStems = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("stems")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const createStem = mutation({
+  args: {
+    orgId: v.string(),
+    sourceFileName: v.string(),
+    vocalsKey: v.optional(v.string()),
+    drumsKey: v.optional(v.string()),
+    bassKey: v.optional(v.string()),
+    otherKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("stems", args);
+  },
+});
+
+export const updateStemR2 = mutation({
+  args: {
+    id: v.id("stems"),
+    vocalsKey: v.optional(v.string()),
+    drumsKey: v.optional(v.string()),
+    bassKey: v.optional(v.string()),
+    otherKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...rest } = args;
+    await ctx.db.patch(id, rest);
+  },
+});
+
+// ---------------------------------------------------------------------------
+// AI Singing Covers (RVC v2)
+// ---------------------------------------------------------------------------
+export const listSingingCovers = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("singingCovers")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const createSingingCover = mutation({
+  args: {
+    orgId: v.string(),
+    title: v.string(),
+    targetVoiceKey: v.string(),
+    pitchShift: v.number(),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("singingCovers", args);
+  },
+});

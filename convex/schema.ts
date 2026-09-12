@@ -105,5 +105,24 @@ export default defineSchema({
     r2ObjectKey: v.optional(v.string()),
     status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
   }).index("by_orgId", ["orgId"]),
+
+  stems: defineTable({
+    orgId: v.string(),
+    sourceFileName: v.string(),
+    vocalsKey: v.optional(v.string()),
+    drumsKey: v.optional(v.string()),
+    bassKey: v.optional(v.string()),
+    otherKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  }).index("by_orgId", ["orgId"]),
+
+  singingCovers: defineTable({
+    orgId: v.string(),
+    title: v.string(),
+    targetVoiceKey: v.string(),
+    pitchShift: v.number(),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  }).index("by_orgId", ["orgId"]),
 });
 
