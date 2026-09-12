@@ -240,7 +240,9 @@ export const studioRouter = createTRPCRouter({
     .input(
       z.object({
         sourceAudioKey: z.string().optional(),
-        targetVoiceKey: z.string(),
+        sourceBase64Audio: z.string().optional(),
+        targetVoiceKey: z.string().optional(),
+        targetBase64Audio: z.string().optional(),
         pitchShift: z.number().default(0),
       })
     )
@@ -261,10 +263,32 @@ export const studioRouter = createTRPCRouter({
         }
       }
 
+      let sourceKey = input.sourceAudioKey;
+      if (input.sourceBase64Audio) {
+        const buffer = Buffer.from(input.sourceBase64Audio, "base64");
+        sourceKey = `voice-conversions/source/${ctx.orgId}/${Date.now()}.wav`;
+        await uploadAudio({
+          key: sourceKey,
+          buffer,
+          contentType: "audio/wav",
+        });
+      }
+
+      let targetKey = input.targetVoiceKey || "voices/system/jd704hxf4y0cy4xtpgep735ek98e4ng8";
+      if (input.targetBase64Audio) {
+        const buffer = Buffer.from(input.targetBase64Audio, "base64");
+        targetKey = `voice-conversions/target-ref/${ctx.orgId}/${Date.now()}.wav`;
+        await uploadAudio({
+          key: targetKey,
+          buffer,
+          contentType: "audio/wav",
+        });
+      }
+
       const { data, error } = await cadence.POST("/voice-change" as any, {
         body: {
-          source_audio_key: input.sourceAudioKey,
-          target_voice_key: input.targetVoiceKey,
+          source_audio_key: sourceKey,
+          target_voice_key: targetKey,
           pitch_shift: input.pitchShift,
         },
         parseAs: "arrayBuffer",

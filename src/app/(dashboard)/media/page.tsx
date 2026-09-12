@@ -85,31 +85,66 @@ export default function MediaStudioPage() {
 
           <TabsContent value="image" className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold flex items-center gap-1.5">
-                  <Wand2 className="h-4 w-4 text-cyan-500" /> Image / Album Cover Prompt
-                </label>
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold flex items-center gap-1.5">
+                    <Wand2 className="h-4 w-4 text-cyan-500" /> Image / Album Cover Prompt
+                  </label>
+                  <span className="text-[11px] text-muted-foreground font-medium">Click a preset below or enter custom</span>
+                </div>
                 <Input
                   value={imagePrompt}
                   onChange={(e) => setImagePrompt(e.target.value)}
                   placeholder="Describe your album cover or visual art..."
-                  className="bg-background"
+                  className="bg-background h-11 text-sm rounded-xl"
                 />
+
+                {/* Style preset chips */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                  {[
+                    "Cyberpunk neon vinyl album art with glowing typography CADENCE",
+                    "Minimalist geometric matte vinyl sleeve with pastel gradients",
+                    "Retro 80s anime city night illustration with rain reflections",
+                    "Hyperrealistic 3D metallic liquid orb floating in obsidian void",
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setImagePrompt(preset)}
+                      className="text-[11px] font-medium px-2.5 py-1 rounded-full border border-border/80 bg-background hover:bg-muted/60 hover:border-primary/40 text-foreground transition-all cursor-pointer active:scale-95 truncate max-w-xs"
+                    >
+                      {preset.slice(0, 32)}…
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex gap-2 pt-2">
-                {["1:1", "16:9", "9:16"].map((ratio) => (
-                  <Button
-                    key={ratio}
-                    type="button"
-                    variant={aspectRatio === ratio ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setAspectRatio(ratio)}
-                    className="text-xs"
-                  >
-                    Aspect {ratio}
-                  </Button>
-                ))}
+              {/* Visual Aspect Ratio Cards */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Aspect Ratio Canvas
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { ratio: "1:1", label: "Square (1:1)", sub: "Vinyl / Album Art" },
+                    { ratio: "16:9", label: "Landscape (16:9)", sub: "YouTube / Widescreen" },
+                    { ratio: "9:16", label: "Portrait (9:16)", sub: "Reels / Stories" },
+                  ].map((item) => (
+                    <button
+                      key={item.ratio}
+                      type="button"
+                      onClick={() => setAspectRatio(item.ratio)}
+                      className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                        aspectRatio === item.ratio
+                          ? "border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/30"
+                          : "border-border/70 bg-card hover:bg-muted/40"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-foreground">{item.label}</span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">{item.sub}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <Button
@@ -122,39 +157,104 @@ export default function MediaStudioPage() {
                     <Sparkles className="h-5 w-5 animate-spin" /> Rendering Visual...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     <ImageIcon className="h-5 w-5" /> Generate Image
+                    <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white/90">
+                      20 credits
+                    </span>
                   </span>
                 )}
               </Button>
             </div>
 
             <div className="rounded-xl border bg-card p-6 flex flex-col justify-between items-center text-center">
-              <div className="w-full aspect-square rounded-lg bg-muted/40 border border-dashed flex items-center justify-center p-2 overflow-hidden">
+              <div className="w-full aspect-square rounded-xl bg-muted/30 border border-dashed flex items-center justify-center p-2 overflow-hidden shadow-inner">
                 {activeMediaUrl?.type === "image" ? (
-                  <img src={activeMediaUrl.url} alt="Generated visual" className="w-full h-full object-cover rounded-md" />
+                  <img src={activeMediaUrl.url} alt="Generated visual" className="w-full h-full object-cover rounded-lg shadow-sm" />
                 ) : (
-                  <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                  <div className="space-y-2 flex flex-col items-center">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground/60" />
+                    <span className="text-xs text-muted-foreground font-medium">Ready for rendering</span>
+                  </div>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground mt-4">
-                {activeMediaUrl?.type === "image" ? "Generated image rendered above." : "High-resolution cover art will render here."}
-              </p>
+              {activeMediaUrl?.type === "image" && (
+                <div className="w-full pt-4 flex items-center justify-between border-t border-border/40 text-xs">
+                  <span className="font-mono text-muted-foreground">1024 × 1024</span>
+                  <a
+                    href={activeMediaUrl.url}
+                    download
+                    className="text-primary hover:underline font-semibold flex items-center gap-1"
+                  >
+                    <Download className="size-3" /> Download PNG
+                  </a>
+                </div>
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="video" className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold flex items-center gap-1.5">
-                  <Wand2 className="h-4 w-4 text-purple-500" /> Video Visualizer Prompt
-                </label>
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold flex items-center gap-1.5">
+                    <Wand2 className="h-4 w-4 text-purple-500" /> Video Visualizer Prompt
+                  </label>
+                  <span className="text-[11px] text-muted-foreground font-medium">Click a preset below or enter custom</span>
+                </div>
                 <Input
                   value={videoPrompt}
                   onChange={(e) => setVideoPrompt(e.target.value)}
-                  placeholder="e.g. Glowing neon waves pulsing in rhythm, aerial drone over mountain..."
-                  className="bg-background"
+                  placeholder="Describe your video visualizer or scene..."
+                  className="bg-background h-11 text-sm rounded-xl"
                 />
+
+                {/* Video Style suggestions chips */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                  {[
+                    "Cinematic slow motion fluid sound waves pulsing in deep cosmic space",
+                    "Hyper-lapse neon Tokyo highway rain reflections with anamorphic lens flare",
+                    "Retro 80s wireframe grid terrain flying forward into purple digital sunset",
+                    "Abstract iridescent metallic liquid ripples vibrating to bass frequencies",
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setVideoPrompt(preset)}
+                      className="text-[11px] font-medium px-2.5 py-1 rounded-full border border-border/80 bg-background hover:bg-muted/60 hover:border-primary/40 text-foreground transition-all cursor-pointer active:scale-95 truncate max-w-xs"
+                    >
+                      {preset.slice(0, 32)}…
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Video Aspect Ratio Tiles */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Video Canvas
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { ratio: "16:9", label: "Landscape (16:9)", sub: "Widescreen / YouTube" },
+                    { ratio: "9:16", label: "Portrait (9:16)", sub: "Reels / TikTok / Shorts" },
+                    { ratio: "1:1", label: "Square (1:1)", sub: "Instagram / Canvas" },
+                  ].map((item) => (
+                    <button
+                      key={item.ratio}
+                      type="button"
+                      onClick={() => setAspectRatio(item.ratio)}
+                      className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                        aspectRatio === item.ratio
+                          ? "border-purple-500 bg-purple-500/10 ring-1 ring-purple-500/30"
+                          : "border-border/70 bg-card hover:bg-muted/40"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-foreground">{item.label}</span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">{item.sub}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <Button
@@ -167,8 +267,11 @@ export default function MediaStudioPage() {
                     <Sparkles className="h-5 w-5 animate-spin" /> Generating Video Clip...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     <Video className="h-5 w-5" /> Generate Video Clip
+                    <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white/90">
+                      200 credits
+                    </span>
                   </span>
                 )}
               </Button>

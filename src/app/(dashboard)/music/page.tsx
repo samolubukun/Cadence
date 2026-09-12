@@ -78,6 +78,28 @@ const MODE_CONFIG = {
   },
 } as const;
 
+const GENRE_PRESETS: Record<Mode, Array<{ label: string; prompt: string; duration: number }>> = {
+  beats: [
+    { label: "Trap 140 BPM", prompt: "Dark hard-hitting trap beat 140 BPM with rolling 808s and eerie piano", duration: 30 },
+    { label: "Lo-Fi Chill", prompt: "Cozy lo-fi hip hop beat with warm vinyl crackle, gentle jazz Rhodes and soft boom-bap drums", duration: 30 },
+    { label: "Synthwave 80s", prompt: "Retro 80s synthwave instrumental with pulsing analog bassline, gating snares, and nostalgic synth leads", duration: 45 },
+    { label: "Smooth Jazz", prompt: "Uptown late night jazz lounge groove with upright double bass, brushed drums, and mellow saxophone", duration: 30 },
+    { label: "Cinematic Strings", prompt: "Epic cinematic orchestral crescendo with marching taiko drums and soaring brass horns", duration: 45 },
+  ],
+  song: [
+    { label: "80s Pop Anthem", prompt: "Upbeat retro 80s electronic pop anthem with euphoric chorus hooks and punchy synths", duration: 60 },
+    { label: "Indie Folk", prompt: "Intimate indie acoustic ballad with fingerpicked guitar, warm vocal harmonies, and gentle tambourine", duration: 60 },
+    { label: "Midnight R&B", prompt: "Sensual contemporary slow R&B with smooth Rhodes piano, deep sub-bass, and soulful vocals", duration: 60 },
+    { label: "Cyberpunk Rock", prompt: "High-octane industrial electronic rock with distorted guitar riffs and driving synth arpeggios", duration: 60 },
+  ],
+  sfx: [
+    { label: "Thunderstorm", prompt: "Gentle rain tapping against glass window with rolling distant thunder rumblings", duration: 10 },
+    { label: "Sci-Fi Laser", prompt: "Futuristic plasma blaster firing inside an echoey metal subterranean corridor", duration: 3 },
+    { label: "Coffee Shop", prompt: "Warm ambiance of a busy cafe with espresso steam hissing and soft ceramic mug clinks", duration: 15 },
+    { label: "Sword Clashes", prompt: "Sharp metallic sword blade clash with bright spark ringing resonance", duration: 4 },
+  ],
+};
+
 export default function MusicStudioPage() {
   const trpc = useTRPC();
   const [mode, setMode] = useState<Mode>("beats");
@@ -232,17 +254,37 @@ export default function MusicStudioPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left controls */}
           <div className="md:col-span-2 space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold flex items-center gap-1.5">
-                <Wand2 className={`h-4 w-4 ${isBeats ? "text-violet-500" : isSong ? "text-indigo-500" : "text-amber-500"}`} />
-                {isBeats ? "Beat Style & Genre" : isSong ? "Music Style & Genre" : "Sound Effect Description"}
-              </label>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold flex items-center gap-1.5">
+                  <Wand2 className={`h-4 w-4 ${isBeats ? "text-violet-500" : isSong ? "text-indigo-500" : "text-amber-500"}`} />
+                  {isBeats ? "Beat Style & Genre" : isSong ? "Music Style & Genre" : "Sound Effect Description"}
+                </label>
+                <span className="text-[11px] text-muted-foreground font-medium">Click a preset below or write custom</span>
+              </div>
               <Input
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={cfg.promptPlaceholder}
-                className="bg-background"
+                className="bg-background h-11 text-sm rounded-xl"
               />
+
+              {/* Quick Genre Preset Chips */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                {GENRE_PRESETS[mode]?.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      setPrompt(preset.prompt);
+                      setDuration(preset.duration);
+                    }}
+                    className="text-[11px] font-medium px-2.5 py-1 rounded-full border border-border/80 bg-background hover:bg-muted/60 hover:border-primary/40 text-foreground transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Lyrics — only for song mode */}
@@ -367,7 +409,7 @@ export default function MusicStudioPage() {
               ) : (
                 <span>
                   {isGenerating
-                    ? `🎵 Generating your ${isBeats ? "beat" : isSong ? "song" : "sound effect"}…`
+                    ? `Generating your ${isBeats ? "beat" : isSong ? "song" : "sound effect"}…`
                     : "Audio player will unlock upon generation."}
                 </span>
               )}
