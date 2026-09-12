@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { parseBuffer } from "music-metadata";
 import { env } from "@/lib/env";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio } from "@/lib/r2";
@@ -12,30 +13,52 @@ export const transcriptionsRouter = createTRPCRouter({
         fileName: z.string().min(1),
         base64Audio: z.string().min(1),
         mimeType: z.string().default("audio/wav"),
+        durationSeconds: z.number().optional(),
         diarize: z.boolean().default(true),
         minSpeakers: z.number().optional(),
         maxSpeakers: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Deduct standard credits for transcription (e.g. 50 credits per transcription)
+      // Convert base64 audio to Buffer
+      const audioBuffer = Buffer.from(input.base64Audio, "base64");
+
+      // Determine audio duration in seconds
+      let durationSec = input.durationSeconds;
+      if (!durationSec || durationSec <= 0) {
+        try {
+          const metadata = await parseBuffer(
+            new Uint8Array(audioBuffer),
+            { mimeType: input.mimeType.split(";")[0]?.trim() || "audio/wav" },
+            { duration: true }
+          );
+          durationSec = metadata.format.duration;
+        } catch {
+          // If unable to parse, fallback to 60 seconds
+          durationSec = 60;
+        }
+      }
+
+      const durationToBill = durationSec || 60;
+      // 15 credits per minute (or fraction thereof), minimum 15 credits
+      const billedMinutes = Math.max(1, Math.ceil(durationToBill / 60));
+      const creditsCost = billedMinutes * 15;
+
+      // Deduct credits based on audio duration
       try {
         await convexClient.mutation(api.credits.deduct, {
           orgId: ctx.orgId,
-          amount: 50,
+          amount: creditsCost,
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "";
         if (msg.includes("INSUFFICIENT_CREDITS")) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Insufficient credits for transcription",
+            message: `Insufficient credits for transcription (requires ${creditsCost} credits for ~${billedMinutes} min)`,
           });
         }
       }
-
-      // Convert base64 audio to Buffer
-      const audioBuffer = Buffer.from(input.base64Audio, "base64");
       const timestamp = Date.now();
       const sanitizedName = input.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
       const audioKey = `transcriptions/orgs/${ctx.orgId}/${timestamp}_${sanitizedName}`;
