@@ -1,5 +1,7 @@
 import { LandingNavbar } from "../components/landing-navbar";
 import { LandingHero } from "../components/landing-hero";
+import { LandingWhy } from "../components/landing-why";
+import { LandingModels } from "../components/landing-models";
 import { LandingBento } from "../components/landing-bento";
 import { LandingVoices } from "../components/landing-voices";
 import { LandingPricing } from "../components/landing-pricing";
@@ -14,6 +16,8 @@ export function LandingView() {
       <LandingNavbar />
       <main>
         <LandingHero />
+        <LandingWhy />
+        <LandingModels />
         <LandingBento />
         <LandingVoices />
         <LandingPricing />
