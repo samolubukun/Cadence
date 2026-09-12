@@ -10,6 +10,7 @@
 
 import type * as credits from "../credits.js";
 import type * as generations from "../generations.js";
+import type * as studio from "../studio.js";
 import type * as transcriptions from "../transcriptions.js";
 import type * as voices from "../voices.js";
 
@@ -22,6 +23,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   credits: typeof credits;
   generations: typeof generations;
+  studio: typeof studio;
   transcriptions: typeof transcriptions;
   voices: typeof voices;
 }>;

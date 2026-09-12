@@ -68,4 +68,42 @@ export default defineSchema({
     orgId: v.string(),
     balance: v.number(),
   }).index("by_orgId", ["orgId"]),
+
+  songs: defineTable({
+    orgId: v.string(),
+    title: v.string(),
+    prompt: v.string(),
+    lyrics: v.optional(v.string()),
+    duration: v.number(),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  }).index("by_orgId", ["orgId"]),
+
+  soundEffects: defineTable({
+    orgId: v.string(),
+    prompt: v.string(),
+    duration: v.number(),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  }).index("by_orgId", ["orgId"]),
+
+  voiceConversions: defineTable({
+    orgId: v.string(),
+    sourceAudioKey: v.optional(v.string()),
+    targetVoiceKey: v.string(),
+    pitchShift: v.number(),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  }).index("by_orgId", ["orgId"]),
+
+  mediaGenerations: defineTable({
+    orgId: v.string(),
+    type: v.union(v.literal("image"), v.literal("video")),
+    prompt: v.string(),
+    aspectRatio: v.optional(v.string()),
+    duration: v.optional(v.number()),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  }).index("by_orgId", ["orgId"]),
 });
+
