@@ -215,10 +215,16 @@ In your [Modal Dashboard](https://modal.com/secrets), configure the required sec
    - `HF_TOKEN`: HuggingFace User Access Token
 
 #### Step C: Deploy the Engines
-Deploy the entire Cadence multi-engine stack:
+Deploy the core Cadence multi-engine stack:
 
 ```bash
 modal deploy cadence_engine.py
+```
+
+Deploy the optional SenseNova-U1.5-8B MoT Studio Visual Engine:
+
+```bash
+modal deploy sensenova_engine.py
 ```
 
 *Modal will output your live service URLs for each engine:*
@@ -226,6 +232,7 @@ modal deploy cadence_engine.py
 - `https://<workspace>--cadence-cadencesoundengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencesongengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencemediaengine-serve.modal.run`
+- `https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run`
 
 ---
 
@@ -262,6 +269,7 @@ CADENCE_API_URL=https://<workspace>--cadence-cadenceaudioengine-serve.modal.run
 CADENCE_SOUND_API_URL=https://<workspace>--cadence-cadencesoundengine-serve.modal.run
 CADENCE_SONG_API_URL=https://<workspace>--cadence-cadencesongengine-serve.modal.run
 CADENCE_MEDIA_API_URL=https://<workspace>--cadence-cadencemediaengine-serve.modal.run
+CADENCE_SENSENOVA_API_URL=https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run
 CADENCE_API_KEY=your_cadence_api_key
 ```
 
@@ -365,7 +373,7 @@ cadence/
 
 ---
 
-## 👨‍💻 Creator
+## Creator
 
 Designed & Built with precision by **[Samuel Olubukun](https://samuelolubukun.com/)**  
 [![Portfolio](https://img.shields.io/badge/Portfolio-samuelolubukun.com-black?style=for-the-badge&logo=google-chrome&logoColor=white)](https://samuelolubukun.com/)
