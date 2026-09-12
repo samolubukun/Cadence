@@ -13,9 +13,10 @@ dotenv.load_dotenv(".env.local")
 dotenv.load_dotenv(".env")
 
 CADENCE_API_URL = os.environ.get("CADENCE_API_URL", "https://samuelolubukun--cadence-cadenceaudioengine-serve.modal.run")
+CADENCE_SOUND_API_URL = os.environ.get("CADENCE_SOUND_API_URL", "https://samuelolubukun--cadence-cadencesoundengine-serve.modal.run")
 CADENCE_SONG_API_URL = os.environ.get("CADENCE_SONG_API_URL", "https://samuelolubukun--cadence-cadencesongengine-serve.modal.run")
 CADENCE_MEDIA_API_URL = os.environ.get("CADENCE_MEDIA_API_URL", "https://samuelolubukun--cadence-cadencemediaengine-serve.modal.run")
-API_KEY = os.environ.get("CADENCE_API_KEY", "cadence-secret-key-2026")
+API_KEY = os.environ.get("CADENCE_API_KEY", "cadence-secret-key")
 
 OUTPUT_DIR = Path("test_output")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -69,7 +70,7 @@ def run_video_gen():
 
 def run_beats_gen():
     print("\n[3a/8] Testing /generate-beats (MusicGen Instrumental Beat)...")
-    url = f"{CADENCE_API_URL}/generate-beats"
+    url = f"{CADENCE_SOUND_API_URL}/generate-beats"
     payload = {
         "prompt": "Dark heavy trap beat 140 BPM with rolling 808 bass, punchy kick, snappy snares and cinematic string chords",
         "duration": 15
@@ -111,7 +112,7 @@ def run_song_gen():
 
 def run_sound_sfx():
     print("\n[4/7] Testing /generate-sound (AudioGen Cyberpunk Hologram SFX)...")
-    url = f"{CADENCE_API_URL}/generate-sound"
+    url = f"{CADENCE_SOUND_API_URL}/generate-sound"
     payload = {
         "prompt": "Futuristic sci-fi holographic interface powering up with crystalline digital chimes and resonant energy hum",
         "duration": 5.0

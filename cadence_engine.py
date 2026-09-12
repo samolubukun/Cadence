@@ -1,17 +1,19 @@
 """Cadence Multi-Modal Generative Engine on Modal.
 
-Three Dedicated Serverless GPU Endpoints:
+Four Dedicated Serverless GPU Endpoints:
 1. CadenceAudioEngine (`CADENCE_API_URL`):
    - Text-to-Speech (TTS) & Zero-Shot Cloning: Resemble AI Chatterbox Turbo
    - Speech-to-Text (STT) & Word Timestamps: OpenAI Whisper large-v3
    - Speech-to-Speech (STS) & Voice Changer: OpenVoice v2
-   - Sound Effects & Foley (SFX): Meta AudioGen (Audiocraft)
-   - Instrumental Beats Generation: Meta MusicGen Melody (Audiocraft)
 
-2. CadenceSongEngine (`CADENCE_SONG_API_URL`):
+2. CadenceSoundEngine (`CADENCE_SOUND_API_URL`):
+   - Sound Effects & Foley (SFX): Meta AudioGen (Audiocraft)
+   - Instrumental Beats & Loops: Meta MusicGen Melody (Audiocraft)
+
+3. CadenceSongEngine (`CADENCE_SONG_API_URL`):
    - Full Vocal Songs with Lyrics & Harmonies: ACE-Step 1.5 Turbo
 
-3. CadenceMediaEngine (`CADENCE_MEDIA_API_URL`):
+4. CadenceMediaEngine (`CADENCE_MEDIA_API_URL`):
    - Photorealistic Image Generation: SDXL-Turbo
    - Text-to-Video Generation: Wan2.1-T2V-1.3B
 
@@ -52,6 +54,7 @@ CACHE_DIR = "/root/.cache/cadence_models"
 # Audio Image (Chatterbox, Whisper, OpenVoice, AudioGen, MusicGen)
 audio_image = (
     modal.Image.debian_slim(python_version="3.11")
+    .env({"PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
     .apt_install(
         "ffmpeg",
         "git",
@@ -107,9 +110,52 @@ audio_image = (
     .pip_install("git+https://github.com/myshell-ai/OpenVoice.git", extra_options="--no-deps")
 )
 
+# Sound Image (Meta AudioGen Foley SFX & Meta MusicGen Instrumental Beats)
+sound_image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .env({"PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
+    .apt_install(
+        "ffmpeg",
+        "git",
+        "libsndfile1",
+        "pkg-config",
+        "libavformat-dev",
+        "libavcodec-dev",
+        "libavdevice-dev",
+        "libavutil-dev",
+        "libswscale-dev",
+        "libswresample-dev",
+        "libavfilter-dev",
+    )
+    .pip_install(
+        "peft==0.18.0",
+        "fastapi[standard]==0.124.4",
+        "python-multipart==0.0.20",
+        "soundfile",
+        "pydantic>=2.0.0",
+        "huggingface_hub",
+        "demucs",
+        "torchmetrics",
+        "encodec",
+        "av",
+        "xformers",
+        "num2words",
+        "spacy",
+        "flashy>=0.0.1",
+        "hydra-core>=1.1",
+        "dora-search",
+        "sentencepiece",
+        "protobuf",
+        "librosa",
+        "pydub",
+    )
+    .pip_install("audiocraft", extra_options="--no-deps")
+)
+
 # Song Generation Image (ACE-Step 1.5 Turbo full vocal tracks)
 song_image = (
     modal.Image.debian_slim(python_version="3.11")
+    .env({"PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
     .apt_install("git", "ffmpeg", "libsndfile1")
     .pip_install("git+https://github.com/ace-step/ACE-Step.git")
     .pip_install(
@@ -125,6 +171,7 @@ song_image = (
 # Media Image (SDXL-Turbo Images + Wan2.1 1.3B Video)
 media_image = (
     modal.Image.debian_slim(python_version="3.11")
+    .env({"PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
     .apt_install("ffmpeg", "git")
     .pip_install(
         "torch",
@@ -199,9 +246,7 @@ class CadenceAudioEngine:
         # 2. OpenAI Whisper large-v3
         self.stt_model = whisper.load_model("large-v3", device=self.device)
 
-        # 3. AudioGen, MusicGen - lazy loaded to save VRAM at startup
-        self.audiogen_model = None
-        self.musicgen_model = None
+        # 3. Tone Color Converter - lazy loaded
         self.tone_converter = None
 
     def _get_tone_converter(self):
@@ -224,17 +269,7 @@ class CadenceAudioEngine:
             self.tone_converter = converter
         return self.tone_converter
 
-    def _get_audiogen(self):
-        if self.audiogen_model is None:
-            from audiocraft.models import AudioGen
-            self.audiogen_model = AudioGen.get_pretrained("facebook/audiogen-medium")
-        return self.audiogen_model
 
-    def _get_musicgen(self):
-        if self.musicgen_model is None:
-            from audiocraft.models import MusicGen
-            self.musicgen_model = MusicGen.get_pretrained("facebook/musicgen-melody")
-        return self.musicgen_model
 
     @modal.asgi_app()
     def serve(self):
@@ -297,19 +332,6 @@ class CadenceAudioEngine:
             text: str
             segments: List[TranscriptionSegment]
 
-        class SoundFXRequest(BaseModel):
-            prompt: str = Field(..., min_length=1, max_length=1000, description="Sound effect prompt")
-            duration: float = Field(default=5.0, ge=1.0, le=30.0)
-
-        class BeatsGenRequest(BaseModel):
-            prompt: str = Field(..., min_length=1, max_length=2000, description="Beat style, tempo, instruments - no vocals")
-            duration: int = Field(default=30, ge=10, le=120, description="Duration in seconds")
-
-        class SongGenRequest(BaseModel):
-            prompt: str = Field(..., min_length=1, max_length=2000, description="Musical genre, tempo, mood, and style tags")
-            lyrics: Optional[str] = Field(default="", description="Structured lyrics with [Verse], [Chorus], etc.")
-            duration: int = Field(default=60, ge=10, le=240, description="Duration in seconds")
-
         class VoiceChangeRequest(BaseModel):
             source_audio_key: Optional[str] = None
             target_voice_key: str = Field(..., description="Target voice profile in R2")
@@ -344,6 +366,11 @@ class CadenceAudioEngine:
                 return StreamingResponse(buffer, media_type="audio/wav")
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Failed to generate audio: {e}")
+            finally:
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
 
         # -------------------------------------------------------------------
         # 2. Speech-to-Text with Timestamps
@@ -418,74 +445,13 @@ class CadenceAudioEngine:
             finally:
                 if temp_path and os.path.exists(temp_path):
                     os.remove(temp_path)
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
 
         # -------------------------------------------------------------------
-        # 3. Sound Effects & Foley (AudioGen)
-        # -------------------------------------------------------------------
-        @web_app.post("/generate-sound", responses={200: {"content": {"audio/wav": {}}}})
-        def generate_sound(request: SoundFXRequest):
-            try:
-                audiogen = self._get_audiogen()
-                audiogen.set_generation_params(duration=request.duration)
-                wav = audiogen.generate([request.prompt])
-                
-                buffer = io.BytesIO()
-                ta.save(buffer, wav[0].cpu(), audiogen.sample_rate, format="wav")
-                buffer.seek(0)
-                return StreamingResponse(buffer, media_type="audio/wav")
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to generate sound effects: {e}")
-
-        # -------------------------------------------------------------------
-        # 4a. Beats & Instrumental Generation (MusicGen)
-        # -------------------------------------------------------------------
-        @web_app.post("/generate-beats", responses={200: {"content": {"audio/wav": {}}}})
-        def generate_beats(request: BeatsGenRequest):
-            """Generate instrumental beats and music using MusicGen.
-            No vocals - pure instrumentation, loops, and soundscapes."""
-            try:
-                musicgen = self._get_musicgen()
-                musicgen.set_generation_params(duration=min(request.duration, 120))
-                wav = musicgen.generate([request.prompt])
-
-                buffer = io.BytesIO()
-                ta.save(buffer, wav[0].cpu(), musicgen.sample_rate, format="wav")
-                buffer.seek(0)
-
-                return StreamingResponse(
-                    buffer,
-                    media_type="audio/wav",
-                    headers={"x-beats-duration": str(request.duration)},
-                )
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to generate beats: {e}")
-
-        # -------------------------------------------------------------------
-        # 4b. Song Generation Fallback (MusicGen)
-        # -------------------------------------------------------------------
-        @web_app.post("/generate-song", responses={200: {"content": {"audio/wav": {}}}})
-        def generate_song_fallback(request: SongGenRequest):
-            """Fallback song generation using MusicGen with lyrics context.
-            For full vocal song generation with ACE-Step 1.5 Turbo, use CadenceSongEngine."""
-            try:
-                musicgen = self._get_musicgen()
-                musicgen.set_generation_params(duration=min(request.duration, 120))
-                lyrics_hint = request.lyrics[:300] if request.lyrics else ""
-                full_prompt = f"{request.prompt}. {lyrics_hint}".strip()
-                wav = musicgen.generate([full_prompt])
-                buffer = io.BytesIO()
-                ta.save(buffer, wav[0].cpu(), musicgen.sample_rate, format="wav")
-                buffer.seek(0)
-                return StreamingResponse(
-                    buffer,
-                    media_type="audio/wav",
-                    headers={"x-song-duration": str(request.duration), "x-model": "musicgen-fallback"},
-                )
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to generate song: {e}")
-
-        # -------------------------------------------------------------------
-        # 5. Speech-to-Speech & Voice Changer (OpenVoice v2 Zero-Shot Tone Color)
+        # 3. Speech-to-Speech & Voice Changer (OpenVoice v2 Zero-Shot Tone Color)
         # -------------------------------------------------------------------
         @web_app.post("/voice-change", responses={200: {"content": {"audio/wav": {}}}})
         async def voice_change(
@@ -557,12 +523,180 @@ class CadenceAudioEngine:
             finally:
                 if temp_source and os.path.exists(temp_source):
                     os.remove(temp_source)
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
 
         return web_app
 
 
 # ===========================================================================
-# 2. CadenceSongEngine (ACE-Step 1.5 Turbo for Full Vocal Songs with Lyrics)
+# 2. CadenceSoundEngine (Meta AudioGen SFX & Meta MusicGen Beats)
+# ===========================================================================
+@app.cls(
+    gpu="a10g",
+    scaledown_window=60 * 5,
+    secrets=[
+        modal.Secret.from_name("hf-token"),
+        modal.Secret.from_name("cadence-api-key"),
+    ],
+    volumes={
+        CACHE_DIR: model_cache_volume,
+    },
+    image=sound_image,
+)
+@modal.concurrent(max_inputs=4)
+class CadenceSoundEngine:
+    @modal.enter()
+    def setup_sound_models(self):
+        import torch
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.audiogen_model = None
+        self.musicgen_model = None
+
+    def _get_audiogen(self):
+        if self.audiogen_model is None:
+            from audiocraft.models import AudioGen
+            self.audiogen_model = AudioGen.get_pretrained("facebook/audiogen-medium")
+        return self.audiogen_model
+
+    def _get_musicgen(self):
+        if self.musicgen_model is None:
+            from audiocraft.models import MusicGen
+            self.musicgen_model = MusicGen.get_pretrained("facebook/musicgen-melody")
+        return self.musicgen_model
+
+    @modal.asgi_app()
+    def serve(self):
+        import io
+        import gc
+        import torch
+        import torchaudio as ta
+        from fastapi import Depends, FastAPI, HTTPException
+        from fastapi.middleware.cors import CORSMiddleware
+        from fastapi.responses import StreamingResponse
+        from pydantic import BaseModel, Field
+
+        verify_api_key = get_auth_verifier()
+
+        sound_app = FastAPI(
+            title="Cadence Sound & Foley Engine",
+            description="Dedicated API for AudioGen SFX Foley and MusicGen Instrumental Beats.",
+            docs_url="/docs",
+            dependencies=[Depends(verify_api_key)],
+        )
+        sound_app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
+        class SoundFXRequest(BaseModel):
+            prompt: str = Field(..., min_length=1, max_length=1000, description="Sound effect prompt")
+            duration: float = Field(default=5.0, ge=1.0, le=30.0)
+
+        class BeatsGenRequest(BaseModel):
+            prompt: str = Field(..., min_length=1, max_length=2000, description="Beat style, tempo, instruments - no vocals")
+            duration: int = Field(default=30, ge=10, le=120, description="Duration in seconds")
+
+        class SongGenRequest(BaseModel):
+            prompt: str = Field(..., min_length=1, max_length=2000, description="Musical genre, tempo, mood, and style tags")
+            lyrics: Optional[str] = Field(default="", description="Structured lyrics with [Verse], [Chorus], etc.")
+            duration: int = Field(default=60, ge=10, le=240, description="Duration in seconds")
+
+        @sound_app.get("/health")
+        def health():
+            return {"status": "ok", "engine": "sound", "models": ["audiogen-medium", "musicgen-melody"]}
+
+        # -------------------------------------------------------------------
+        # 1. Sound Effects & Foley (AudioGen)
+        # -------------------------------------------------------------------
+        @sound_app.post("/generate-sound", responses={200: {"content": {"audio/wav": {}}}})
+        def generate_sound(request: SoundFXRequest):
+            try:
+                import soundfile as sf
+                audiogen = self._get_audiogen()
+                audiogen.set_generation_params(duration=request.duration)
+                wav = audiogen.generate([request.prompt])
+
+                # Convert torch tensor (shape [1, channels, samples] or [channels, samples]) to numpy (samples, channels)
+                audio_np = wav[0].detach().cpu().float().numpy().squeeze(0)
+                buffer = io.BytesIO()
+                sf.write(buffer, audio_np, audiogen.sample_rate, format="WAV")
+                buffer.seek(0)
+                return StreamingResponse(buffer, media_type="audio/wav")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate sound effects: {e}")
+            finally:
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
+        # -------------------------------------------------------------------
+        # 2. Beats & Instrumental Generation (MusicGen)
+        # -------------------------------------------------------------------
+        @sound_app.post("/generate-beats", responses={200: {"content": {"audio/wav": {}}}})
+        def generate_beats(request: BeatsGenRequest):
+            try:
+                import soundfile as sf
+                musicgen = self._get_musicgen()
+                musicgen.set_generation_params(duration=min(request.duration, 120))
+                wav = musicgen.generate([request.prompt])
+
+                audio_np = wav[0].detach().cpu().float().numpy().squeeze(0)
+                buffer = io.BytesIO()
+                sf.write(buffer, audio_np, musicgen.sample_rate, format="WAV")
+                buffer.seek(0)
+
+                return StreamingResponse(
+                    buffer,
+                    media_type="audio/wav",
+                    headers={"x-beats-duration": str(request.duration)},
+                )
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate beats: {e}")
+            finally:
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
+        # -------------------------------------------------------------------
+        # 3. Song Fallback (MusicGen)
+        # -------------------------------------------------------------------
+        @sound_app.post("/generate-song", responses={200: {"content": {"audio/wav": {}}}})
+        def generate_song_fallback(request: SongGenRequest):
+            try:
+                import soundfile as sf
+                musicgen = self._get_musicgen()
+                musicgen.set_generation_params(duration=min(request.duration, 120))
+                lyrics_hint = request.lyrics[:300] if request.lyrics else ""
+                full_prompt = f"{request.prompt}. {lyrics_hint}".strip()
+                wav = musicgen.generate([full_prompt])
+
+                audio_np = wav[0].detach().cpu().float().numpy().squeeze(0)
+                buffer = io.BytesIO()
+                sf.write(buffer, audio_np, musicgen.sample_rate, format="WAV")
+                buffer.seek(0)
+                return StreamingResponse(
+                    buffer,
+                    media_type="audio/wav",
+                    headers={"x-song-duration": str(request.duration), "x-model": "musicgen-fallback"},
+                )
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate song: {e}")
+            finally:
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
+        return sound_app
+
+
+# ===========================================================================
+# 3. CadenceSongEngine (ACE-Step 1.5 Turbo for Full Vocal Songs with Lyrics)
 # ===========================================================================
 @app.cls(
     gpu="a10g",
@@ -658,6 +792,11 @@ class CadenceSongEngine:
                 except Exception:
                     pass
 
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
                 return Response(
                     content=audio_bytes,
                     media_type="audio/wav",
@@ -670,7 +809,7 @@ class CadenceSongEngine:
 
 
 # ===========================================================================
-# 3. CadenceMediaEngine (SDXL-Turbo Photoreal 1024x1024 Images & Wan2.1 Video)
+# 4. CadenceMediaEngine (SDXL-Turbo Photoreal 1024x1024 Images & Wan2.1 Video)
 # ===========================================================================
 @app.cls(
     gpu="a10g",
@@ -799,6 +938,11 @@ class CadenceMediaEngine:
                 return StreamingResponse(buf, media_type="image/png")
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Image generation failed: {e}")
+            finally:
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
 
         # -------------------------------------------------------------------
         # 2. Text-to-Video Synthesis (Wan2.1-T2V-1.3B)
@@ -848,5 +992,10 @@ class CadenceMediaEngine:
                 )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Video generation failed: {e}")
+            finally:
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
 
         return media_app

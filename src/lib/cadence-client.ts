@@ -27,5 +27,14 @@ export const cadenceSong = createClient<any>({
   },
 });
 
+// Sound Client (Meta AudioGen SFX & Meta MusicGen Beats)
+export const cadenceSound = createClient<any>({
+  baseUrl: env.CADENCE_SOUND_API_URL || env.CADENCE_API_URL,
+  headers: {
+    "x-api-key": env.CADENCE_API_KEY,
+  },
+});
+
 // Backward compatibility alias
 export const chatterbox = cadence;
+

@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { cadence, cadenceMedia, cadenceSong } from "@/lib/cadence-client";
+import { cadence, cadenceMedia, cadenceSong, cadenceSound } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio, getSignedAudioUrl } from "@/lib/r2";
 import { createTRPCRouter, orgProcedure } from "../init";
@@ -19,7 +19,7 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { data, error } = await cadence.POST("/generate-beats" as any, {
+      const { data, error } = await cadenceSound.POST("/generate-beats" as any, {
         body: {
           prompt: input.prompt,
           duration: input.duration,
@@ -130,7 +130,7 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { data, error } = await cadence.POST("/generate-sound" as any, {
+      const { data, error } = await cadenceSound.POST("/generate-sound" as any, {
         body: {
           prompt: input.prompt,
           duration: input.duration,

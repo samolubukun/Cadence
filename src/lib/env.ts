@@ -9,6 +9,7 @@ export const env = createEnv({
     R2_SECRET_ACCESS_KEY: z.string().min(1),
     R2_BUCKET_NAME: z.string().min(1),
     CADENCE_API_URL: z.string().url(),
+    CADENCE_SOUND_API_URL: z.string().url().optional(),
     CADENCE_MEDIA_API_URL: z.string().url().optional(),
     CADENCE_SONG_API_URL: z.string().url().optional(),
     CADENCE_API_KEY: z.string().min(1),

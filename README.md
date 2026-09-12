@@ -48,7 +48,7 @@ Cadence is a self-hostable, full-spectrum generative audio, music, and media pla
 
 ## High-Performance Microservice Architecture
 
-Cadence features a clean microservice architecture deployed on serverless NVIDIA A10G GPUs via Modal, split into three decoupled specialized engines:
+Cadence features a clean microservice architecture deployed on serverless NVIDIA A10G GPUs via Modal, split into four decoupled specialized engines:
 
 ```mermaid
 graph TD
@@ -57,6 +57,7 @@ graph TD
     classDef edge fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
     classDef db fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46;
     classDef audioEngine fill:#f5f3ff,stroke:#8e75ff,stroke-width:2px,color:#5b21b6;
+    classDef soundEngine fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e;
     classDef songEngine fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#3730a3;
     classDef mediaEngine fill:#ecfeff,stroke:#06b6d4,stroke-width:2px,color:#0e7490;
 
@@ -71,7 +72,8 @@ graph TD
     end
 
     subgraph Microservices ["Modal Serverless GPU Microservices"]
-        AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS / Cloning)<br/>• Whisper large-v3 (STT Timestamps)<br/>• OpenVoice v2 (Speech-to-Speech)<br/>• AudioGen (SFX / Foley)<br/>• MusicGen (Instrumental Beats)"]
+        AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS / Cloning)<br/>• Whisper large-v3 (STT Timestamps)<br/>• OpenVoice v2 (Speech-to-Speech)"]
+        SoundEng["CadenceSoundEngine<br/>• AudioGen (SFX / Foley)<br/>• MusicGen (Instrumental Beats)"]
         SongEng["CadenceSongEngine<br/>• ACE-Step 1.5 Turbo (Full Vocal Songs)"]
         MediaEng["CadenceMediaEngine<br/>• SDXL-Turbo (Images & Covers)<br/>• Wan2.1 1.3B (Cinematic Video)"]
     end
@@ -80,11 +82,13 @@ graph TD
     TRPC -->|"Audio Stems & Media Uploads"| R2_Store
     TRPC -->|"State, Logs & Credit Accounting"| Convex_DB
 
-    TRPC -->|"TTS, STT, Beats, SFX, Voice Changer"| AudioEng
+    TRPC -->|"TTS, STT, Voice Changer"| AudioEng
+    TRPC -->|"Beats & SFX Foley"| SoundEng
     TRPC -->|"Full Vocal Songs with Lyrics"| SongEng
     TRPC -->|"Cover Art & Video Visualizers"| MediaEng
 
     AudioEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    SoundEng -->|"Weights Cache Mount"| R2_Store
     SongEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
     MediaEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
 
@@ -92,15 +96,17 @@ graph TD
     class TRPC,R2_Store edge;
     class Convex_DB db;
     class AudioEng audioEngine;
+    class SoundEng soundEngine;
     class SongEng songEngine;
     class MediaEng mediaEngine;
 ```
 
 ### Architectural Highlights
-1. **Decoupled Microservice Engines**: Audio processing, song generation, and media generation run in isolated Modal GPU containers with independent dependency stacks and autoscaling.
-2. **Serverless GPU Scale-to-Zero**: Powered by Modal container definitions with `scaledown_window=300` (5 minutes warm stay-alive). Containers scale to 0 when idle ($0.00 cost).
-3. **Zero-Latency R2 Mounting (`modal.CloudBucketMount`)**: Reference voice files and audio assets are mounted at `/r2` directly in the Linux filesystem.
-4. **Reactive State Synchrony**: Built on Convex subscriptions. Generations, billing ledgers, and voice libraries synchronize live without client polling.
+1. **Decoupled Microservice Engines**: Voice synthesis/transcription, sound effects/beats, song composition, and media generation run in isolated Modal GPU containers with independent dependency stacks and dedicated memory boundaries.
+2. **PyTorch VRAM Management & Memory Isolation**: All containers run with `PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"` with explicit `torch.cuda.empty_cache()` and `gc.collect()` in route cleanup blocks, eliminating CUDA memory fragmentation and Out-Of-Memory risks.
+3. **Serverless GPU Scale-to-Zero**: Powered by Modal container definitions with `scaledown_window=300` (5 minutes warm stay-alive). Containers scale to 0 when idle ($0.00 cost).
+4. **Zero-Latency R2 Mounting (`modal.CloudBucketMount`)**: Reference voice files and audio assets are mounted at `/r2` directly in the Linux filesystem.
+5. **Reactive State Synchrony**: Built on Convex subscriptions. Generations, billing ledgers, and voice libraries synchronize live without client polling.
 
 ---
 
@@ -151,11 +157,12 @@ graph TD
 
 ## Modal Microservice Engines: `cadence_engine.py`
 
-Cadence organizes serverless compute into three dedicated microservice engines in [`cadence_engine.py`](file:///c:/Users/USER/Downloads/cadence/cadence_engine.py):
+Cadence organizes serverless compute into four dedicated microservice engines in [`cadence_engine.py`](file:///c:/Users/USER/Downloads/cadence/cadence_engine.py):
 
 | Engine Class | Models Included | GPU / Hardware | Endpoints Hosted |
 | :--- | :--- | :--- | :--- |
-| **`CadenceAudioEngine`** | Chatterbox Turbo, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen | NVIDIA A10G (24GB) | `/generate`, `/transcribe`, `/generate-beats`, `/generate-sound`, `/generate-song`, `/voice-change` |
+| **`CadenceAudioEngine`** | Chatterbox Turbo, Whisper large-v3, OpenVoice v2 | NVIDIA A10G (24GB) | `/generate`, `/transcribe`, `/voice-change` |
+| **`CadenceSoundEngine`** | Meta AudioGen (Audiocraft), Meta MusicGen Melody (Audiocraft) | NVIDIA A10G (24GB) | `/health`, `/generate-sound`, `/generate-beats`, `/generate-song` (fallback) |
 | **`CadenceSongEngine`** | ACE-Step 1.5 Turbo (`torchcodec`) | NVIDIA A10G (24GB) | `/health`, `/generate-song` |
 | **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/generate-image`, `/generate-video` |
 
@@ -165,10 +172,10 @@ Cadence organizes serverless compute into three dedicated microservice engines i
 | :--- | :--- | :---: | :--- | :--- | :--- |
 | `/generate` | Audio | `POST` | `prompt`, `voice_key`, `temperature`, `top_p`, `top_k`, `repetition_penalty` | `audio/wav` | Chatterbox Turbo TTS speech synthesis |
 | `/transcribe` | Audio | `POST` | `multipart/form-data` audio file or `audio_key` | JSON | Multilingual Whisper large-v3 transcription with word-level timestamps |
-| `/generate-beats` | Audio | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
-| `/generate-sound` | Audio | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
 | `/voice-change` | Audio | `POST` | `file` or `source_audio_key`, `target_voice_key`, `pitch_shift` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
-| `/generate-song` | Song | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition |
+| `/generate-sound` | Sound | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
+| `/generate-beats` | Sound | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
+| `/generate-song` | Song / Sound | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition (or MusicGen fallback) |
 | `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio` (1:1, 16:9, 9:16, 4:3), `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
 | `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2–5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
 
@@ -214,6 +221,7 @@ modal deploy cadence_engine.py
 
 *Modal will output your live service URLs for each engine:*
 - `https://<workspace>--cadence-cadenceaudioengine-serve.modal.run`
+- `https://<workspace>--cadence-cadencesoundengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencesongengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencemediaengine-serve.modal.run`
 
@@ -249,6 +257,7 @@ NEXT_PUBLIC_R2_PUBLIC_URL=https://pub-<your-id>.r2.dev
 
 # Modal Microservice Endpoints
 CADENCE_API_URL=https://<workspace>--cadence-cadenceaudioengine-serve.modal.run
+CADENCE_SOUND_API_URL=https://<workspace>--cadence-cadencesoundengine-serve.modal.run
 CADENCE_SONG_API_URL=https://<workspace>--cadence-cadencesongengine-serve.modal.run
 CADENCE_MEDIA_API_URL=https://<workspace>--cadence-cadencemediaengine-serve.modal.run
 CADENCE_API_KEY=your_cadence_api_key
