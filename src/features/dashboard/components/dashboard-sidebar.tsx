@@ -138,11 +138,6 @@ export function DashboardSidebar() {
       icon: Mic2,
     },
     {
-      title: "Sound effects",
-      url: "/sound-fx",
-      icon: Sparkles,
-    },
-    {
       title: "Visuals & Video",
       url: "/media",
       icon: Clapperboard,

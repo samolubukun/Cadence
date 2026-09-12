@@ -131,24 +131,21 @@ graph TD
 - **Dual View Modes**: Seamless toggle between formatted timestamp blocks and clean text copy.
 - **Subtitle Export**: Export transcription directly to `.srt` or `.vtt` format.
 
-### 4. Music Studio (`/music`)
+### 4. Music & Sound Studio (`/music`)
 - **Beats & Instrumentals Mode**: Powered by **Meta MusicGen**. Craft hip-hop loops, electronic dance tracks, jazz chords, ambient soundscapes, or cinematic orchestral beds up to 120 seconds.
 - **Full Song with Vocals Mode**: Powered by **ACE-Step 1.5 Turbo**. Generate complete songs featuring singing, harmonies, verses, and choruses from custom prompts and lyrics up to 240 seconds.
-- **Custom BPM & Duration**: Full control over track length, tempo, and style prompts.
+- **Sound Effects & Foley Mode**: Powered by **Meta AudioGen**. Synthesize photorealistic sound effects, ambient environments, and cinematic Foley from descriptive prompts (1–30s).
+- **Custom Duration & Sliders**: Dedicated length sliders and instant in-studio waveform playback per mode.
 
-### 5. Sound Effects Studio (`/sound-fx`)
-- **Cinematic Foley Generation**: Powered by **Meta AudioGen**. Generate realistic environmental ambience, weapon impacts, sci-fi sounds, natural phenomena, and UI audio effects from descriptive prompts.
-- **Duration Sliders**: Render sound effects from 1 to 30 seconds.
-
-### 6. Voice Changer Studio (`/voice-changer`)
+### 5. Voice Changer Studio (`/voice-changer`)
 - **Zero-Shot Speech-to-Speech**: Powered by **MyShell OpenVoice v2**. Morph voice timbre while preserving exact emotional intonation, pitch dynamics, cadence, and pause timing.
 - **Input & Target Flexibility**: Upload or record source audio and convert it to match any target voice profile.
 
-### 7. Visuals & Video Studio (`/media`)
+### 6. Visuals & Video Studio (`/media`)
 - **Photorealistic Cover Art**: Powered by **Stability AI SDXL-Turbo**. Ultra-fast single-step generative artwork in 1:1, 16:9, or 9:16 aspect ratios.
 - **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
-### 8. Voice Library (`/voices`)
+### 7. Voice Library (`/voices`)
 - **Curated Catalog**: 30 distinct voice personas across narrative, conversational, character, and commercial styles.
 - **Live Audition**: Immediate preview playback for testing voices.
 - **Unified Header & Search**: Streamlined search toolbar and categorized voice counts.
