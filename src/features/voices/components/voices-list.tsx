@@ -45,7 +45,12 @@ export function VoicesList({ title, voices }: VoicesListProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+      <h3 className="text-base font-bold tracking-tight text-foreground flex items-center gap-2">
+        {title}
+        <span className="text-xs font-medium text-muted-foreground px-2 py-0.5 rounded-full bg-muted border border-border/50 font-mono">
+          {voices.length}
+        </span>
+      </h3>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {voices.map((voice) => (
           <VoiceCard key={voice.id} voice={voice} />

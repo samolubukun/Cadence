@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { useQueryState } from "nuqs";
 import { useDebouncedCallback } from "use-debounce";
-import { Search, Sparkles } from "lucide-react";
-
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import {
   InputGroup,
   InputGroupInput,
   InputGroupAddon,
 } from "@/components/ui/input-group";
 import { voicesSearchParams } from "@/features/voices/lib/params";
-import { VoiceCreateDialog } from "./voice-create-dialog";
 
 export function VoicesToolbar() {
   const [query, setQuery] = useQueryState(
@@ -26,49 +22,20 @@ export function VoicesToolbar() {
   );
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-xl lg:text-2xl font-semibold tracking-tight">
-          All Libraries
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Discover your voices, or make your own
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <InputGroup className="lg:max-w-sm">
-            <InputGroupAddon>
-              <Search className="size-4" />
-            </InputGroupAddon>
-            <InputGroupInput
-              placeholder="Search voices..."
-              value={localQuery}
-              onChange={(e) => {
-                setLocalQuery(e.target.value);
-                debouncedSetQuery(e.target.value);
-              }}
-            />
-          </InputGroup>
-          <div className="ml-auto hidden lg:block">
-            <Button size="sm" asChild>
-              <Link href="/voice-clone">
-                <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-                Custom voice
-              </Link>
-            </Button>
-          </div>
-          <div className="lg:hidden">
-            <Button size="sm" className="w-full" asChild>
-              <Link href="/voice-clone">
-                <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-                Custom voice
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="flex items-center justify-between gap-4 pb-2">
+      <InputGroup className="w-full max-w-md bg-card">
+        <InputGroupAddon>
+          <Search className="size-4 text-muted-foreground" />
+        </InputGroupAddon>
+        <InputGroupInput
+          placeholder="Search voices by name, style, or category..."
+          value={localQuery}
+          onChange={(e) => {
+            setLocalQuery(e.target.value);
+            debouncedSetQuery(e.target.value);
+          }}
+        />
+      </InputGroup>
     </div>
   );
 };
