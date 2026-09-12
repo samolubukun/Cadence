@@ -1,11 +1,9 @@
 <div align="center">
 
-
-
 # Cadence
-### Open-Source Generative Voice & Speech Platform
+### Next-Gen Generative Voice, Music, Speech & Media Studio
 
-Fast text-to-speech, zero-shot voice cloning, and speech-to-text with word-level timestamps. Built with **Next.js 16 (React 19)**, **Convex**, **Cloudflare R2**, and **Serverless NVIDIA A10G GPUs via Modal**.
+High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, and generative video visualizers. Built with **Next.js 16 (React 19)**, **Convex**, **Cloudflare R2**, and **Serverless NVIDIA A10G GPUs via Modal**.
 
 <br />
 
@@ -17,7 +15,13 @@ Fast text-to-speech, zero-shot voice cloning, and speech-to-text with word-level
   <img src="https://img.shields.io/badge/Clerk-Organizations-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk" />&nbsp;
   <img src="https://img.shields.io/badge/Cloudflare-R2_Storage-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare R2" />&nbsp;
   <img src="https://img.shields.io/badge/OpenAI-Whisper_v3-412991?style=for-the-badge&logo=openai&logoColor=white" alt="Whisper" />&nbsp;
-  <img src="https://img.shields.io/badge/Chatterbox-Turbo_TTS-10B981?style=for-the-badge&logo=pytorch&logoColor=white" alt="Chatterbox" />
+  <img src="https://img.shields.io/badge/Chatterbox-Turbo_TTS-10B981?style=for-the-badge&logo=pytorch&logoColor=white" alt="Chatterbox" />&nbsp;
+  <img src="https://img.shields.io/badge/ACE--Step-Song_Gen-6366F1?style=for-the-badge&logo=huggingface&logoColor=white" alt="ACE-Step" />&nbsp;
+  <img src="https://img.shields.io/badge/Meta-MusicGen-8B5CF6?style=for-the-badge&logo=meta&logoColor=white" alt="MusicGen" />&nbsp;
+  <img src="https://img.shields.io/badge/Meta-AudioGen-F59E0B?style=for-the-badge&logo=meta&logoColor=white" alt="AudioGen" />&nbsp;
+  <img src="https://img.shields.io/badge/MyShell-OpenVoice_v2-EC4899?style=for-the-badge&logo=github&logoColor=white" alt="OpenVoice" />&nbsp;
+  <img src="https://img.shields.io/badge/Stability-SDXL--Turbo-06B6D4?style=for-the-badge&logo=stabilityai&logoColor=white" alt="SDXL-Turbo" />&nbsp;
+  <img src="https://img.shields.io/badge/Wan-Video_2.1-A855F7?style=for-the-badge&logo=pytorch&logoColor=white" alt="Wan2.1" />
 </p>
 
 </div>
@@ -26,35 +30,25 @@ Fast text-to-speech, zero-shot voice cloning, and speech-to-text with word-level
 
 ## Overview
 
-Cadence is a self-hostable, modern speech platform combining neural text-to-speech, fast zero-shot voice cloning, and multilingual transcription:
+Cadence is a self-hostable, full-spectrum generative audio, music, and media platform:
 
-- **Text-to-Speech (TTS) Studio**: Natural speech generation via Chatterbox Turbo with customizable tone exaggeration, speed pacing, and punctuation pauses.
-- **Zero-Shot Voice Cloning**: Clone any voice in under 3 seconds using a 5-to-15 second reference audio sample, direct microphone recording, or pre-uploaded audio stems.
-- **Speech-to-Text (STT) Studio**: Fast multilingual speech recognition powered by OpenAI Whisper (`large-v3`) delivering synchronized word-level timestamps, duration analytics, and instant one-click transcript exports.
-- **Pre-Seeded Voice Library**: 30 broadcast-quality curated voice personas pre-rendered and stored in Cloudflare R2 with dedicated category tags.
-- **Usage Accounting**: Transparent, real-time credit deduction ledger with automated tenant balances.
-
----
-
-## Why Cadence?
-
-Standard proprietary speech APIs charge high per-character subscription rates, introduce vendor lock-in, and present data privacy risks with private voice recordings.
-
-Here is how **Cadence** compares:
-
-| Capability Dimension | Traditional Third-Party Voice APIs | The Cadence Architecture |
-| :--- | :--- | :--- |
-| **Compute Ownership** | Proprietary SaaS with recurring per-seat and per-minute markups. | **Self-Hosted GPU Cluster**. Deploys directly to your own serverless NVIDIA A10G GPUs via Modal. |
-| **Data Sovereignty & Privacy** | Voice samples and transcripts pass through external servers. | **Private Storage**. Raw audio and custom clone references reside exclusively in your private Cloudflare R2 bucket. |
-| **Voice Cloning Latency** | Slow fine-tuning or queued pipelines taking 30–90 seconds. | **Sub-3s Zero-Shot Synthesis**. Modal GPU mounts R2 natively (`CloudBucketMount`) with warm memory caching. |
-| **Speech-to-Text Alignment** | Separate APIs, fragmented billing, and coarse paragraph-level chunks. | **Word-Level Precision**. Pure PyTorch OpenAI Whisper `large-v3` running on the same GPU cluster with synchronized timestamp scrubbers. |
-| **Cold Starts & Economics** | Pay expensive fixed 24/7 dedicated instances or suffer multi-minute cold starts. | **Scale-to-Zero Serverless**. Spins down to 0 instances when idle, auto-scales on traffic, costs $0.00 when inactive. |
+- **Text-to-Speech (TTS) Studio**: Expressive neural speech synthesis powered by Chatterbox Turbo with dynamic creativity, pacing, style presets (Balanced, Expressive, Steady), and real-time cost estimation.
+- **Zero-Shot Voice Cloning**: Clone any voice in under 3 seconds using a 5-to-15 second reference audio sample, direct microphone recording, or uploaded audio stems.
+- **Speech-to-Text (STT) & Subtitles**: Multilingual speech recognition powered by OpenAI Whisper (`large-v3`) with interactive word-level timestamp scrubbers and subtitle exports (.srt, .vtt).
+- **Music Studio (Beats & Full Songs)**:
+  - **Beats & Instrumentals**: Generate pure instrumental tracks, loops, and synth soundscapes up to 120 seconds powered by **Meta MusicGen**.
+  - **Full Songs with Vocals**: Compose complete songs with custom lyrics, verses, choruses, and singing vocals up to 240 seconds powered by **ACE-Step 1.5 Turbo**.
+- **Sound Effects Studio**: Generate photorealistic Foley effects, cinematic impacts, and ambient soundscapes powered by **Meta AudioGen**.
+- **Voice Changer & Speech-to-Speech**: Zero-shot timbre and pitch conversion powered by **MyShell OpenVoice v2**, preserving original timing, pitch dynamics, and emotion.
+- **Visuals & Video Studio**: Generate high-resolution 1024x1024 album cover art with **SDXL-Turbo** and cinematic motion video visualizers with **Wan2.1 1.3B**.
+- **Curated Voice Library**: Pre-seeded broadcast-quality voice personas with instant preview audition and custom cloned voice management.
+- **Usage Accounting & Multi-Tenancy**: Deterministic credit deduction ledger backed by Convex and Clerk Organizations.
 
 ---
 
-## High-Performance Hybrid Architecture
+## High-Performance Microservice Architecture
 
-Cadence bridges the browser, a reactive real-time database, distributed edge object storage, and serverless GPU workers into a low-latency reactive pipeline:
+Cadence features a clean microservice architecture deployed on serverless NVIDIA A10G GPUs via Modal, split into three decoupled specialized engines:
 
 ```mermaid
 graph TD
@@ -62,105 +56,117 @@ graph TD
     classDef client fill:#f8fafc,stroke:#475569,stroke-width:2px,color:#0f172a;
     classDef edge fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
     classDef db fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46;
-    classDef gpu fill:#f5f3ff,stroke:#8e75ff,stroke-width:2px,color:#5b21b6;
+    classDef audioEngine fill:#f5f3ff,stroke:#8e75ff,stroke-width:2px,color:#5b21b6;
+    classDef songEngine fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#3730a3;
+    classDef mediaEngine fill:#ecfeff,stroke:#06b6d4,stroke-width:2px,color:#155e75;
 
     %% Client Layer
-    User([User / Browser Studio]) -->|1. Text Prompt / Audio Sample| NextApp[Next.js 16 Web Application]
-    NextApp -->|2. Authenticate & Deduct Credits| ConvexDB[(Convex Real-Time Database)]
+    User([User / Browser Studio]) -->|1. Prompts & Audio| NextApp[Next.js 16 Web Application]
+    NextApp -->|2. Deduct Credits & Track Generations| ConvexDB[(Convex Real-Time Database)]
 
-    %% Storage & Ingestion Layer
+    %% Storage
     NextApp -->|3. Presigned PUT Audio| R2[(Cloudflare R2 Bucket 'cadence')]
-    
-    %% Compute & Inference Layer
-    NextApp -->|4. HTTP POST /generate or /transcribe| ModalGateway[Modal API Gateway / FastAPISecure]
-    ModalGateway -->|5. Forward with Auth| GPUInstance[Modal NVIDIA A10G GPU Container]
-    
-    %% GPU Local Mount
-    R2 -.->|Direct Read-Only Mount /r2| GPUInstance
-    GPUInstance -->|Chatterbox Turbo TTS Engine| SynthBuffer[In-Memory WAV Buffer]
-    GPUInstance -->|OpenAI Whisper v3 Model| TranscribeJSON[Word-Level Timestamps JSON]
 
-    %% Real-time Sync Back
-    SynthBuffer -->|6. Stream WAV Back| NextApp
-    TranscribeJSON -->|6. Return Timestamps| NextApp
-    NextApp -->|7. Persist Generation / Transcript Record| ConvexDB
-    NextApp -->|8. Real-time Reactive Playback & Scrubber| User
+    %% Microservice Routing
+    NextApp -->|4a. TTS, STT, SFX, Beats, Voice Changer| AudioEng[CadenceAudioEngine<br/>Chatterbox · Whisper · MusicGen · AudioGen · OpenVoice]
+    NextApp -->|4b. Full Vocal Songs| SongEng[CadenceSongEngine<br/>ACE-Step 1.5 Turbo · torchcodec]
+    NextApp -->|4c. Images & Videos| MediaEng[CadenceMediaEngine<br/>SDXL-Turbo · Wan2.1]
+
+    %% GPU R2 Mount
+    R2 -.->|Direct Read-Only Mount /r2| AudioEng
+    R2 -.->|Direct Read-Only Mount /r2| SongEng
+    R2 -.->|Direct Read-Only Mount /r2| MediaEng
+
+    %% Outputs Back
+    AudioEng -->|Stream Audio / JSON| NextApp
+    SongEng -->|Stream WAV Song| NextApp
+    MediaEng -->|Stream JPG / MP4| NextApp
+    NextApp -->|5. Real-time Reactive Playback & Waveform| User
 
     class User,NextApp client;
     class R2 edge;
     class ConvexDB db;
-    class ModalGateway,GPUInstance,SynthBuffer,TranscribeJSON gpu;
+    class AudioEng audioEngine;
+    class SongEng songEngine;
+    class MediaEng mediaEngine;
 ```
 
 ### Architectural Highlights
-1. **Serverless GPU Scale-to-Zero**: Powered by Modal container definitions with `scaledown_window=300` (5 minutes warm stay-alive). Compute shuts down automatically when inactive.
-2. **Zero-Latency R2 Mounting (`modal.CloudBucketMount`)**: Reference voice files and pre-recorded prompts are mounted at `/r2` directly in the Linux container filesystem, eliminating network download overhead during synthesis.
-3. **Reactive State Synchrony**: Built on Convex subscriptions. Audio generations, credit deducts, and voice libraries synchronize live without manual polling or client refresh.
-4. **Edge Delivery**: Final audio outputs and voice previews stream directly with low latency and can be scrubbed in real-time.
+1. **Decoupled Microservice Engines**: Audio processing, song generation, and media generation run in isolated Modal GPU containers with independent dependency stacks and autoscaling.
+2. **Serverless GPU Scale-to-Zero**: Powered by Modal container definitions with `scaledown_window=300` (5 minutes warm stay-alive). Containers scale to 0 when idle ($0.00 cost).
+3. **Zero-Latency R2 Mounting (`modal.CloudBucketMount`)**: Reference voice files and audio assets are mounted at `/r2` directly in the Linux filesystem.
+4. **Reactive State Synchrony**: Built on Convex subscriptions. Generations, billing ledgers, and voice libraries synchronize live without client polling.
 
 ---
 
 ## Core Product Studios
 
 ### 1. Text-to-Speech Studio (`/text-to-speech`)
-- **Neural Speech Generation**: High-fidelity audio synthesis from arbitrary text inputs.
-- **Voice Selection Drawer**: Switch between 20 canonical system personas or your own custom cloned voices.
-- **Expressive Controls**: Adjust pitch exaggeration, pacing, and speech tempo dynamically.
-- **Integrated Audio Player**: Scrubbable waveform player with speed toggles (0.5x to 2x), looping, and instant MP3/WAV download.
+- **Neural Speech Generation**: High-fidelity speech synthesis powered by Chatterbox Turbo.
+- **Redesigned Input Card**: Spacious text editor with character counter, real-time cost estimation (`$0.0000 est.`), and quick "Clear" and "New" actions.
+- **Style Presets**: 1-click presets (**Balanced**, **Expressive**, **Steady**) that automatically configure temperature, top-p, and penalties.
+- **Audio Dynamics Controls**: Fine-tune Creativity, Voice Variety, Expression Range, and Natural Flow with live numerical value badges and a 1-click **Reset defaults** button.
+- **Generation History with Search**: Instant keyword search, active clip highlighting ("Playing" badge), and voice metadata.
+- **Compacted Audio Preview**: Streamlined waveform player with scrubber, 10s seek forward/backward, time counter, and one-click download.
 
 ### 2. Dedicated Voice Cloning Studio (`/voice-clone`)
-- **Zero-Shot Voice Cloning**: Create a permanent, personalized voice model from a single audio sample (5–15 seconds recommended).
-- **Flexible Ingestion**: Upload studio audio (`WAV`, `MP3`, `M4A`, `FLAC`) or record live speech directly via the built-in browser microphone recorder.
-- **Cloud Storage Persistence**: Audio stems are validated, uploaded directly to Cloudflare R2, and cataloged in Convex under your organization.
+- **Zero-Shot Voice Cloning**: Create permanent, personalized voice profiles from a 5–15 second audio sample without model retraining.
+- **Flexible Ingestion**: Upload audio (`WAV`, `MP3`, `M4A`, `FLAC`) or record live speech directly using the built-in microphone recorder.
+- **Cloud Persistence**: Voice profiles are cataloged in Convex and stored in Cloudflare R2 under your organization.
 
-### 3. Speech-to-Text & Transcription Studio (`/transcribe`)
-- **Multilingual Whisper Engine**: Transcribes long-form or short-form speech files using OpenAI Whisper `large-v3`.
-- **Synchronized Word-Level Timestamps**: Click any individual word or sentence block to jump the audio player scrubber directly to that exact millisecond.
-- **Dual View Modes**: Toggle seamlessly between **Structured Timestamps** view and **Clean Normal Text** view.
-- **One-Click Clipboard Export**: Copy entire formatted transcripts with a single click.
+### 3. Speech-to-Text & Subtitles Studio (`/transcribe`)
+- **Multilingual Whisper Engine**: Transcribe spoken audio using OpenAI Whisper `large-v3`.
+- **Word-Level Timestamps**: Synchronized interactive timestamps that jump the audio scrubber directly to specific words upon clicking.
+- **Dual View Modes**: Seamless toggle between formatted timestamp blocks and clean text copy.
+- **Subtitle Export**: Export transcription directly to `.srt` or `.vtt` format.
 
-### 4. Voice Explorer (`/voices`)
-- **Curated System Library**: 20 distinct voice personas across narrative, commercial, podcast, cinematic, and conversational styles.
-- **Live Audition**: One-click preview players to test voices before generating content.
-- **Community & Custom Tabs**: Segment between platform voices and your organization's custom cloned voices.
+### 4. Music Studio (`/music`)
+- **Beats & Instrumentals Mode**: Powered by **Meta MusicGen**. Craft hip-hop loops, electronic dance tracks, jazz chords, ambient soundscapes, or cinematic orchestral beds up to 120 seconds.
+- **Full Song with Vocals Mode**: Powered by **ACE-Step 1.5 Turbo**. Generate complete songs featuring singing, harmonies, verses, and choruses from custom prompts and lyrics up to 240 seconds.
+- **Custom BPM & Duration**: Full control over track length, tempo, and style prompts.
 
----
+### 5. Sound Effects Studio (`/sound-fx`)
+- **Cinematic Foley Generation**: Powered by **Meta AudioGen**. Generate realistic environmental ambience, weapon impacts, sci-fi sounds, natural phenomena, and UI audio effects from descriptive prompts.
+- **Duration Sliders**: Render sound effects from 1 to 30 seconds.
 
-## The Modal Audio Engine: `cadence_engine.py`
+### 6. Voice Changer Studio (`/voice-changer`)
+- **Zero-Shot Speech-to-Speech**: Powered by **MyShell OpenVoice v2**. Morph voice timbre while preserving exact emotional intonation, pitch dynamics, cadence, and pause timing.
+- **Input & Target Flexibility**: Upload or record source audio and convert it to match any target voice profile.
 
-Cadence runs on a unified serverless GPU engine: [`cadence_engine.py`](file:///c:/Users/USER/Downloads/cadence/cadence_engine.py).
+### 7. Visuals & Video Studio (`/media`)
+- **4K Album Cover Art**: Powered by **Stability AI SDXL-Turbo**. Ultra-fast single-step generative artwork in 1:1, 16:9, or 9:16 aspect ratios.
+- **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
-### Dual-Engine Intelligence Architecture
-Cadence fuses two state-of-the-art open models into a unified serverless GPU execution context:
-1. **Resemble AI Chatterbox Turbo (TTS & Zero-Shot Cloning)**:
-   - High-throughput autoregressive speech synthesis with flow-matching vocoder conditioning.
-   - Generates broadcast-grade 24kHz audio from minimal 5-second reference audio prompts without requiring model fine-tuning.
-   - Native controls for prompt pacing, repetition penalty, and pitch exaggeration.
-2. **OpenAI Whisper `large-v3` (Speech-to-Text & Word Timestamps)**:
-   - Multilingual acoustic transformer executed in pure PyTorch CUDA (`fp16`).
-   - Generates exact word-level bounding timestamps and confidence scores used by Cadence's real-time interactive scrubber.
-3. **Zero-Overhead Edge Object Store**:
-   - Both models interface with Cloudflare R2 via Modal's direct `modal.CloudBucketMount` at `/r2`, eliminating network download steps prior to inference.
-
-### API Endpoints
-| Endpoint | Method | Input | Output | Description |
-| :--- | :---: | :--- | :--- | :--- |
-| `/health` | `GET` | None | JSON status | Engine liveness and GPU readiness check |
-| `/generate` | `POST` | `prompt`, `voice_name`, `exaggeration`, `pace` | `audio/wav` Stream | Generates speech using canonical or custom cloned voice |
-| `/transcribe` | `POST` | `multipart/form-data` audio file | JSON with word timestamps | Transcribes speech and returns word-level intervals |
+### 8. Voice Library (`/voices`)
+- **Curated Catalog**: 30 distinct voice personas across narrative, conversational, character, and commercial styles.
+- **Live Audition**: Immediate preview playback for testing voices.
+- **Unified Header & Search**: Streamlined search toolbar and categorized voice counts.
 
 ---
 
-## Operation-Aware Credit Accounting
+## Modal Microservice Engines: `cadence_engine.py`
 
-Cadence features an automated, deterministic credit ledger to prevent abuse and meter GPU compute fairly:
+Cadence organizes serverless compute into three dedicated microservice engines in [`cadence_engine.py`](file:///c:/Users/USER/Downloads/cadence/cadence_engine.py):
 
-| Operation | Base Cost | Deduct Formula | Example |
-| :--- | :---: | :--- | :--- |
-| **New Organization Onboarding** | **+10,000 credits** | Automatic signup grant | Free starter tier |
-| **Text-to-Speech Synthesis** | 1 credit / character | `len(prompt)` characters | 250-character script = **250 credits** |
-| **Speech-to-Text Transcription** | 50 credits / job | Flat compute unit per audio file | 2-minute interview = **50 credits** |
-| **Custom Voice Cloning** | 500 credits / voice | Flat creation fee | Create new custom voice = **500 credits** |
+| Engine Class | Models Included | GPU / Hardware | Endpoints Hosted |
+| :--- | :--- | :--- | :--- |
+| **`CadenceAudioEngine`** | Chatterbox Turbo, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen | NVIDIA A10G (24GB) | `/health`, `/generate`, `/transcribe`, `/generate-music`, `/generate-sound-fx`, `/convert-voice` |
+| **`CadenceSongEngine`** | ACE-Step 1.5 Turbo (`torchcodec`) | NVIDIA A10G (24GB) | `/health`, `/generate-song` |
+| **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/health`, `/generate-image`, `/generate-video` |
+
+### API Endpoints Reference
+
+| Endpoint | Engine | Method | Input Parameters | Output | Description |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `/health` | All | `GET` | None | JSON | Engine liveness and GPU readiness check |
+| `/generate` | Audio | `POST` | `prompt`, `voice_name`, `temperature`, `top_p`, `top_k`, `repetition_penalty` | `audio/wav` | TTS speech synthesis |
+| `/transcribe` | Audio | `POST` | `multipart/form-data` audio file | JSON | Multilingual Whisper transcription with timestamps |
+| `/generate-music` | Audio | `POST` | `prompt`, `duration` (1–120s) | `audio/wav` | Meta MusicGen instrumental beat generation |
+| `/generate-sound-fx` | Audio | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen sound effect generation |
+| `/convert-voice` | Audio | `POST` | `source_audio` (base64/file), `target_voice` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
+| `/generate-song` | Song | `POST` | `prompt`, `lyrics`, `duration` (5–240s) | `audio/wav` | ACE-Step 1.5 full vocal track composition |
+| `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio` | `image/jpeg` | SDXL-Turbo album art generation |
+| `/generate-video` | Media | `POST` | `prompt`, `duration` | `video/mp4` | Wan2.1 video visualizer generation |
 
 ---
 
@@ -176,7 +182,7 @@ Cadence features an automated, deterministic credit ledger to prevent abuse and 
 
 ---
 
-### 2. Deploy the Modal GPU Engine
+### 2. Deploy Modal GPU Microservices
 
 #### Step A: Install and Authenticate Modal
 ```bash
@@ -185,29 +191,31 @@ modal setup
 ```
 
 #### Step B: Configure Modal Secrets
-In your [Modal Dashboard](https://modal.com/secrets), create the required secrets:
+In your [Modal Dashboard](https://modal.com/secrets), configure the required secrets:
 
 1. **`cloudflare-r2`**:
-   - `AWS_ACCESS_KEY_ID`: Your Cloudflare R2 Access Key ID
-   - `AWS_SECRET_ACCESS_KEY`: Your Cloudflare R2 Secret Access Key
+   - `AWS_ACCESS_KEY_ID`: Cloudflare R2 Access Key ID
+   - `AWS_SECRET_ACCESS_KEY`: Cloudflare R2 Secret Access Key
 2. **`cadence-api-key`**:
    - `CADENCE_API_KEY`: A secure random secret key (e.g. `cadence_secret_...`)
-3. **`hf-token`** *(Optional/Recommended)*:
-   - `HF_TOKEN`: HuggingFace User Access Token (to download Chatterbox model weights)
+3. **`hf-token`** *(Recommended)*:
+   - `HF_TOKEN`: HuggingFace User Access Token
 
-#### Step C: Deploy the Engine
-Run the deployment command pointing to [`cadence_engine.py`](file:///c:/Users/USER/Downloads/cadence/cadence_engine.py):
+#### Step C: Deploy the Engines
+Deploy the entire Cadence multi-engine stack:
 
 ```bash
 modal deploy cadence_engine.py
 ```
 
-*Modal will output your live URL, e.g.:*
-`https://<your-workspace>--cadence-cadence-engine-serve.modal.run`
+*Modal will output your live service URLs for each engine:*
+- `https://<workspace>--cadence-cadenceaudioengine-serve.modal.run`
+- `https://<workspace>--cadence-cadencesongengine-serve.modal.run`
+- `https://<workspace>--cadence-cadencemediaengine-serve.modal.run`
 
 ---
 
-### 3. Configure Frontend & Convex Environment
+### 3. Configure Frontend Environment
 
 Create `.env.local` in the project root:
 
@@ -215,13 +223,13 @@ Create `.env.local` in the project root:
 cp .env.example .env.local
 ```
 
-Populate the required environment keys:
+Populate the required environment variables:
 
 ```env
 # Next.js Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Clerk Authentication (Enable Organizations in Clerk Dashboard)
+# Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 
@@ -235,15 +243,17 @@ R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
 R2_BUCKET_NAME=cadence
 NEXT_PUBLIC_R2_PUBLIC_URL=https://pub-<your-id>.r2.dev
 
-# Modal Audio Engine Backend
-CADENCE_API_URL=https://<your-workspace>--cadence-cadence-engine-serve.modal.run
+# Modal Microservice Endpoints
+CADENCE_API_URL=https://<workspace>--cadence-cadenceaudioengine-serve.modal.run
+CADENCE_SONG_API_URL=https://<workspace>--cadence-cadencesongengine-serve.modal.run
+CADENCE_MEDIA_API_URL=https://<workspace>--cadence-cadencemediaengine-serve.modal.run
 CADENCE_API_KEY=your_cadence_api_key
 ```
 
 Sync environment variables with your Convex cloud deployment:
 
 ```bash
-npx convex env set CADENCE_API_URL https://<your-workspace>--cadence-cadence-engine-serve.modal.run
+npx convex env set CADENCE_API_URL https://<workspace>--cadence-cadenceaudioengine-serve.modal.run
 npx convex env set CADENCE_API_KEY your_cadence_api_key
 ```
 
@@ -251,22 +261,17 @@ npx convex env set CADENCE_API_KEY your_cadence_api_key
 
 ### 4. Seed Canonical System Voices
 
-Cadence comes with 20 pre-configured canonical system personas. Seed their metadata into Convex and audio assets into R2:
+Seed the 30 canonical voice personas into Convex and R2:
 
 ```bash
 npx tsx scripts/seed-canonical-voices.ts
-```
-
-*(Optional)* To re-generate custom preview clips saying *"Hello! I am [Voice], powered by Cadence"*:
-```bash
-npx tsx scripts/regenerate-explore-voices.ts
 ```
 
 ---
 
 ### 5. Launch Development Server
 
-Start both the Convex real-time sync process and Next.js Turbopack development server:
+Start the Convex data sync process and Next.js development server:
 
 ```bash
 # Terminal 1: Convex Data Sync
@@ -276,7 +281,17 @@ npx convex dev
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to access the Cadence workspace.
+Open [http://localhost:3000](http://localhost:3000) to launch Cadence.
+
+---
+
+### 6. Verify All Live Endpoints
+
+Run the automated endpoint test suite to verify all live Modal services:
+
+```bash
+python scripts/run_all_endpoints_test.py
+```
 
 ---
 
@@ -284,9 +299,10 @@ Open [http://localhost:3000](http://localhost:3000) to access the Cadence worksp
 
 ```
 cadence/
-├── cadence_engine.py           # Modal serverless GPU backend (Chatterbox Turbo TTS + OpenAI Whisper v3)
-├── convex/                     # Convex reactive backend
-│   ├── schema.ts               # Database schema (users, organizations, generations, voices, billing)
+├── cadence_engine.py           # Modal serverless GPU microservices (Audio, Song, Media)
+├── convex/                     # Convex reactive database
+│   ├── schema.ts               # Tables: users, organizations, generations, voices, studio
+│   ├── studio.ts               # Music, SFX, Voice Changer, and Media mutations
 │   ├── voices.ts               # Voice queries, canonical catalog, and custom voice mutations
 │   ├── speechToText.ts         # Whisper transcription mutation & timestamp ingestion
 │   ├── textToSpeech.ts         # Audio generation orchestration & credit checks
@@ -294,37 +310,44 @@ cadence/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── (dashboard)/        # Authenticated workspace layout
-│   │   │   ├── page.tsx        # Dashboard metrics and recent activity
-│   │   │   ├── text-to-speech/ # TTS studio view
+│   │   │   ├── text-to-speech/ # Upgraded TTS studio view & generation playback
 │   │   │   ├── transcribe/     # Whisper STT studio with timestamp scrubber
+│   │   │   ├── music/          # Music Studio (MusicGen beats & ACE-Step songs)
+│   │   │   ├── sound-fx/       # Sound FX Studio (AudioGen Foley)
+│   │   │   ├── voice-changer/  # Voice Changer Studio (OpenVoice v2)
+│   │   │   ├── media/          # Visuals & Video Studio (SDXL & Wan2.1)
 │   │   │   ├── voices/         # System & custom voice library
 │   │   │   ├── voice-clone/    # Dedicated voice cloning studio
 │   │   │   └── billing/        # Usage history & credit balance
 │   │   └── api/                # Edge API routes & audio streaming proxy
 │   ├── features/               # Modular domain feature components
-│   │   ├── text-to-speech/     # TTS player, prompt editor, voice drawer
+│   │   ├── text-to-speech/     # TTS editor, presets, sliders, history search, audio preview
 │   │   ├── speech-to-text/     # Whisper waveform scrubber & timestamp block renderer
 │   │   ├── voices/             # Voice card grid, category filters, audition players
 │   │   ├── voice-clone/        # Audio stem recorder, upload dropzone, clone wizard
-│   │   └── billing/            # Credit balance widgets & invoice history
+│   │   └── dashboard/          # Sidebar navigation and workspace overview
 │   ├── lib/                    # Storage, R2 S3 client, Convex clients, env schema
-│   └── trpc/                   # End-to-end typed RPC routers and client
-└── scripts/                    # Voice seeding and audio regeneration utilities
+│   └── trpc/                   # End-to-end typed RPC routers (voices, generations, studio)
+└── scripts/                    # Voice seeding and comprehensive Modal endpoint test suite
 ```
 
 ---
 
 ## License & Acknowledgements
 
-- **[VCTK Corpus Dataset](https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data)**: Voice Cloning Toolkit corpus (CSTR Edinburgh) used for the curated Cadence reference voice catalog.
 - **[Chatterbox TTS](https://github.com/resemble-ai/chatterbox)** by Resemble AI: Open-source zero-shot voice synthesis.
 - **[OpenAI Whisper](https://github.com/openai/whisper)**: State-of-the-art multilingual speech recognition.
-- **[Modal](https://modal.com)**: Serverless NVIDIA A10G GPU orchestration and auto-scaling infrastructure.
+- **[ACE-Step 1.5](https://huggingface.co/spaces/ACE-Studio/ACE-Step)**: Full vocal song generation model.
+- **[Meta MusicGen & AudioGen](https://github.com/facebookresearch/audiocraft)** by Meta AI: Instrumental music composition and Foley sound effects synthesis.
+- **[MyShell OpenVoice](https://github.com/myshell-ai/OpenVoice)**: Zero-shot speech-to-speech voice conversion.
+- **[Stability AI SDXL-Turbo](https://huggingface.co/stabilityai/sdxl-turbo)**: Real-time photorealistic text-to-image synthesis.
+- **[Wan2.1](https://github.com/Wan-Video/Wan2.1)**: State-of-the-art open generative video model.
+- **[Modal](https://modal.com)**: Serverless NVIDIA A10G GPU orchestration and auto-scaling.
 - **[Convex](https://convex.dev)**: Reactive real-time state database.
-- **[Clerk](https://clerk.com)**: Secure identity and multi-tenant organization management.
+- **[Clerk](https://clerk.com)**: Identity and multi-tenant organization management.
 
 ---
 
 <p align="center">
-  <sub>Built for reliable, high-performance, private generative voice & speech intelligence.</sub>
+  <sub>Built for reliable, high-performance, private generative voice, music, speech & media intelligence.</sub>
 </p>
