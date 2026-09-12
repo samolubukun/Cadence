@@ -202,7 +202,7 @@ export function PageHeader({ title, className, children }: PageHeaderProps) {
       });
     }
 
-    // 4. System status — always show engine readiness
+    // 4. System status - always show engine readiness
     items.push({
       id: "system-engine",
       category: "system",

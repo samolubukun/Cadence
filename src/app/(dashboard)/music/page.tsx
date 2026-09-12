@@ -34,7 +34,7 @@ const MODE_CONFIG = {
     badge: "MusicGen · No Vocals",
     badgeColor: "bg-violet-500/10 text-violet-400",
     description:
-      "Generate pure instrumental beats, loops, and soundscapes — no vocals. Powered by Meta MusicGen.",
+      "Generate pure instrumental beats, loops, and soundscapes (no vocals). Powered by Meta MusicGen.",
     promptPlaceholder:
       "e.g. Trap beat 140 BPM dark orchestral strings, lo-fi hip hop with vinyl crackle, chill synthwave groove...",
     defaultPrompt: "Dark trap beat 140 BPM with orchestral strings and 808 bass",
@@ -287,14 +287,14 @@ export default function MusicStudioPage() {
               </div>
             </div>
 
-            {/* Lyrics — only for song mode */}
+            {/* Lyrics - only for song mode */}
             {isSong && (
               <div className="space-y-2">
                 <label className="text-sm font-semibold flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4 text-indigo-500" />
                   Lyrics &amp; Structure
                   <span className="text-xs text-muted-foreground font-normal ml-1">
-                    (optional — leave blank for instrumental arrangement)
+                    (optional - leave blank for instrumental arrangement)
                   </span>
                 </label>
                 <Textarea
@@ -359,7 +359,7 @@ export default function MusicStudioPage() {
             </Button>
           </div>
 
-          {/* Right — player card */}
+          {/* Right - player card */}
           <div className="rounded-xl border bg-card p-6 flex flex-col justify-between gap-6">
             <div className="space-y-4 text-center">
               <div

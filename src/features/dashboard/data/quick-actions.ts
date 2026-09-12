@@ -10,13 +10,13 @@ export const quickActions: QuickAction[] = [
     title: "Narrate a Story",
     description: "Bring characters to life with expressive AI narration",
     gradient: "from-cyan-400 to-cyan-50",
-    href: "/text-to-speech?text=In a village tucked between mist-covered mountains, there lived an old clockmaker whose clocks never told the right time — but they always told the truth. One rainy evening, a stranger walked in and asked for a clock that could show him his future.",
+    href: "/text-to-speech?text=In a village tucked between mist-covered mountains, there lived an old clockmaker whose clocks never told the right time, but they always told the truth. One rainy evening, a stranger walked in and asked for a clock that could show him his future.",
   },
   {
     title: "Record an Ad",
     description: "Create professional advertisements with lifelike AI voices",
     gradient: "from-pink-400 to-pink-100",
-    href: "/text-to-speech?text=Introducing BrightBean Coffee — the smoothest roast you'll ever taste. Sourced from high-altitude farms, slow-roasted to perfection, and delivered fresh to your door every single week. Wake up to something extraordinary. Try BrightBean today and get your first bag free.",
+    href: "/text-to-speech?text=Introducing BrightBean Coffee: the smoothest roast you'll ever taste. Sourced from high-altitude farms, slow-roasted to perfection, and delivered fresh to your door every single week. Wake up to something extraordinary. Try BrightBean today and get your first bag free.",
   },
   {
     title: "Direct a Movie Scene",
@@ -34,7 +34,7 @@ export const quickActions: QuickAction[] = [
     title: "Introduce Your Podcast",
     description: "Hook your listeners from the very first second",
     gradient: "from-blue-500 to-blue-100",
-    href: "/text-to-speech?text=Hey everyone, welcome back to another episode of The Curious Mind — the podcast where we dig into the stories, science, and strange ideas that shape our world. I'm your host, and today we have an incredible guest who's going to challenge everything you thought you knew.",
+    href: "/text-to-speech?text=Hey everyone, welcome back to another episode of The Curious Mind - the podcast where we dig into the stories, science, and strange ideas that shape our world. I'm your host, and today we have an incredible guest who's going to challenge everything you thought you knew.",
   },
   {
     title: "Guide a Meditation",

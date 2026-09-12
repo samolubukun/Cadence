@@ -16,7 +16,7 @@ const PROMPT_SUGGESTIONS: {
   {
     label: "Story narration",
     prompt:
-      "In a village tucked between mist-covered mountains, there lived an old clockmaker whose clocks never told the right time — but they always told the truth. One rainy evening, a stranger walked in and asked for a clock that could show him his future.",
+      "In a village tucked between mist-covered mountains, there lived an old clockmaker whose clocks never told the right time - but they always told the truth. One rainy evening, a stranger walked in and asked for a clock that could show him his future.",
     icon: BookOpen,
   },
   {
@@ -28,7 +28,7 @@ const PROMPT_SUGGESTIONS: {
   {
     label: "Podcast intro",
     prompt:
-      "Hey everyone, welcome back to another episode of The Curious Mind — the podcast where we dig into the stories, science, and strange ideas that shape our world. I'm your host, and today we have an incredible guest who's going to challenge everything you thought you knew.",
+      "Hey everyone, welcome back to another episode of The Curious Mind - the podcast where we dig into the stories, science, and strange ideas that shape our world. I'm your host, and today we have an incredible guest who's going to challenge everything you thought you knew.",
     icon: Podcast,
   },
 ];
