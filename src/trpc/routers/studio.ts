@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { cadence, cadenceMedia, cadenceSong, cadenceSound } from "@/lib/cadence-client";
+import { cadence, cadenceMedia, cadenceSenseNova, cadenceSong, cadenceSound } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio, getSignedAudioUrl } from "@/lib/r2";
 import { createTRPCRouter, orgProcedure } from "../init";
@@ -304,7 +304,7 @@ export const studioRouter = createTRPCRouter({
       const conversionId = await convexClient.mutation(api.studio.createVoiceConversion, {
         orgId: ctx.orgId,
         sourceAudioKey: input.sourceAudioKey,
-        targetVoiceKey: input.targetVoiceKey,
+        targetVoiceKey: input.targetVoiceKey || "",
         pitchShift: input.pitchShift,
         status: "completed",
       });
@@ -338,38 +338,71 @@ export const studioRouter = createTRPCRouter({
       z.object({
         prompt: z.string().min(1).max(2000),
         aspectRatio: z.string().default("1:1"),
+        model: z.enum(["sdxl-turbo", "sensenova"]).default("sdxl-turbo"),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // Deduct 20 credits for image generation
+      const isSenseNova = input.model === "sensenova";
+      const creditCost = isSenseNova ? 50 : 20;
+
+      // Deduct credits based on selected model tier
       try {
         await convexClient.mutation(api.credits.deduct, {
           orgId: ctx.orgId,
-          amount: 20,
+          amount: creditCost,
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "";
         if (msg.includes("INSUFFICIENT_CREDITS")) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Insufficient credits for image generation (requires 20 credits)",
+            message: `Insufficient credits for ${isSenseNova ? "SenseNova Studio Quality (requires 50 credits)" : "image generation (requires 20 credits)"}`,
           });
         }
       }
 
-      const { data, error } = await cadenceMedia.POST("/generate-image", {
-        body: {
-          prompt: input.prompt,
-          aspect_ratio: input.aspectRatio,
-        },
-        parseAs: "arrayBuffer",
-      });
+      let imageBuffer: Buffer;
 
-      if (error || !(data instanceof ArrayBuffer)) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to generate image",
+      if (isSenseNova) {
+        // SenseNova-U1.5-8B MoT Advanced Studio Engine
+        const res = await cadenceSenseNova.POST("/generate", {
+          body: {
+            action: "generate",
+            prompt: input.prompt,
+            aspect_ratio: input.aspectRatio,
+            quality: "standard",
+            num_steps: 28,
+            cfg_scale: 4.0,
+            timestep_shift: 3.0,
+          },
         });
+
+        if (res.error || !res.data || !res.data.image_base64) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate image via SenseNova U1.5 engine",
+          });
+        }
+
+        imageBuffer = Buffer.from(res.data.image_base64, "base64");
+      } else {
+        // Standard SDXL-Turbo Fast Engine
+        const { data, error } = await cadenceMedia.POST("/generate-image", {
+          body: {
+            prompt: input.prompt,
+            aspect_ratio: input.aspectRatio,
+          },
+          parseAs: "arrayBuffer",
+        });
+
+        if (error || !(data instanceof ArrayBuffer)) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate image via SDXL-Turbo",
+          });
+        }
+
+        imageBuffer = Buffer.from(data);
       }
 
       const mediaId = await convexClient.mutation(api.studio.createMediaGeneration, {
@@ -383,7 +416,7 @@ export const studioRouter = createTRPCRouter({
       const r2Key = `media/orgs/${ctx.orgId}/${mediaId}.png`;
       await uploadAudio({
         key: r2Key,
-        buffer: Buffer.from(data),
+        buffer: imageBuffer,
         contentType: "image/png",
       });
 

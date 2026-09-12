@@ -16,6 +16,7 @@ export default function MediaStudioPage() {
   const [imagePrompt, setImagePrompt] = useState("Cyberpunk neon vinyl album art with glowing typography CADENCE");
   const [videoPrompt, setVideoPrompt] = useState("Cinematic slow motion fluid sound waves pulsing in deep cosmic space");
   const [aspectRatio, setAspectRatio] = useState("1:1");
+  const [imageModel, setImageModel] = useState<"sdxl-turbo" | "sensenova">("sdxl-turbo");
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeMediaUrl, setActiveMediaUrl] = useState<{ url: string; type: "image" | "video" } | null>(null);
 
@@ -28,11 +29,15 @@ export default function MediaStudioPage() {
     if (!imagePrompt.trim()) return;
     setIsGenerating(true);
     try {
-      toast.info("Rendering 1024x1024 visual on Modal GPU via SDXL-Turbo…");
-      const res = await imageMutation.mutateAsync({ prompt: imagePrompt, aspectRatio });
+      if (imageModel === "sensenova") {
+        toast.info("Rendering studio-quality visual via SenseNova-U1.5-8B MoT (Modal GPU)…");
+      } else {
+        toast.info("Rendering 1024x1024 visual on Modal GPU via SDXL-Turbo…");
+      }
+      const res = await imageMutation.mutateAsync({ prompt: imagePrompt, aspectRatio, model: imageModel });
       if (res.url) setActiveMediaUrl({ url: res.url, type: "image" });
       refetch();
-      toast.success("Image generated successfully!");
+      toast.success(imageModel === "sensenova" ? "SenseNova visual rendered!" : "Image generated successfully!");
     } catch (err: any) {
       toast.error(err?.message || "Failed to generate image");
     } finally {
@@ -119,6 +124,61 @@ export default function MediaStudioPage() {
                 </div>
               </div>
 
+              {/* Engine Tier Selection */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Rendering Engine Tier
+                  </label>
+                  <span className="text-[11px] text-cyan-500 font-medium">
+                    {imageModel === "sensenova" ? "High-Resolution 8B MoT" : "Instant 1-Step Latent"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setImageModel("sdxl-turbo")}
+                    className={`p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                      imageModel === "sdxl-turbo"
+                        ? "border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/30"
+                        : "border-border/70 bg-card hover:bg-muted/40"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-xs font-bold text-foreground">Standard (SDXL-Turbo)</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                        20 credits
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground mt-1">
+                      Ultra-fast 1–2s generation. Perfect for rapid prototyping &amp; album covers.
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setImageModel("sensenova")}
+                    className={`p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                      imageModel === "sensenova"
+                        ? "border-purple-500 bg-purple-500/10 ring-1 ring-purple-500/30"
+                        : "border-border/70 bg-card hover:bg-muted/40"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="size-3.5 text-purple-400" /> Advanced (SenseNova U1.5)
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        50 credits
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground mt-1">
+                      8B MoT studio-grade rendering. Precise typography, hyper-detail &amp; promo flyers.
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               {/* Visual Aspect Ratio Cards */}
               <div className="space-y-1.5 pt-1">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -136,7 +196,9 @@ export default function MediaStudioPage() {
                       onClick={() => setAspectRatio(item.ratio)}
                       className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
                         aspectRatio === item.ratio
-                          ? "border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/30"
+                          ? imageModel === "sensenova"
+                            ? "border-purple-500 bg-purple-500/10 ring-1 ring-purple-500/30"
+                            : "border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/30"
                           : "border-border/70 bg-card hover:bg-muted/40"
                       }`}
                     >
@@ -150,17 +212,22 @@ export default function MediaStudioPage() {
               <Button
                 onClick={handleGenerateImage}
                 disabled={isGenerating}
-                className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-6 text-base mt-4"
+                className={`w-full text-white font-semibold py-6 text-base mt-4 transition-all ${
+                  imageModel === "sensenova"
+                    ? "bg-purple-600 hover:bg-purple-500"
+                    : "bg-cyan-600 hover:bg-cyan-500"
+                }`}
               >
                 {isGenerating ? (
                   <span className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 animate-spin" /> Rendering Visual...
+                    <Sparkles className="h-5 w-5 animate-spin" />
+                    {imageModel === "sensenova" ? "Rendering SenseNova 8B..." : "Rendering Visual..."}
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
                     <ImageIcon className="h-5 w-5" /> Generate Image
                     <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white/90">
-                      20 credits
+                      {imageModel === "sensenova" ? "50 credits" : "20 credits"}
                     </span>
                   </span>
                 )}

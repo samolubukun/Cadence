@@ -19,6 +19,14 @@ export const cadenceMedia = createClient<any>({
   },
 });
 
+// Advanced Visuals Client (SenseNova-U1.5-8B MoT Studio Quality)
+export const cadenceSenseNova = createClient<any>({
+  baseUrl: env.CADENCE_SENSENOVA_API_URL || "https://samuelolubukun--sensenova-u1-5-sensenovaengine-serve.modal.run",
+  headers: {
+    "x-api-key": env.CADENCE_API_KEY,
+  },
+});
+
 // Song Client (ACE-Step 1.5 Turbo full vocal songs)
 export const cadenceSong = createClient<any>({
   baseUrl: env.CADENCE_SONG_API_URL || env.CADENCE_API_URL,
