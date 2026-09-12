@@ -50,34 +50,34 @@ export function LandingBento() {
       previewDetails: "Word timestamps • Multi-speaker diarization • Export TXT, SRT, JSON",
     },
     {
-      title: "Music & Beat Studio",
-      badge: "MusicGen & ACE-Step",
-      subtitle: "Melodic Harmonies & Beats",
+      title: "Music & Sound Studio",
+      badge: "Demucs v4 • RVC v2 • ACE-Step",
+      subtitle: "Beats, Songs, Stems & AI Singing",
       icon: Music,
       accent: "text-amber-600 bg-amber-50 border-amber-200",
       link: "/music",
-      description: "Compose full instrumental arrangements and heavy beat grooves from text prompts. Pick BPM, genre, and duration on-demand.",
-      previewDetails: "Lo-Fi, Hip-Hop, Ambient & EDM • Controllable BPM • Instant audio download",
+      description: "Produce full instrumental beats, complete vocal songs, isolate 4-track stems with Demucs v4, and create AI singing covers with RVC v2.",
+      previewDetails: "4-Stem Multitrack Split • AI Singing Pitch-Shift • ACE-Step & MusicGen • Foley SFX",
     },
     {
       title: "Voice Changer",
-      badge: "OpenVoice v2",
+      badge: "OpenVoice v2 & Resemble",
       subtitle: "Speech-to-Speech Timbre Morph",
       icon: Layers,
       accent: "text-pink-600 bg-pink-50 border-pink-200",
       link: "/voice-changer",
-      description: "Preserve your exact emotional nuance, pauses, and cadence while instantly morphing your vocal timbre to any target reference voice.",
-      previewDetails: "Zero-shot target audio upload • Realtime pitch tuning • Emotion-preserving",
+      description: "Preserve your exact emotional nuance, pauses, and cadence while instantly morphing your vocal timbre with studio neural denoising.",
+      previewDetails: "Zero-shot target audio upload • Realtime pitch tuning • 44.1kHz Resemble Enhance polish",
     },
     {
       title: "Visuals & Video",
-      badge: "SDXL-Turbo & Wan2.1",
-      subtitle: "Album Covers & Visualizers",
+      badge: "SenseNova 8B & Wan2.1",
+      subtitle: "Studio Art & Motion Loops",
       icon: Video,
       accent: "text-cyan-600 bg-cyan-50 border-cyan-200",
       link: "/media",
-      description: "Create 4K album sleeves, thumbnail artwork, and cinematic sound-wave reactive video loops tailored for Reels, TikTok, and YouTube.",
-      previewDetails: "1024x1024 1-step SDXL • Wan2.1 1.3B video • 16:9, 9:16 & 1:1 aspect ratios",
+      description: "Generate photorealistic 1024px album covers with SenseNova-U1.5-8B MoT, fast SDXL-Turbo art, and Wan2.1 video visualizers.",
+      previewDetails: "SenseNova-U1.5-8B MoT • SDXL-Turbo • Wan2.1 1.3B video • 1:1, 16:9 & 9:16",
     },
   ];
 
@@ -93,7 +93,7 @@ export function LandingBento() {
             Everything you need to <span className="text-gradient-cadence">generate voice, music &amp; media</span>
           </h2>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Six dedicated production studios powered by self-hosted open-source neural weights on serverless NVIDIA A10G GPUs.
+            Six dedicated production studios powered by self-hosted open source neural weights on serverless NVIDIA A10G GPUs.
           </p>
         </div>
 
