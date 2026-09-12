@@ -159,7 +159,7 @@ export function DashboardView() {
       const isBeat = s.title.startsWith("[Beat]");
       return {
         id: `song-${s._id}`,
-        type: (isBeat ? "beat" : "song") as const,
+        type: isBeat ? ("beat" as const) : ("song" as const),
         title: s.prompt?.slice(0, 60) || s.title,
         subtitle: `${s.duration}s • ${isBeat ? "MusicGen Beats" : "ACE-Step Vocal Song"}`,
         href: "/music",
