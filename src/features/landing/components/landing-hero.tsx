@@ -3,12 +3,13 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { PlaySquare, BookOpen, Sparkles, Radio } from "lucide-react";
 
 const DEMO_PRESETS = [
-  { id: "youtube", label: "YouTube", icon: "▶", text: "Welcome back! In today's video, we're diving into the future of voice synthesis and AI audio." },
-  { id: "narrative", label: "Narrative", icon: "📖", text: "The ancient library stood silent under starlight, its forgotten parchment murmuring with lost wisdom." },
-  { id: "ad", label: "Commercial", icon: "✨", text: "Crafted for speed, built for creators. Experience studio-quality voices in real-time." },
-  { id: "podcast", label: "Podcast", icon: "🎙", text: "Thanks for tuning in. Today we explore self-hosted neural models and why privacy matters." },
+  { id: "youtube", label: "YouTube", icon: PlaySquare, text: "Welcome back! In today's video, we're diving into the future of voice synthesis and AI audio." },
+  { id: "narrative", label: "Narrative", icon: BookOpen, text: "The ancient library stood silent under starlight, its forgotten parchment murmuring with lost wisdom." },
+  { id: "ad", label: "Commercial", icon: Sparkles, text: "Crafted for speed, built for creators. Experience studio-quality voices in real-time." },
+  { id: "podcast", label: "Podcast", icon: Radio, text: "Thanks for tuning in. Today we explore self-hosted neural models and why privacy matters." },
 ];
 
 const WAVE_BARS = [
@@ -70,7 +71,7 @@ export function LandingHero() {
         ))}
       </div>
 
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center">
+      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center">
         {/* Luminous Top Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-indigo-100 shadow-[0_2px_10px_rgba(99,102,241,0.08)] mb-6 animate-fade-up">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -81,10 +82,10 @@ export function LandingHero() {
 
         {/* Hero Headline */}
         <h1 
-          className="animate-fade-up-delay-1 text-gradient-hero text-slate-900 tracking-tight leading-[1.08] mb-5"
-          style={{ fontSize: "clamp(2.6rem, 5.2vw, 4.4rem)", fontWeight: 800 }}
+          className="animate-fade-up-delay-1 text-gradient-hero text-slate-900 tracking-tight leading-[1.12] mb-6 max-w-4xl"
+          style={{ fontSize: "clamp(2.6rem, 5vw, 4.4rem)", fontWeight: 800 }}
         >
-          Built for extreme<br />speed and pure efficiency
+          Open platform for voice,<br className="hidden sm:block" /> music, and media.
         </h1>
 
         {/* Hero Subtitle */}
@@ -181,7 +182,7 @@ export function LandingHero() {
                       : "bg-slate-50 text-slate-600 border border-slate-200/60 hover:bg-slate-100"
                   }`}
                 >
-                  <span className="text-[10px]">{preset.icon}</span>
+                  <preset.icon className="size-3" />
                   {preset.label}
                 </button>
               ))}

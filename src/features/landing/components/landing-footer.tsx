@@ -27,9 +27,19 @@ export function LandingFooter() {
           </div>
 
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Product</div>
+            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Studios &amp; Tools</div>
             <div className="flex flex-col gap-2">
-              {[["TTS Studio","/text-to-speech"],["Voice Cloning","/voice-clone"],["Transcription","/transcribe"],["Voice Library","/voices"]].map(([l,h]) => (
+              {[
+                ["Text to Speech","/text-to-speech"],
+                ["Voice Cloning","/voice-clone"],
+                ["Speech to Text","/transcribe"],
+                ["Music & Beat Studio","/music"],
+                ["Voice Changer","/voice-changer"],
+                ["Visuals & Video","/media"],
+                ["Voice Library","/voices"],
+                ["Usage & Analytics","/usage"],
+                ["Billing & Credits","/billing"],
+              ].map(([l,h]) => (
                 <Link key={l} href={h} className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
                   {l}
                 </Link>

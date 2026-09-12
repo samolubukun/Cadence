@@ -23,7 +23,7 @@ export function LandingCta() {
         <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 60%, rgba(99,102,241,0.03) 0%, transparent 70%)" }} />
       </div>
 
-      <div style={{ position:"relative", zIndex:1, maxWidth:"740px", margin:"0 auto", textAlign:"center" }}>
+      <div style={{ position:"relative", zIndex:1, maxWidth:"860px", margin:"0 auto", textAlign:"center" }}>
         <div style={{ marginBottom:"2rem", display:"flex", justifyContent:"center" }}>
           <div style={{ width:64, height:64, borderRadius:20, background:"#0F172A", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 10px 30px -8px rgba(15,23,42,0.25)" }}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" width="38" height="38">
@@ -40,13 +40,13 @@ export function LandingCta() {
           10,000 Free Credits Granted Upon Signup
         </div>
 
-        <h2 style={{ fontSize:"clamp(2.2rem,4.5vw,3.5rem)", fontWeight:800, color:"#0F172A", letterSpacing:"-0.04em", lineHeight:1.07, marginBottom:"1.25rem" }}>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-5 md:whitespace-nowrap">
           Start Creating With Cadence Today.
         </h2>
 
-        <p style={{ fontSize:"1.1rem", color:"#475569", lineHeight:1.75, maxWidth:"520px", margin:"0 auto 2.5rem" }}>
-          Fully self-hosted voice AI - text-to-speech, voice cloning, and transcription in one studio.
-          No subscriptions. No vendor APIs. Just your voice, your data.
+        <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto mb-8 font-normal">
+          Zero-shot voice cloning, expressive neural speech, and music composition in one studio.
+          No recurring subscriptions, no vendor lock-in. Just pure creative freedom.
         </p>
 
         <div style={{ display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"0.85rem" }}>
