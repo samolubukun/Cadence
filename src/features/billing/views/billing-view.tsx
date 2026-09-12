@@ -101,15 +101,30 @@ export function BillingView() {
               </p>
             </div>
           </div>
-          <div className="text-xs text-muted-foreground space-y-1.5 sm:text-right border-t sm:border-t-0 sm:border-l sm:pl-6 pt-3 sm:pt-0">
-            <p className="flex sm:justify-end items-center gap-2">
-              <span className="font-semibold text-foreground">TTS Generation:</span> 1 credit / character
+          <div className="text-xs text-muted-foreground grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 border-t sm:border-t-0 sm:border-l sm:pl-6 pt-3 sm:pt-0">
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">TTS Speech:</span> 1 credit / char
             </p>
-            <p className="flex sm:justify-end items-center gap-2">
-              <span className="font-semibold text-foreground">Voice Cloning:</span> 500 credits / voice
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">Transcription:</span> 15 credits / min
             </p>
-            <p className="flex sm:justify-end items-center gap-2">
-              <span className="font-semibold text-foreground">Transcription:</span> 50 credits / job
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">Voice Cloning:</span> 500 credits
+            </p>
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">Instrumental Beats:</span> 50 credits
+            </p>
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">Full Vocal Song:</span> 150 credits
+            </p>
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">Sound Effects:</span> 25 credits
+            </p>
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">AI Image / Video:</span> 20 / 200 credits
+            </p>
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-foreground">Voice Changer:</span> 50 credits
             </p>
           </div>
         </CardContent>
