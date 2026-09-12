@@ -31,6 +31,10 @@ import {
   Settings,
   Headphones,
   CreditCard,
+  Music,
+  Mic2,
+  Sparkles,
+  Clapperboard,
 } from "lucide-react";
 import Link from "next/link";
 import { UsageContainer } from "@/features/billing/components/usage-container";
@@ -122,6 +126,26 @@ export function DashboardSidebar() {
       title: "Voice cloning",
       url: "/voice-clone",
       icon: Volume2,
+    },
+    {
+      title: "Music studio",
+      url: "/music",
+      icon: Music,
+    },
+    {
+      title: "Voice changer",
+      url: "/voice-changer",
+      icon: Mic2,
+    },
+    {
+      title: "Sound effects",
+      url: "/sound-fx",
+      icon: Sparkles,
+    },
+    {
+      title: "Visuals & Video",
+      url: "/media",
+      icon: Clapperboard,
     },
   ];
 
