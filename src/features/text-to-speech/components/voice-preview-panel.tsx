@@ -70,14 +70,14 @@ export function VoicePreviewPanel({
   };
 
   return (
-    <div className="h-full gap-8 flex-col border-t hidden flex-1 lg:flex">
+    <div className="flex-none h-[240px] gap-2 flex-col border-t hidden lg:flex bg-muted/5">
       {/* Header */}
-      <div className="p-6 pb-0">
-        <h3 className="font-semibold text-foreground">Voice preview</h3>
+      <div className="px-6 pt-3 pb-0">
+        <h3 className="font-semibold text-sm text-foreground">Voice preview</h3>
       </div>
 
       {/* Content */}
-      <div className="relative flex flex-1 items-center justify-center">
+      <div className="relative flex flex-1 min-h-[50px] max-h-[75px] items-center justify-center px-6">
         {!isReady && (
           <div className="absolute inset-0 z-10 flex items-center justify-center">
             <Badge
@@ -99,7 +99,7 @@ export function VoicePreviewPanel({
       </div>
        {/* Time display */}
        <div className="flex items-center justify-center">
-        <p className="text-3xl font-semibold tabular-nums tracking-tight text-foreground">
+        <p className="text-xl font-semibold tabular-nums tracking-tight text-foreground">
           {formatTime(currentTime)}&nbsp;
           <span className="text-muted-foreground">
             /&nbsp;{formatTime(duration)}
@@ -108,7 +108,7 @@ export function VoicePreviewPanel({
        </div>
 
       {/* Footer */}
-      <div className="flex flex-col items-center p-6">
+      <div className="flex flex-col items-center px-6 pb-3 pt-1">
         <div className="grid w-full grid-cols-3">
           {/* Metadata */}
           <div className="flex min-w-0 flex-col gap-0.5">
