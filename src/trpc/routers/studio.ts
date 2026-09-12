@@ -19,6 +19,22 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Deduct 50 credits for instrumental beat generation
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 50,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for instrumental beat generation (requires 50 credits)",
+          });
+        }
+      }
+
       const { data, error } = await cadenceSound.POST("/generate-beats" as any, {
         body: {
           prompt: input.prompt,
@@ -80,6 +96,22 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Deduct 150 credits for full vocal song composition
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 150,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for song generation (requires 150 credits)",
+          });
+        }
+      }
+
       const { data, error } = await cadenceSong.POST("/generate-song", {
         body: {
           prompt: input.prompt,
@@ -142,6 +174,22 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Deduct 25 credits for sound effect generation
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 25,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for sound effect generation (requires 25 credits)",
+          });
+        }
+      }
+
       const { data, error } = await cadenceSound.POST("/generate-sound" as any, {
         body: {
           prompt: input.prompt,
@@ -197,6 +245,22 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Deduct 50 credits for voice conversion
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 50,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for voice conversion (requires 50 credits)",
+          });
+        }
+      }
+
       const { data, error } = await cadence.POST("/voice-change" as any, {
         body: {
           source_audio_key: input.sourceAudioKey,
@@ -253,6 +317,22 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Deduct 20 credits for image generation
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 20,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for image generation (requires 20 credits)",
+          });
+        }
+      }
+
       const { data, error } = await cadenceMedia.POST("/generate-image", {
         body: {
           prompt: input.prompt,
@@ -295,6 +375,22 @@ export const studioRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Deduct 200 credits for video generation
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 200,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for video generation (requires 200 credits)",
+          });
+        }
+      }
+
       const { data, error } = await cadenceMedia.POST("/generate-video", {
         body: {
           prompt: input.prompt,
