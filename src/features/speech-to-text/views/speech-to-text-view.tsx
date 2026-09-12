@@ -193,6 +193,7 @@ export function SpeechToTextView() {
         fileName: file.name,
         base64Audio: base64Data,
         mimeType: file.type || "audio/wav",
+        durationSeconds: audioElement?.duration && !isNaN(audioElement.duration) ? audioElement.duration : undefined,
         diarize,
       });
     };
