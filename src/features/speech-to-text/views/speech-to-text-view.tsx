@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, MicOff, UploadCloud, FileAudio, Play, Pause, RefreshCw, UserCheck, Copy, Check, Download, FileText } from "lucide-react";
+import { Mic, MicOff, UploadCloud, FileAudio, Play, Pause, RefreshCw, UserCheck, Copy, Check, Download, FileText, Headphones } from "lucide-react";
 import { useTRPC } from "@/trpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -198,7 +198,21 @@ export function SpeechToTextView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       <PageHeader title="Speech to Text & Subtitles" />
-      <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        {/* Header Banner */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border pb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2.5">
+              <Headphones className="h-7 w-7 text-blue-500" />
+              Speech to Text &amp; Subtitles
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Transcribe spoken audio, generate word-level timestamps, and export subtitle files (.srt, .vtt) powered by Whisper.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6">
         {/* Left panel: audio input & options */}
         <div className="w-full lg:w-1/3 flex flex-col gap-6">
           <Card className="border-border bg-card">
@@ -446,6 +460,7 @@ export function SpeechToTextView() {
             )}
           </CardContent>
         </Card>
+      </div>
       </div>
       </div>
     </div>
