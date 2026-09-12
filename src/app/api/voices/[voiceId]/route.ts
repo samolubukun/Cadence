@@ -7,12 +7,6 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ voiceId: string }> },
 ) {
-  const { userId, orgId } = await auth();
-
-  if (!userId || !orgId) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
   const { voiceId } = await params;
 
   const voice = await convexClient.query(api.voices.getById, {
@@ -23,8 +17,11 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  if (voice.variant === "CUSTOM" && voice.orgId !== orgId) {
-    return new Response("Not found", { status: 404 });
+  if (voice.variant === "CUSTOM") {
+    const { userId, orgId } = await auth();
+    if (!userId || !orgId || voice.orgId !== orgId) {
+      return new Response("Unauthorized", { status: 401 });
+    }
   }
 
   if (!voice.r2ObjectKey) {

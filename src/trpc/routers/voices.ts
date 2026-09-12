@@ -2,10 +2,31 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { convexClient, api } from "@/lib/convex-server";
 import { deleteAudio } from "@/lib/r2";
-import { createTRPCRouter, orgProcedure } from "../init";
+import { createTRPCRouter, orgProcedure, baseProcedure } from "../init";
 import type { Id } from "convex/_generated/dataModel";
 
 export const voicesRouter = createTRPCRouter({
+  getPublicSystemVoices: baseProcedure
+    .query(async () => {
+      const result = await convexClient.query(api.voices.list, {});
+      type VoiceRecord = {
+        _id: Id<"voices">;
+        name: string;
+        description?: string;
+        category: string;
+        language: string;
+        variant: "SYSTEM" | "CUSTOM";
+      };
+      return (result.system || []).map((v: VoiceRecord) => ({
+        id: v._id as string,
+        name: v.name,
+        description: v.description ?? null,
+        category: v.category,
+        language: v.language,
+        variant: v.variant,
+      }));
+    }),
+
   getAll: orgProcedure
     .input(
       z
