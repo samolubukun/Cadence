@@ -1,34 +1,49 @@
 "use client";
 
-import { Cpu, HardDrive, Database, ShieldCheck, Layers, Mic, Music, Video } from "lucide-react";
+import Image from "next/image";
+import { Cpu, HardDrive, Database, ShieldCheck, Layers, Mic, Music, Video, Wand2 } from "lucide-react";
 
 export function LandingArchitecture() {
   const modalWorkloads = [
     {
-      title: "Voice & Speech Container",
+      title: "Voice & Speech Engine",
       models: "Chatterbox Turbo & Whisper large-v3",
       specs: "24kHz TTS • Word timestamps STT",
       icon: Mic,
       color: "text-indigo-600 bg-indigo-50 border-indigo-200",
     },
     {
-      title: "Voice Morphing Container",
+      title: "Cadence Studio Engine",
+      models: "Demucs v4, RVC v2 & Resemble Enhance",
+      specs: "4-Stem split • Singing cover • 44.1kHz denoise",
+      icon: Layers,
+      color: "text-rose-600 bg-rose-50 border-rose-200",
+    },
+    {
+      title: "Voice Morphing Engine",
       models: "OpenVoice v2 Engine",
       specs: "Zero-shot timbre clone • Pitch shift",
-      icon: Layers,
+      icon: Mic,
       color: "text-pink-600 bg-pink-50 border-pink-200",
     },
     {
-      title: "Music & Beat Container",
+      title: "Music & Beat Engine",
       models: "MusicGen, AudioGen & ACE-Step",
       specs: "Melody & beats • Foley SFX",
       icon: Music,
       color: "text-amber-600 bg-amber-50 border-amber-200",
     },
     {
-      title: "Visuals & Video Container",
-      models: "SDXL-Turbo & Wan2.1 1.3B",
-      specs: "1024x1024 1-step • 4s video loops",
+      title: "Studio Image Visuals",
+      models: "SenseNova-U1.5-8B MoT & SDXL-Turbo",
+      specs: "Native 1024px • MoT realism & 1-step fast",
+      icon: Wand2,
+      color: "text-amber-600 bg-amber-50 border-amber-200",
+    },
+    {
+      title: "Video Visualizer Engine",
+      models: "Wan2.1 1.3B Diffusion Transformer",
+      specs: "4s audio-reactive scene loops • 16:9 & 9:16",
       icon: Video,
       color: "text-cyan-600 bg-cyan-50 border-cyan-200",
     },
@@ -38,6 +53,7 @@ export function LandingArchitecture() {
     {
       layer: "02",
       icon: HardDrive,
+      logo: "/images/logos/cloudflare.png",
       title: "Cloudflare R2 Storage",
       subtitle: "Private Bucket • Zero Egress Fees",
       badge: "Media Vault",
@@ -48,6 +64,7 @@ export function LandingArchitecture() {
     {
       layer: "03",
       icon: Database,
+      logo: "/images/logos/convex.png",
       title: "Convex Real-Time Database",
       subtitle: "Reactive Subscriptions • Instant State Sync",
       badge: "Sync & State",
@@ -58,6 +75,7 @@ export function LandingArchitecture() {
     {
       layer: "04",
       icon: ShieldCheck,
+      logo: "/images/logos/nextjs.png",
       title: "Edge Security & Tenant Isolation",
       subtitle: "Clerk Auth • JWT Cryptographic Verification",
       badge: "Zero-Trust",
@@ -79,7 +97,7 @@ export function LandingArchitecture() {
             Self-hosted infrastructure, zero vendor lock-in
           </h2>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Every component runs on open-source models and managed cloud primitives. No proprietary black boxes, transparent latency.
+            Every component runs on open source models and managed cloud primitives. No proprietary black boxes, transparent latency.
           </p>
         </div>
 
@@ -88,15 +106,21 @@ export function LandingArchitecture() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3.5">
-              <div className="size-11 sm:size-12 rounded-2xl border flex items-center justify-center text-emerald-600 bg-emerald-50 border-emerald-200 shrink-0 mt-0.5 sm:mt-0">
-                <Cpu className="size-5 sm:size-6" />
+              <div className="size-11 sm:size-12 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 shadow-2xs">
+                <Image
+                  src="/images/logos/modal.png"
+                  alt="Modal Labs"
+                  width={36}
+                  height={36}
+                  className="size-full object-contain"
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-lg sm:text-2xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
                   Modal Serverless GPU Compute Engine
                 </h3>
                 <p className="text-xs sm:text-sm font-mono text-slate-500 mt-0.5">
-                  Dedicated NVIDIA A10G (24GB VRAM) • 4 Isolated Container Workloads
+                  Dedicated NVIDIA A10G (24GB VRAM) • 6 Specialized GPU Microservices
                 </p>
               </div>
             </div>
@@ -112,11 +136,11 @@ export function LandingArchitecture() {
           </div>
 
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-4xl">
-            Four specialized container environments cold-start on demand (~2.5s) and terminate immediately when inference completes ($0.00 idle cost). PyTorch CUDA kernels run directly on high-bandwidth A10G GPUs:
+            Six specialized container microservices cold-start on demand (~2.5s) and terminate immediately when inference completes ($0.00 idle cost). PyTorch CUDA kernels run directly on high-bandwidth A10G GPUs:
           </p>
 
-          {/* 4 Mini Container Cards in a Row on Desktop */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+          {/* 6 Mini Container Cards in a Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
             {modalWorkloads.map((workload) => {
               const Icon = workload.icon;
               return (
@@ -156,7 +180,7 @@ export function LandingArchitecture() {
 
           {/* Bottom Pills */}
           <div className="flex flex-wrap gap-1.5 pt-4 border-t border-slate-100">
-            {["NVIDIA A10G (24GB VRAM)", "4 Isolated Containers", "$0.00 Idle Cost", "~2.5s Cold Start", "PyTorch CUDA Native", "Auto Scale-to-Zero"].map((pill) => (
+            {["NVIDIA A10G (24GB VRAM)", "6 Specialized Microservices", "$0.00 Idle Cost", "~2.5s Cold Start", "PyTorch CUDA Native", "Auto Scale-to-Zero"].map((pill) => (
               <span
                 key={pill}
                 className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100/80 text-slate-600 border border-slate-200/60"
@@ -169,16 +193,22 @@ export function LandingArchitecture() {
 
         {/* BOTTOM ROW: 3 Cards for Cloudflare R2, Convex, and Edge Security */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {cloudServices.map(({ layer, icon: Icon, title, subtitle, badge, color, desc, pills }) => (
+          {cloudServices.map(({ layer, logo, title, subtitle, badge, color, desc, pills }) => (
             <div
               key={layer}
               className="p-7 rounded-3xl bg-white/95 border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-6 group hover:border-slate-300"
             >
               <div className="space-y-4">
-                {/* Top bar with Icon and Layer Number */}
+                {/* Top bar with Official Logo and Layer Number */}
                 <div className="flex items-center justify-between">
-                  <div className={`size-11 rounded-2xl border flex items-center justify-center ${color}`}>
-                    <Icon className="size-5" />
+                  <div className="size-11 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                    <Image
+                      src={logo}
+                      alt={title}
+                      width={32}
+                      height={32}
+                      className="size-full object-contain"
+                    />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">

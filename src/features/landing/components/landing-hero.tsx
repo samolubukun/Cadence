@@ -48,27 +48,47 @@ export function LandingHero() {
         }}
       />
 
-      {/* Center Subdued Audio Waveform Horizon Banner (Inspired by Image 1) */}
+      {/* Center Subdued Audio Waveform Horizon Banner with vivid multi-hue color spectrum */}
       <div 
-        className="pointer-events-none absolute left-0 right-0 top-[52%] -translate-y-1/2 flex items-center justify-center gap-[3px] opacity-25 overflow-hidden h-32 px-4"
+        className="pointer-events-none absolute left-0 right-0 top-[52%] -translate-y-1/2 flex items-center justify-center gap-[3px] opacity-45 overflow-hidden h-36 px-4"
         style={{ maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)" }}
       >
-        {WAVE_BARS.map((height, i) => (
-          <div
-            key={i}
-            className={playing ? "wavebar" : ""}
-            style={{
-              width: 3,
-              borderRadius: 3,
-              height: `${height}%`,
-              background: playing 
-                ? "linear-gradient(to top, #4F46E5, #A855F7)" 
-                : "linear-gradient(to top, #0F172A, #64748B)",
-              animationDelay: `${(i * 0.05).toFixed(2)}s`,
-              transition: "all 0.3s ease",
-            }}
-          />
-        ))}
+        {/* Luminous multi-color chromatic bloom */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-35 blur-3xl"
+          style={{
+            background: "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(99, 102, 241, 0.4) 0%, rgba(236, 72, 153, 0.25) 30%, rgba(14, 165, 233, 0.25) 60%, rgba(16, 185, 129, 0.15) 85%, transparent 100%)"
+          }}
+        />
+        {WAVE_BARS.map((height, i) => {
+          // Calculate chromatic color distribution across the frequency bars
+          const t = i / WAVE_BARS.length;
+          const barColor = playing
+            ? "linear-gradient(to top, #06B6D4, #6366F1, #EC4899)"
+            : t < 0.25
+            ? "linear-gradient(to top, #0284C7, #38BDF8)"
+            : t < 0.5
+            ? "linear-gradient(to top, #4F46E5, #818CF8)"
+            : t < 0.75
+            ? "linear-gradient(to top, #9333EA, #C084FC)"
+            : "linear-gradient(to top, #E11D48, #FB7185)";
+
+          return (
+            <div
+              key={i}
+              className={playing ? "wavebar relative z-10" : "relative z-10"}
+              style={{
+                width: 3,
+                borderRadius: 3,
+                height: `${height}%`,
+                background: barColor,
+                boxShadow: "0 0 6px rgba(99,102,241,0.2)",
+                animationDelay: `${(i * 0.05).toFixed(2)}s`,
+                transition: "all 0.3s ease",
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center">
@@ -90,7 +110,7 @@ export function LandingHero() {
 
         {/* Hero Subtitle */}
         <p className="animate-fade-up-delay-2 text-slate-600 max-w-xl text-base sm:text-lg leading-relaxed mb-8">
-          Sub-second TTS inference, 24kHz zero-shot voice cloning, and word-accurate Whisper transcription on self-hosted GPU infrastructure.
+          Studio-grade neural voice synthesis, multi-track music production, and visual media creation on self-hosted GPU infrastructure.
         </p>
 
         {/* Action Buttons */}
@@ -105,14 +125,15 @@ export function LandingHero() {
             <span className="whitespace-nowrap">{isLoaded && isSignedIn ? "Studio" : "Open Studio"}</span>
           </Link>
           <a 
-            href="#architecture" 
-            className="btn-ghost-cadence bg-white/70 hover:bg-white whitespace-nowrap shrink-0 px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-medium"
+            href="https://github.com/samolubukun/Cadence" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="btn-dark-carbon bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 shadow-md hover:shadow-lg transition-all whitespace-nowrap shrink-0 px-4 sm:px-5 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold flex items-center gap-2"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-              <polyline points="16 18 22 12 16 6" />
-              <polyline points="8 6 2 12 8 18" />
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
+              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
             </svg>
-            <span className="whitespace-nowrap">Architecture</span>
+            <span className="whitespace-nowrap">GitHub</span>
           </a>
         </div>
 
@@ -219,7 +240,7 @@ export function LandingHero() {
 
         {/* Proof Statement Underneath */}
         <p className="mt-8 text-xs font-medium tracking-wide text-slate-400 animate-fade-up-delay-4">
-          The solution of choice for fast audio engineering, content creators, and AI teams.
+          The open creative platform for next-generation audio, music, and media production.
         </p>
       </div>
     </section>

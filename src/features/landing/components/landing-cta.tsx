@@ -2,74 +2,147 @@
 
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { CheckCircle2, Sparkles, ArrowRight, Zap, Shield, Waves } from "lucide-react";
 
-const CURTAINS = [5,12,19,26,33,40,47,54,61,68,75,82,89,96];
+const CURTAINS = [4, 12, 20, 28, 36, 44, 52, 60, 68, 76, 84, 92, 98];
+
+// 56-bar flowing horizon soundwave with cinematic chromatic distribution
+const BIG_HORIZON_BARS = [
+  14, 22, 38, 20, 52, 32, 68, 48, 88, 58, 100, 72, 92, 60, 82, 45,
+  65, 35, 52, 28, 74, 46, 92, 64, 100, 78, 96, 52, 70, 42, 58, 30,
+  72, 48, 88, 62, 98, 70, 84, 40, 60, 32, 48, 22, 38, 18, 28, 14,
+  24, 12, 18, 10, 16, 8, 14, 8
+];
 
 export function LandingCta() {
   const { isSignedIn, isLoaded } = useAuth();
   const studioHref = isLoaded && isSignedIn ? "/dashboard" : "/sign-up";
 
   return (
-    <section style={{ padding:"7rem 1.5rem", background:"#FAF9F6", position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
+    <section className="relative py-28 sm:py-36 px-4 sm:px-6 bg-[#FAF9F6] border-t border-slate-200/80 overflow-hidden">
+      {/* Background Animated Light Shimmers */}
+      <div className="absolute inset-0 pointer-events-none">
         {CURTAINS.map((pct, i) => (
-          <div key={i} style={{
-            position:"absolute", top:"-30%", bottom:0, left:`${pct}%`, width:1,
-            background:`linear-gradient(to bottom, rgba(99,102,241,${(0.1 + (i%3)*0.05).toFixed(2)}) 0%, rgba(99,102,241,0.02) 65%, transparent 100%)`,
-            animation:`curtain-shimmer ${3.8 + (i%4)*0.5}s ease-in-out infinite`,
-            animationDelay:`${(i*0.29).toFixed(2)}s`,
-          }} />
+          <div
+            key={i}
+            className="absolute -top-[40%] bottom-0 w-px"
+            style={{
+              left: `${pct}%`,
+              background: `linear-gradient(to bottom, rgba(99,102,241,${(0.04 + (i % 4) * 0.02).toFixed(2)}) 0%, rgba(99,102,241,0.005) 60%, transparent 100%)`,
+              animation: `curtain-shimmer ${4.2 + (i % 4) * 0.6}s ease-in-out infinite`,
+              animationDelay: `${(i * 0.26).toFixed(2)}s`,
+            }}
+          />
         ))}
-        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 60%, rgba(99,102,241,0.03) 0%, transparent 70%)" }} />
+
+        {/* Faint Subtle Chromatic Ambient Bloom Aura */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(ellipse 75% 55% at 50% 50%, rgba(99,102,241,0.045) 0%, rgba(236,72,153,0.02) 35%, rgba(14,165,233,0.015) 65%, transparent 100%)"
+          }}
+        />
       </div>
 
-      <div style={{ position:"relative", zIndex:1, maxWidth:"860px", margin:"0 auto", textAlign:"center" }}>
-        <div style={{ marginBottom:"2rem", display:"flex", justifyContent:"center" }}>
-          <div style={{ width:64, height:64, borderRadius:20, background:"#0F172A", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 10px 30px -8px rgba(15,23,42,0.25)" }}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" width="38" height="38">
-              <path d="M390 112C348 78 299 60 247 60C143 60 60 144 60 247C60 350 143 434 247 434C299 434 348 416 390 382L341 319C314 340 282 351 247 351C189 351 142 305 142 247C142 189 189 143 247 143C282 143 314 154 341 175Z" fill="white" fillOpacity="0.95"/>
-              <rect x="222" y="191" width="22" height="112" rx="11" fill="white" fillOpacity="0.75"/>
-              <rect x="258" y="168" width="22" height="158" rx="11" fill="white" fillOpacity="0.95"/>
-              <rect x="294" y="190" width="22" height="114" rx="11" fill="white" fillOpacity="0.75"/>
-              <rect x="330" y="214" width="22" height="66" rx="11" fill="white" fillOpacity="0.6"/>
-            </svg>
+      {/* Faint Subdued Audio Waveform Horizon Running Across the Center */}
+      <div
+        className="pointer-events-none absolute left-0 right-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-[3px] sm:gap-[4px] opacity-15 sm:opacity-20 overflow-hidden h-44 sm:h-56 px-4"
+        style={{ maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)" }}
+      >
+        {BIG_HORIZON_BARS.map((height, i) => {
+          const t = i / BIG_HORIZON_BARS.length;
+          const barColor =
+            t < 0.25
+              ? "linear-gradient(to top, #0284C7, #38BDF8)"
+              : t < 0.5
+              ? "linear-gradient(to top, #4F46E5, #818CF8)"
+              : t < 0.75
+              ? "linear-gradient(to top, #9333EA, #C084FC)"
+              : "linear-gradient(to top, #E11D48, #FB7185)";
+
+          return (
+            <div
+              key={i}
+              className="relative z-10 w-[2.5px] sm:w-[3.5px] rounded-full transition-all duration-300"
+              style={{
+                height: `${height}%`,
+                background: barColor,
+                boxShadow: "0 0 4px rgba(99,102,241,0.12)",
+                animation: `wave-dance 2.2s ease-in-out infinite`,
+                animationDelay: `${(i * 0.05).toFixed(2)}s`,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Main Content Container with Glass Backdrop */}
+      <div className="relative z-10 max-w-4xl mx-auto text-center space-y-9">
+        {/* Top Logo Badge Emblem */}
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="absolute -inset-3 bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-pink-500/15 rounded-3xl blur-2xl opacity-50" />
+            <div className="relative size-18 sm:size-20 rounded-3xl bg-slate-950 border border-white/10 flex items-center justify-center shadow-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" className="size-11 sm:size-12">
+                <path d="M390 112C348 78 299 60 247 60C143 60 60 144 60 247C60 350 143 434 247 434C299 434 348 416 390 382L341 319C314 340 282 351 247 351C189 351 142 305 142 247C142 189 189 143 247 143C282 143 314 154 341 175Z" fill="white" fillOpacity="0.95"/>
+                <rect x="222" y="191" width="22" height="112" rx="11" fill="white" fillOpacity="0.75"/>
+                <rect x="258" y="168" width="22" height="158" rx="11" fill="white" fillOpacity="0.95"/>
+                <rect x="294" y="190" width="22" height="114" rx="11" fill="white" fillOpacity="0.75"/>
+                <rect x="330" y="214" width="22" height="66" rx="11" fill="white" fillOpacity="0.6"/>
+              </svg>
+            </div>
           </div>
         </div>
 
-        <div className="section-label" style={{ marginBottom:"1.5rem", display:"inline-flex" }}>
+        {/* Luminous Top Pill Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-indigo-200/80 shadow-md text-xs font-semibold uppercase tracking-wider text-indigo-950">
+          <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
           10,000 Free Credits Granted Upon Signup
         </div>
 
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-5 md:whitespace-nowrap">
-          Start Creating With Cadence Today.
-        </h2>
+        {/* Big Bold Headline */}
+        <div className="space-y-5 max-w-3xl mx-auto">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-extrabold text-slate-900 tracking-tight leading-[1.08]">
+            Start Creating With Cadence Today.
+          </h2>
 
-        <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto mb-8 font-normal">
-          Zero-shot voice cloning, expressive neural speech, and music composition in one studio.
-          No recurring subscriptions, no vendor lock-in. Just pure creative freedom.
-        </p>
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            Zero-shot voice cloning, expressive neural speech, multi-track music, stem separation, and visual media in one studio.
+            No recurring subscriptions, no vendor lock-in. Just pure creative freedom.
+          </p>
+        </div>
 
-        <div style={{ display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"0.85rem" }}>
-          <Link href={studioHref} className="btn-dark-carbon whitespace-nowrap flex-shrink-0" style={{ fontSize:"0.95rem", padding:"0.8rem 1.8rem" }}>
-            <span className="whitespace-nowrap">{isLoaded && isSignedIn ? "Go to Studio" : "Launch Studio Free"}</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <Link
+            href={studioHref}
+            className="btn-dark-carbon shadow-xl hover:shadow-2xl transition-all px-8 sm:px-10 py-3.5 sm:py-4 text-sm sm:text-base font-bold rounded-2xl flex items-center gap-2.5"
+          >
+            <span>{isLoaded && isSignedIn ? "Go to Studio" : "Launch Studio Free"}</span>
+            <ArrowRight className="size-4.5" />
           </Link>
+
           {(!isLoaded || !isSignedIn) && (
-            <Link href="/sign-in" className="btn-ghost-cadence whitespace-nowrap flex-shrink-0" style={{ fontSize:"0.95rem", padding:"0.75rem 1.5rem" }}>
-              <span className="whitespace-nowrap">Sign In</span>
+            <Link
+              href="/sign-in"
+              className="btn-ghost-cadence px-7 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-semibold rounded-2xl bg-white/90 backdrop-blur-md hover:bg-white border border-slate-200 shadow-sm"
+            >
+              <span>Sign In</span>
             </Link>
           )}
         </div>
 
-        <div style={{ marginTop:"3rem", display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"1.25rem" }}>
-          {["No credit card required","10,000 free credits","Cancel anytime","Self-hosted infrastructure"].map(item => (
-            <span key={item} style={{ display:"inline-flex", alignItems:"center", gap:"0.35rem", fontSize:"0.83rem", color:"#64748B", fontWeight:500 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              {item}
+        {/* Trust Badges Bar */}
+        <div className="pt-6 flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-xs sm:text-sm text-slate-600 font-medium">
+          {[
+            "No credit card required",
+            "10,000 free credits",
+            "Cancel anytime",
+            "Self-hosted serverless GPUs",
+          ].map((item) => (
+            <span key={item} className="inline-flex items-center gap-2">
+              <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+              <span>{item}</span>
             </span>
           ))}
         </div>
@@ -77,3 +150,4 @@ export function LandingCta() {
     </section>
   );
 }
+

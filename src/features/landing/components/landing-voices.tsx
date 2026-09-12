@@ -41,45 +41,42 @@ function LandingVoiceCard({ voice }: { voice: { id: string; name: string; catego
   const { isPlaying, isLoading, togglePlay } = useAudioPlayback(audioSrc);
 
   return (
-    <div className="flex items-center gap-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-xs hover:shadow-md transition-all pr-3 lg:pr-5 group">
-      {/* Left Avatar Container with Vertical Dividing Border (matches /voices card) */}
-      <div className="relative h-24 w-20 shrink-0 lg:h-28 lg:w-24">
-        <div className="absolute left-0 top-0 h-24 w-10 border-r border-slate-100 bg-slate-50/70 lg:h-28 lg:w-12" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <VoiceAvatar
-            seed={voice.id}
-            name={voice.name}
-            className="size-13 border-[2px] border-white shadow-sm lg:size-16 transition-transform group-hover:scale-105"
-          />
-        </div>
+    <div className="flex items-center gap-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-xs hover:shadow-md transition-all p-3 sm:p-4 group">
+      {/* Left Avatar Container */}
+      <div className="relative shrink-0 flex items-center justify-center">
+        <VoiceAvatar
+          seed={voice.id}
+          name={voice.name}
+          className="size-13 border-[2px] border-white shadow-sm sm:size-14 transition-transform group-hover:scale-105"
+        />
       </div>
 
       {/* Voice Details */}
-      <div className="flex min-w-0 flex-1 flex-col gap-1 py-3">
-        <div className="flex items-center gap-1.5 line-clamp-1 text-sm font-bold text-slate-900 tracking-tight">
-          <span>{voice.name}</span>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <div className="flex items-center gap-1.5 text-sm font-bold text-slate-900 tracking-tight">
+          <span className="truncate">{voice.name}</span>
           <span className="size-1 shrink-0 rounded-full bg-slate-300" />
-          <span className="text-xs font-semibold text-[#327c88] truncate">
+          <span className="text-xs font-semibold text-[#327c88] shrink-0">
             {VOICE_CATEGORY_LABELS[voice.category as VoiceCategory] ?? voice.category}
           </span>
         </div>
 
-        <p className="line-clamp-1 text-xs text-slate-500">
+        <p className="text-xs text-slate-500 leading-relaxed">
           {voice.description || "24kHz neutral high-fidelity reference voice."}
         </p>
 
-        <p className="flex items-center gap-1 text-xs text-slate-600 font-medium">
+        <p className="flex items-center gap-1 text-[11px] text-slate-600 font-medium pt-0.5">
           <span className="shrink-0">{flag}</span>
           <span className="truncate">{region}</span>
         </p>
       </div>
 
       {/* Play Preview & Use Actions */}
-      <div className="ml-2 flex shrink-0 items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1.5 pl-1">
         <Button
           variant="outline"
           size="icon-sm"
-          className="rounded-full bg-slate-50 hover:bg-slate-100 border-slate-200"
+          className="rounded-full bg-slate-50 hover:bg-slate-100 border-slate-200 shrink-0"
           onClick={togglePlay}
           disabled={isLoading}
           title="Preview Voice Sample"
@@ -95,7 +92,7 @@ function LandingVoiceCard({ voice }: { voice: { id: string; name: string; catego
 
         <Link
           href={`/text-to-speech?voiceId=${voice.id}`}
-          className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition"
+          className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition shrink-0"
           title="Use in Text to Speech"
         >
           <Mic className="size-3" />

@@ -2,10 +2,11 @@ export function LandingPricing() {
   const rows = [
     { feature:"Storage",       cadence:"Private Cloudflare R2 - your bucket, your keys", others:"Vendor-managed; terms can change" },
     { feature:"Compute",       cadence:"Scale-to-zero serverless NVIDIA A10G",            others:"24/7 dedicated inference servers" },
-    { feature:"Pricing model", cadence:"1 credit per character - pay-as-you-go",          others:"Opaque subscriptions + overage penalties" },
-    { feature:"Voice cloning", cadence:"Zero-shot from 5s clip - no fine-tuning",         others:"Hours of data + expensive training jobs" },
+    { feature:"Pricing model", cadence:"Pay-as-you-go credit pool across all studio modes", others:"Opaque subscriptions + overage penalties" },
+    { feature:"Voice & Music", cadence:"Zero-shot cloning + multi-track music & stems",  others:"Fragmented separate subscriptions" },
+    { feature:"Media Studio",  cadence:"SDXL & Wan2.1 visualizers included in one hub",   others:"Separate third-party API keys" },
     { feature:"Transcription", cadence:"Whisper large-v3 - word timestamps + SRT",        others:"Proprietary model - JSON only" },
-    { feature:"Data privacy",  cadence:"Audio never leaves your R2 bucket",               others:"Sent to vendor APIs for inference" },
+    { feature:"Data privacy",  cadence:"Audio & media never leave your R2 bucket",        others:"Sent to vendor APIs for inference" },
     { feature:"Idle cost",     cadence:"$0.00 when not in use",                           others:"Full monthly fee regardless of usage" },
   ];
 
@@ -17,8 +18,8 @@ export function LandingPricing() {
           <h2 style={{ fontSize:"clamp(1.9rem,3.5vw,2.8rem)", fontWeight:800, color:"#0F172A", letterSpacing:"-0.04em", lineHeight:1.1, marginTop:"0.75rem", marginBottom:"1rem" }}>
             Cadence vs. Legacy Cloud APIs
           </h2>
-          <p style={{ fontSize:"1.05rem", color:"#64748B", lineHeight:1.7, maxWidth:"540px", margin:"0 auto" }}>
-            No mystery pricing. No locked-in subscriptions. Just pay for what you use.
+          <p style={{ fontSize:"1.05rem", color:"#64748B", lineHeight:1.7, maxWidth:"580px", margin:"0 auto" }}>
+            No mystery subscriptions. No vendor lock-in. Voice, music, stems, and visual media powered by predictable pay-as-you-go credits.
           </p>
         </div>
 
@@ -61,8 +62,8 @@ export function LandingPricing() {
         <div style={{ marginTop:"2rem", display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:"1rem" }}>
           {[
             { label:"Free credits on signup", value:"10,000", sub:"No credit card required", color:"#10B981" },
-            { label:"Per character rate",     value:"1 credit", sub:"Flat, predictable pricing", color:"#6366F1" },
-            { label:"Idle compute cost",      value:"$0.00",  sub:"Scale-to-zero GPU",        color:"#0EA5E9" },
+            { label:"Shared credit pool",     value:"Pay-as-you-go", sub:"Voice, music, stems & media", color:"#6366F1" },
+            { label:"Idle compute cost",      value:"$0.00",  sub:"Scale-to-zero serverless GPU", color:"#0EA5E9" },
           ].map(({ label, value, sub, color }) => (
             <div key={label} style={{ textAlign:"center", padding:"1.5rem", background:"rgba(255,255,255,0.85)", backdropFilter:"blur(12px)", border:"1px solid rgba(0,0,0,0.07)", borderRadius:"16px", boxShadow:"0 2px 12px -4px rgba(15,23,42,0.06)" }}>
               <div style={{ fontSize:"2rem", fontWeight:800, color, letterSpacing:"-0.04em", lineHeight:1 }}>{value}</div>
