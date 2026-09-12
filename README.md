@@ -21,6 +21,7 @@ Generative voice, music, speech, and media studio. High-throughput text-to-speec
   <img src="https://img.shields.io/badge/Meta-AudioGen-F59E0B?style=for-the-badge&logo=meta&logoColor=white" alt="AudioGen" />&nbsp;
   <img src="https://img.shields.io/badge/MyShell-OpenVoice_v2-EC4899?style=for-the-badge&logo=github&logoColor=white" alt="OpenVoice" />&nbsp;
   <img src="https://img.shields.io/badge/Stability-SDXL--Turbo-06B6D4?style=for-the-badge&logo=stabilityai&logoColor=white" alt="SDXL-Turbo" />&nbsp;
+  <img src="https://img.shields.io/badge/SenseNova-U1.5--8B_MoT-8B5CF6?style=for-the-badge&logo=pytorch&logoColor=white" alt="SenseNova-U1.5" />&nbsp;
   <img src="https://img.shields.io/badge/Wan-Video_2.1-A855F7?style=for-the-badge&logo=pytorch&logoColor=white" alt="Wan2.1" />
 </p>
 
@@ -142,7 +143,9 @@ graph TD
 - **Input & Target Flexibility**: Upload or record source audio and convert it to match any target voice profile.
 
 ### 6. Visuals & Video Studio (`/media`)
-- **Photorealistic Cover Art**: Powered by **Stability AI SDXL-Turbo**. Ultra-fast single-step generative artwork in 1:1, 16:9, or 9:16 aspect ratios.
+- **Dual-Tier Image Generation**:
+  - **Standard Mode (SDXL-Turbo)**: Ultra-fast 1–2 second generative artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
+  - **Advanced Studio Mode (SenseNova-U1.5-8B MoT)**: 8-billion parameter mixture-of-trajectories diffusion transformer for studio releases, crisp graphic typography, and professional marketing flyers (50 credits).
 - **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
 ### 7. Voice Library (`/voices`)
@@ -152,9 +155,9 @@ graph TD
 
 ---
 
-## Modal Microservice Engines: `cadence_engine.py`
+## Modal Microservice Engines: `cadence_engine.py` & `sensenova_engine.py`
 
-Cadence organizes serverless compute into four dedicated microservice engines in [`cadence_engine.py`](file:///c:/Users/USER/Downloads/cadence/cadence_engine.py):
+Cadence organizes serverless compute into dedicated microservice engines:
 
 | Engine Class | Models Included | GPU / Hardware | Endpoints Hosted |
 | :--- | :--- | :--- | :--- |
@@ -162,6 +165,7 @@ Cadence organizes serverless compute into four dedicated microservice engines in
 | **`CadenceSoundEngine`** | Meta AudioGen (Audiocraft), Meta MusicGen Melody (Audiocraft) | NVIDIA A10G (24GB) | `/health`, `/generate-sound`, `/generate-beats`, `/generate-song` (fallback) |
 | **`CadenceSongEngine`** | ACE-Step 1.5 Turbo (`torchcodec`) | NVIDIA A10G (24GB) | `/health`, `/generate-song` |
 | **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/generate-image`, `/generate-video` |
+| **`SenseNovaEngine`** | SenseNova-U1.5-8B-MoT | NVIDIA A10G / L40S (24GB+) | `/`, `/generate` |
 
 ### API Endpoints Reference
 
@@ -173,7 +177,8 @@ Cadence organizes serverless compute into four dedicated microservice engines in
 | `/generate-sound` | Sound | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
 | `/generate-beats` | Sound | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
 | `/generate-song` | Song / Sound | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition (or MusicGen fallback) |
-| `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio` (1:1, 16:9, 9:16, 4:3), `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
+| `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio`, `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
+| `/generate` | SenseNova | `POST` | `prompt`, `aspect_ratio`, `num_steps`, `quality` | JSON (base64) | SenseNova-U1.5-8B MoT studio-quality photorealistic rendering |
 | `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2–5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
 
 ---

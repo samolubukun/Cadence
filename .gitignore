@@ -55,6 +55,5 @@ __pycache__
 test_output/
 *.wav
 *.mp4
-sensenova_engine.py
 sensenova_sample.png
 cadence_flyer.png
