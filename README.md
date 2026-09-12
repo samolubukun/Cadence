@@ -165,6 +165,7 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | **`CadenceSoundEngine`** | Meta AudioGen (Audiocraft), Meta MusicGen Melody (Audiocraft) | NVIDIA A10G (24GB) | `/health`, `/generate-sound`, `/generate-beats`, `/generate-song` (fallback) |
 | **`CadenceSongEngine`** | ACE-Step 1.5 Turbo (`torchcodec`) | NVIDIA A10G (24GB) | `/health`, `/generate-song` |
 | **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/generate-image`, `/generate-video` |
+| **`CadenceStudioEngine`** | Meta Demucs v4, RVC v2, Resemble Enhance | NVIDIA A10G (24GB) | `/separate-stems`, `/convert-singing`, `/enhance-audio` |
 | **`SenseNovaEngine`** | SenseNova-U1.5-8B-MoT | NVIDIA A10G / L40S (24GB+) | `/`, `/generate` |
 
 ### API Endpoints Reference
@@ -177,6 +178,9 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | `/generate-sound` | Sound | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
 | `/generate-beats` | Sound | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
 | `/generate-song` | Song / Sound | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition (or MusicGen fallback) |
+| `/separate-stems` | Studio | `POST` | `audio_base64`, `audio_key` | JSON (4 stems) | Meta Demucs v4 neural 4-track stem separation (Vocals, Drums, Bass, Other) |
+| `/convert-singing` | Studio | `POST` | `audio_base64`, `target_voice_key`, `pitch_shift` | `audio/wav` | RVC v2 musical singing voice conversion with pitch transpose |
+| `/enhance-audio` | Studio | `POST` | `audio_base64`, `audio_key` | `audio/wav` | Resemble Enhance 44.1kHz deep denoising and studio vocoding |
 | `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio`, `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
 | `/generate` | SenseNova | `POST` | `prompt`, `aspect_ratio`, `num_steps`, `quality` | JSON (base64) | SenseNova-U1.5-8B MoT studio-quality photorealistic rendering |
 | `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2–5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
@@ -221,6 +225,12 @@ Deploy the core Cadence multi-engine stack:
 modal deploy cadence_engine.py
 ```
 
+Deploy the dedicated Audio Studio Engine (Demucs v4, RVC v2, Resemble Enhance):
+
+```bash
+modal deploy cadence_studio_engine.py
+```
+
 Deploy the optional SenseNova-U1.5-8B MoT Studio Visual Engine:
 
 ```bash
@@ -232,6 +242,7 @@ modal deploy sensenova_engine.py
 - `https://<workspace>--cadence-cadencesoundengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencesongengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencemediaengine-serve.modal.run`
+- `https://<workspace>--cadence-studio-cadencestudioengine-serve.modal.run`
 - `https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run`
 
 ---
@@ -270,6 +281,7 @@ CADENCE_SOUND_API_URL=https://<workspace>--cadence-cadencesoundengine-serve.moda
 CADENCE_SONG_API_URL=https://<workspace>--cadence-cadencesongengine-serve.modal.run
 CADENCE_MEDIA_API_URL=https://<workspace>--cadence-cadencemediaengine-serve.modal.run
 CADENCE_SENSENOVA_API_URL=https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run
+CADENCE_STUDIO_API_URL=https://<workspace>--cadence-studio-cadencestudioengine-serve.modal.run
 CADENCE_API_KEY=your_cadence_api_key
 ```
 
