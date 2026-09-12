@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { cadence, cadenceMedia, cadenceSenseNova, cadenceSong, cadenceSound } from "@/lib/cadence-client";
+import { cadence, cadenceMedia, cadenceSenseNova, cadenceSong, cadenceSound, cadenceStudioClient } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio, getSignedAudioUrl } from "@/lib/r2";
 import { createTRPCRouter, orgProcedure } from "../init";
@@ -480,5 +480,237 @@ export const studioRouter = createTRPCRouter({
 
       const signedUrl = await getSignedAudioUrl(r2Key);
       return { id: mediaId, r2Key, url: signedUrl };
+    }),
+
+  // ---------------------------------------------------------------------------
+  // 5. Neural Stem Separation (Meta Demucs v4)
+  // ---------------------------------------------------------------------------
+  listStems: orgProcedure.query(async ({ ctx }) => {
+    const list = await convexClient.query(api.studio.listStems, { orgId: ctx.orgId });
+    return await Promise.all(
+      list.map(async (item) => ({
+        ...item,
+        vocalsUrl: item.vocalsKey ? await getSignedAudioUrl(item.vocalsKey) : null,
+        drumsUrl: item.drumsKey ? await getSignedAudioUrl(item.drumsKey) : null,
+        bassUrl: item.bassKey ? await getSignedAudioUrl(item.bassKey) : null,
+        otherUrl: item.otherKey ? await getSignedAudioUrl(item.otherKey) : null,
+      }))
+    );
+  }),
+
+  separateStems: orgProcedure
+    .input(
+      z.object({
+        fileName: z.string().default("track.mp3"),
+        base64Audio: z.string().optional(),
+        audioKey: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Deduct 30 credits for full 4-track stem separation
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 30,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for stem separation (requires 30 credits)",
+          });
+        }
+      }
+
+      // Call Modal CadenceStudioEngine /separate-stems endpoint
+      const res = await cadenceStudioClient.POST("/separate-stems", {
+        body: {
+          audio_base64: input.base64Audio,
+          audio_key: input.audioKey,
+          model: "htdemucs",
+        },
+      });
+
+      if (res.error || !res.data) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to separate audio stems via Demucs v4 engine",
+        });
+      }
+
+      const stemId = await convexClient.mutation(api.studio.createStem, {
+        orgId: ctx.orgId,
+        sourceFileName: input.fileName,
+        status: "completed",
+      });
+
+      // Upload individual stems to R2 if base64 buffers are returned
+      const vocalsKey = `stems/orgs/${ctx.orgId}/${stemId}_vocals.wav`;
+      const drumsKey = `stems/orgs/${ctx.orgId}/${stemId}_drums.wav`;
+      const bassKey = `stems/orgs/${ctx.orgId}/${stemId}_bass.wav`;
+      const otherKey = `stems/orgs/${ctx.orgId}/${stemId}_other.wav`;
+
+      if (res.data.vocals_base64) {
+        await uploadAudio({ key: vocalsKey, buffer: Buffer.from(res.data.vocals_base64, "base64"), contentType: "audio/wav" });
+      }
+      if (res.data.drums_base64) {
+        await uploadAudio({ key: drumsKey, buffer: Buffer.from(res.data.drums_base64, "base64"), contentType: "audio/wav" });
+      }
+      if (res.data.bass_base64) {
+        await uploadAudio({ key: bassKey, buffer: Buffer.from(res.data.bass_base64, "base64"), contentType: "audio/wav" });
+      }
+      if (res.data.other_base64) {
+        await uploadAudio({ key: otherKey, buffer: Buffer.from(res.data.other_base64, "base64"), contentType: "audio/wav" });
+      }
+
+      await convexClient.mutation(api.studio.updateStemR2, {
+        id: stemId,
+        vocalsKey,
+        drumsKey,
+        bassKey,
+        otherKey,
+        status: "completed",
+      });
+
+      return {
+        id: stemId,
+        vocalsUrl: await getSignedAudioUrl(vocalsKey),
+        drumsUrl: await getSignedAudioUrl(drumsKey),
+        bassUrl: await getSignedAudioUrl(bassKey),
+        otherUrl: await getSignedAudioUrl(otherKey),
+      };
+    }),
+
+  // ---------------------------------------------------------------------------
+  // 6. AI Singing Voice Conversion (RVC v2)
+  // ---------------------------------------------------------------------------
+  listSingingCovers: orgProcedure.query(async ({ ctx }) => {
+    const list = await convexClient.query(api.studio.listSingingCovers, { orgId: ctx.orgId });
+    return await Promise.all(
+      list.map(async (item) => ({
+        ...item,
+        url: item.r2ObjectKey ? await getSignedAudioUrl(item.r2ObjectKey) : null,
+      }))
+    );
+  }),
+
+  createSingingCover: orgProcedure
+    .input(
+      z.object({
+        title: z.string().default("AI Singing Cover"),
+        targetVoiceKey: z.string().optional(),
+        targetBase64Audio: z.string().optional(),
+        pitchShift: z.number().min(-12).max(12).default(0),
+        base64Audio: z.string().optional(),
+        audioKey: z.string().optional(),
+        remixInstrumental: z.boolean().default(true),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Deduct 50 credits for AI singing conversion and mix
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 50,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for singing voice cover (requires 50 credits)",
+          });
+        }
+      }
+
+      const res = await cadenceStudioClient.POST("/convert-singing", {
+        body: {
+          audio_base64: input.base64Audio,
+          audio_key: input.audioKey,
+          target_voice_key: input.targetVoiceKey || "",
+          target_base64_audio: input.targetBase64Audio,
+          pitch_shift: input.pitchShift,
+          remix_instrumental: input.remixInstrumental,
+        },
+      });
+
+      if (res.error || !res.data || !res.data.audio_base64) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to render singing voice cover via RVC v2",
+        });
+      }
+
+      const coverId = await convexClient.mutation(api.studio.createSingingCover, {
+        orgId: ctx.orgId,
+        title: input.title,
+        targetVoiceKey: input.targetVoiceKey || "custom-upload",
+        pitchShift: input.pitchShift,
+        status: "completed",
+      });
+
+      const r2Key = `singing-covers/orgs/${ctx.orgId}/${coverId}.wav`;
+      await uploadAudio({
+        key: r2Key,
+        buffer: Buffer.from(res.data.audio_base64, "base64"),
+        contentType: "audio/wav",
+      });
+
+      const signedUrl = await getSignedAudioUrl(r2Key);
+      return { id: coverId, r2Key, url: signedUrl };
+    }),
+
+  // ---------------------------------------------------------------------------
+  // 7. Neural Audio Enhancement & Denoising (Resemble Enhance)
+  // ---------------------------------------------------------------------------
+  enhanceAudio: orgProcedure
+    .input(
+      z.object({
+        base64Audio: z.string().optional(),
+        audioKey: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Deduct 15 credits for studio polish & denoising
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 15,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for audio enhancement (requires 15 credits)",
+          });
+        }
+      }
+
+      const res = await cadenceStudioClient.POST("/enhance-audio", {
+        body: {
+          audio_base64: input.base64Audio,
+          audio_key: input.audioKey,
+        },
+      });
+
+      if (res.error || !res.data || !res.data.audio_base64) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to enhance audio via Resemble Enhance",
+        });
+      }
+
+      const enhancedId = `enhanced_${Date.now()}`;
+      const r2Key = `enhanced/orgs/${ctx.orgId}/${enhancedId}.wav`;
+      await uploadAudio({
+        key: r2Key,
+        buffer: Buffer.from(res.data.audio_base64, "base64"),
+        contentType: "audio/wav",
+      });
+
+      const signedUrl = await getSignedAudioUrl(r2Key);
+      return { r2Key, url: signedUrl };
     }),
 });
