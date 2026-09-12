@@ -43,6 +43,14 @@ export const cadenceSound = createClient<any>({
   },
 });
 
+// Audio Workstation Studio Client (Demucs v4 Stems, RVC v2 Singing Covers, Resemble Enhance)
+export const cadenceStudioClient = createClient<any>({
+  baseUrl: env.CADENCE_STUDIO_API_URL || env.CADENCE_API_URL,
+  headers: {
+    "x-api-key": env.CADENCE_API_KEY,
+  },
+});
+
 // Backward compatibility alias
 export const chatterbox = cadence;
 

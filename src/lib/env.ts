@@ -12,6 +12,7 @@ export const env = createEnv({
     CADENCE_SOUND_API_URL: z.string().url().optional(),
     CADENCE_MEDIA_API_URL: z.string().url().optional(),
     CADENCE_SENSENOVA_API_URL: z.string().url().optional(),
+    CADENCE_STUDIO_API_URL: z.string().url().optional(),
     CADENCE_SONG_API_URL: z.string().url().optional(),
     CADENCE_API_KEY: z.string().min(1),
   },
