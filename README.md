@@ -1,7 +1,7 @@
 <div align="center">
 
 # Cadence
-### Next-Gen Generative Voice, Music, Speech & Media Studio
+### Generative Voice, Music, Speech & Media Studio
 
 High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, and generative video visualizers. Built with **Next.js 16 (React 19)**, **Convex**, **Cloudflare R2**, and **Serverless NVIDIA A10G GPUs via Modal**.
 
@@ -58,34 +58,39 @@ graph TD
     classDef db fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46;
     classDef audioEngine fill:#f5f3ff,stroke:#8e75ff,stroke-width:2px,color:#5b21b6;
     classDef songEngine fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#3730a3;
-    classDef mediaEngine fill:#ecfeff,stroke:#06b6d4,stroke-width:2px,color:#155e75;
+    classDef mediaEngine fill:#ecfeff,stroke:#06b6d4,stroke-width:2px,color:#0e7490;
 
-    %% Client Layer
-    User([User / Browser Studio]) -->|1. Prompts & Audio| NextApp[Next.js 16 Web Application]
-    NextApp -->|2. Deduct Credits & Track Generations| ConvexDB[(Convex Real-Time Database)]
+    subgraph Client ["Client Interface"]
+        UI["Cadence Studio (Next.js 16 + React 19)"]
+    end
 
-    %% Storage
-    NextApp -->|3. Presigned PUT Audio| R2[(Cloudflare R2 Bucket 'cadence')]
+    subgraph Edge ["API Layer & Edge Proxy"]
+        TRPC["tRPC Routers & Edge API Routes"]
+        R2_Store[("Cloudflare R2 Object Storage")]
+        Convex_DB[("Convex Real-Time Database")]
+    end
 
-    %% Microservice Routing
-    NextApp -->|4a. TTS, STT, SFX, Beats, Voice Changer| AudioEng[CadenceAudioEngine<br/>Chatterbox · Whisper · MusicGen · AudioGen · OpenVoice]
-    NextApp -->|4b. Full Vocal Songs| SongEng[CadenceSongEngine<br/>ACE-Step 1.5 Turbo · torchcodec]
-    NextApp -->|4c. Images & Videos| MediaEng[CadenceMediaEngine<br/>SDXL-Turbo · Wan2.1]
+    subgraph Microservices ["Modal Serverless GPU Microservices"]
+        AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS / Cloning)<br/>• Whisper large-v3 (STT Timestamps)<br/>• OpenVoice v2 (Speech-to-Speech)<br/>• AudioGen (SFX / Foley)<br/>• MusicGen (Instrumental Beats)"]
+        SongEng["CadenceSongEngine<br/>• ACE-Step 1.5 Turbo (Full Vocal Songs)"]
+        MediaEng["CadenceMediaEngine<br/>• SDXL-Turbo (Images & Covers)<br/>• Wan2.1 1.3B (Cinematic Video)"]
+    end
 
-    %% GPU R2 Mount
-    R2 -.->|Direct Read-Only Mount /r2| AudioEng
-    R2 -.->|Direct Read-Only Mount /r2| SongEng
-    R2 -.->|Direct Read-Only Mount /r2| MediaEng
+    UI -->|"User Actions & Real-Time Queries"| TRPC
+    TRPC -->|"Audio Stems & Media Uploads"| R2_Store
+    TRPC -->|"State, Logs & Credit Accounting"| Convex_DB
 
-    %% Outputs Back
-    AudioEng -->|Stream Audio / JSON| NextApp
-    SongEng -->|Stream WAV Song| NextApp
-    MediaEng -->|Stream JPG / MP4| NextApp
-    NextApp -->|5. Real-time Reactive Playback & Waveform| User
+    TRPC -->|"TTS, STT, Beats, SFX, Voice Changer"| AudioEng
+    TRPC -->|"Full Vocal Songs with Lyrics"| SongEng
+    TRPC -->|"Cover Art & Video Visualizers"| MediaEng
 
-    class User,NextApp client;
-    class R2 edge;
-    class ConvexDB db;
+    AudioEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    SongEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    MediaEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+
+    class UI client;
+    class TRPC,R2_Store edge;
+    class Convex_DB db;
     class AudioEng audioEngine;
     class SongEng songEngine;
     class MediaEng mediaEngine;
@@ -134,7 +139,7 @@ graph TD
 - **Input & Target Flexibility**: Upload or record source audio and convert it to match any target voice profile.
 
 ### 7. Visuals & Video Studio (`/media`)
-- **4K Album Cover Art**: Powered by **Stability AI SDXL-Turbo**. Ultra-fast single-step generative artwork in 1:1, 16:9, or 9:16 aspect ratios.
+- **Photorealistic Cover Art**: Powered by **Stability AI SDXL-Turbo**. Ultra-fast single-step generative artwork in 1:1, 16:9, or 9:16 aspect ratios.
 - **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
 ### 8. Voice Library (`/voices`)
@@ -150,23 +155,22 @@ Cadence organizes serverless compute into three dedicated microservice engines i
 
 | Engine Class | Models Included | GPU / Hardware | Endpoints Hosted |
 | :--- | :--- | :--- | :--- |
-| **`CadenceAudioEngine`** | Chatterbox Turbo, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen | NVIDIA A10G (24GB) | `/health`, `/generate`, `/transcribe`, `/generate-music`, `/generate-sound-fx`, `/convert-voice` |
+| **`CadenceAudioEngine`** | Chatterbox Turbo, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen | NVIDIA A10G (24GB) | `/generate`, `/transcribe`, `/generate-beats`, `/generate-sound`, `/generate-song`, `/voice-change` |
 | **`CadenceSongEngine`** | ACE-Step 1.5 Turbo (`torchcodec`) | NVIDIA A10G (24GB) | `/health`, `/generate-song` |
-| **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/health`, `/generate-image`, `/generate-video` |
+| **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/generate-image`, `/generate-video` |
 
 ### API Endpoints Reference
 
 | Endpoint | Engine | Method | Input Parameters | Output | Description |
 | :--- | :--- | :---: | :--- | :--- | :--- |
-| `/health` | All | `GET` | None | JSON | Engine liveness and GPU readiness check |
-| `/generate` | Audio | `POST` | `prompt`, `voice_name`, `temperature`, `top_p`, `top_k`, `repetition_penalty` | `audio/wav` | TTS speech synthesis |
-| `/transcribe` | Audio | `POST` | `multipart/form-data` audio file | JSON | Multilingual Whisper transcription with timestamps |
-| `/generate-music` | Audio | `POST` | `prompt`, `duration` (1–120s) | `audio/wav` | Meta MusicGen instrumental beat generation |
-| `/generate-sound-fx` | Audio | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen sound effect generation |
-| `/convert-voice` | Audio | `POST` | `source_audio` (base64/file), `target_voice` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
-| `/generate-song` | Song | `POST` | `prompt`, `lyrics`, `duration` (5–240s) | `audio/wav` | ACE-Step 1.5 full vocal track composition |
-| `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio` | `image/jpeg` | SDXL-Turbo album art generation |
-| `/generate-video` | Media | `POST` | `prompt`, `duration` | `video/mp4` | Wan2.1 video visualizer generation |
+| `/generate` | Audio | `POST` | `prompt`, `voice_key`, `temperature`, `top_p`, `top_k`, `repetition_penalty` | `audio/wav` | Chatterbox Turbo TTS speech synthesis |
+| `/transcribe` | Audio | `POST` | `multipart/form-data` audio file or `audio_key` | JSON | Multilingual Whisper large-v3 transcription with word-level timestamps |
+| `/generate-beats` | Audio | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
+| `/generate-sound` | Audio | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
+| `/voice-change` | Audio | `POST` | `file` or `source_audio_key`, `target_voice_key`, `pitch_shift` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
+| `/generate-song` | Song | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition |
+| `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio` (1:1, 16:9, 9:16, 4:3), `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
+| `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2–5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
 
 ---
 
@@ -259,29 +263,27 @@ npx convex env set CADENCE_API_KEY your_cadence_api_key
 
 ---
 
-### 4. Seed Canonical System Voices
+### 4. Seed Canonical Voices
 
-Seed the 30 canonical voice personas into Convex and R2:
+Cadence comes pre-packaged with 30 diverse reference voices (gender-balanced, across multiple accents and vocal styles). Seed them to your Convex database and Cloudflare R2 bucket:
 
 ```bash
-npx tsx scripts/seed-canonical-voices.ts
+npm run seed:voices
 ```
 
 ---
 
-### 5. Launch Development Server
-
-Start the Convex data sync process and Next.js development server:
+### 5. Launch the Local Development Server
 
 ```bash
-# Terminal 1: Convex Data Sync
+# Start the Convex development backend
 npx convex dev
 
-# Terminal 2: Next.js Frontend Server
+# In a separate terminal, launch the Next.js dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to launch Cadence.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
@@ -335,6 +337,10 @@ cadence/
 
 ## License & Acknowledgements
 
+### Voice Dataset & System Voices
+- **[CSTR VCTK Corpus (Voice Cloning Toolkit)](https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data)**: Curated corpus of English speech recorded by 110 English speakers with various accents, used to curate Cadence's 30 canonical system voices and reference timbres under the **Open Data Commons Attribution License (ODC-By v1.0)** / University of Edinburgh CSTR. Available on [Kaggle](https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data) and the [University of Edinburgh CSTR](https://datashare.ed.ac.uk/handle/10283/3443).
+
+### AI Foundation Models & Frameworks
 - **[Chatterbox TTS](https://github.com/resemble-ai/chatterbox)** by Resemble AI: Open-source zero-shot voice synthesis.
 - **[OpenAI Whisper](https://github.com/openai/whisper)**: State-of-the-art multilingual speech recognition.
 - **[ACE-Step 1.5](https://huggingface.co/spaces/ACE-Studio/ACE-Step)**: Full vocal song generation model.
