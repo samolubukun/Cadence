@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ import {
   BellOff,
   LayoutDashboard,
   Loader2,
+  Activity,
 } from "lucide-react";
 import { UserButton, useUser, useOrganization } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -545,7 +546,11 @@ export function PageHeader({ title, className, children }: PageHeaderProps) {
               <Headphones className="mr-2 size-4" />
               Speech to Text
             </CommandItem>
-            <CommandItem value="billing credits top-up usage" onSelect={() => runCommand(() => router.push("/billing"))}>
+            <CommandItem value="usage analytics consumption credit metrics" onSelect={() => runCommand(() => router.push("/usage"))}>
+              <Activity className="mr-2 size-4" />
+              Usage & Analytics
+            </CommandItem>
+            <CommandItem value="billing credits top-up packs" onSelect={() => runCommand(() => router.push("/billing"))}>
               <CreditCard className="mr-2 size-4" />
               Billing & Credits
             </CommandItem>
