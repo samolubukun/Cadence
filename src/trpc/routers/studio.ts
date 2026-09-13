@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { cadence, cadenceMedia, cadenceSenseNova, cadenceSong, cadenceSound, cadenceStudioClient } from "@/lib/cadence-client";
+import { cadence, cadenceMedia, cadenceSenseNova, cadenceSong, cadenceSound, cadenceStudioClient, cadenceClipper } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio, getSignedAudioUrl } from "@/lib/r2";
 import { createTRPCRouter, orgProcedure } from "../init";
@@ -713,4 +713,186 @@ export const studioRouter = createTRPCRouter({
       const signedUrl = await getSignedAudioUrl(r2Key);
       return { r2Key, url: signedUrl };
     }),
+
+  // ---------------------------------------------------------------------------
+  // 6. Viral Clipper Studio
+  // ---------------------------------------------------------------------------
+  clipMedia: orgProcedure
+    .input(
+      z.object({
+        sourceType: z.enum(["youtube", "upload", "studio"]).default("youtube"),
+        sourceUrl: z.string().optional(),
+        r2SourceKey: z.string().optional(),
+        numClips: z.number().min(1).max(10).default(5),
+        aspectRatio: z.enum(["9:16", "1:1", "16:9"]).default("9:16"),
+        enableReframe: z.boolean().default(true),
+        reframeMode: z.enum(["speaker", "podcast_split", "blur_fill"]).default("speaker"),
+        subtitleStyle: z.string().default("hormozi"),
+        fontFamily: z.string().default("THEBOLDFONT"),
+        fontSize: z.number().default(48),
+        primaryColor: z.string().default("#FFFFFF"),
+        highlightColor: z.string().default("#00FF66"),
+        wordsPerLine: z.number().min(1).max(6).default(3),
+        wordPop: z.boolean().default(true),
+        showHookBanner: z.boolean().default(true),
+        originalityBoost: z.boolean().default(true),
+        preferredDurationCategory: z.enum(["<30", "30-60", "60-90"]).default("30-60"),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Deduct 50 credits for viral clipper run
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 50,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for Viral Clipper (requires 50 credits)",
+          });
+        }
+      }
+
+      // 1. Create parent session in Convex
+      const sessionId = await convexClient.mutation(api.studio.createClipperSession, {
+        orgId: ctx.orgId,
+        title: input.sourceUrl || "Uploaded Media",
+        sourceType: input.sourceType,
+        sourceUrl: input.sourceUrl,
+        numClipsRequested: input.numClips,
+        aspectRatio: input.aspectRatio,
+        subtitleStyle: input.subtitleStyle,
+        status: "processing",
+      });
+
+      try {
+        // 2. Call Modal engine
+        const res = await cadenceClipper.POST("/api/clip", {
+          body: {
+            source_type: input.sourceType,
+            source_url: input.sourceUrl,
+            r2_source_key: input.r2SourceKey,
+            num_clips: input.numClips,
+            aspect_ratio: input.aspectRatio,
+            enable_reframe: input.enableReframe,
+            reframe_mode: input.reframeMode,
+            subtitle_style: input.subtitleStyle,
+            font_family: input.fontFamily,
+            font_size: input.fontSize,
+            primary_color: input.primaryColor,
+            highlight_color: input.highlightColor,
+            words_per_line: input.wordsPerLine,
+            word_pop: input.wordPop,
+            show_hook_banner: input.showHookBanner,
+            originality_boost: input.originalityBoost,
+            preferred_duration_category: input.preferredDurationCategory,
+          },
+        });
+
+        if (res.error || !res.data || !res.data.success) {
+          await convexClient.mutation(api.studio.updateClipperSessionStatus, {
+            sessionId,
+            status: "failed",
+            errorMessage: res.data?.error || "Modal Clipper engine failed",
+          });
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: res.data?.error || "Failed to process viral clips",
+          });
+        }
+
+        const engineData = res.data;
+
+        // 3. Update session title and thumbnail
+        await convexClient.mutation(api.studio.updateClipperSessionStatus, {
+          sessionId,
+          status: "completed",
+        });
+
+        // 4. Save generated clips into Convex
+        const createdClips = [];
+        for (const clip of engineData.clips || []) {
+          const clipRecordId = await convexClient.mutation(api.studio.createClip, {
+            sessionId,
+            orgId: ctx.orgId,
+            title: clip.title,
+            hookTitle: clip.hook_title,
+            hookType: clip.hook_type,
+            sourceType: input.sourceType,
+            sourceUrl: input.sourceUrl,
+            viralScore: clip.viral_score,
+            hookScore: clip.hook_score,
+            engagementScore: clip.engagement_score,
+            valueScore: clip.value_score,
+            shareabilityScore: clip.shareability_score,
+            reasoning: clip.reasoning,
+            startTime: clip.start_time,
+            endTime: clip.end_time,
+            duration: clip.duration,
+            transcriptText: clip.transcript,
+            aspectRatio: input.aspectRatio,
+            subtitleStyle: input.subtitleStyle,
+            r2ObjectKey: clip.r2_object_key,
+            status: "completed",
+          });
+
+          const signedUrl = await getSignedAudioUrl(clip.r2_object_key);
+          createdClips.push({
+            id: clipRecordId,
+            ...clip,
+            videoUrl: signedUrl,
+          });
+        }
+
+        return {
+          sessionId,
+          sourceTitle: engineData.source_title,
+          clips: createdClips,
+        };
+      } catch (err: any) {
+        await convexClient.mutation(api.studio.updateClipperSessionStatus, {
+          sessionId,
+          status: "failed",
+          errorMessage: err.message || "Failed to clip video",
+        });
+        throw err;
+      }
+    }),
+
+  getClipperSessions: orgProcedure.query(async ({ ctx }) => {
+    const sessions = await convexClient.query(api.studio.listClipperSessions, {
+      orgId: ctx.orgId,
+    });
+
+    // Sign video URLs for preview/download
+    const sessionsWithUrls = await Promise.all(
+      sessions.map(async (s) => {
+        const clipsWithUrls = await Promise.all(
+          (s.clips || []).map(async (c) => ({
+            ...c,
+            videoUrl: c.r2ObjectKey ? await getSignedAudioUrl(c.r2ObjectKey) : null,
+          }))
+        );
+        return {
+          ...s,
+          clips: clipsWithUrls,
+        };
+      })
+    );
+
+    return sessionsWithUrls;
+  }),
+
+  deleteClipperSession: orgProcedure
+    .input(z.object({ sessionId: z.string() }))
+    .mutation(async ({ input }) => {
+      await convexClient.mutation(api.studio.deleteClipperSession, {
+        sessionId: input.sessionId as Id<"clipperSessions">,
+      });
+      return { success: true };
+    }),
 });
+
