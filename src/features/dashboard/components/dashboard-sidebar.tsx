@@ -35,6 +35,7 @@ import {
   Mic2,
   Sparkles,
   Clapperboard,
+  Scissors,
   Activity,
   LogOut,
 } from "lucide-react";
@@ -143,6 +144,11 @@ export function DashboardSidebar() {
       title: "Visuals & Video",
       url: "/media",
       icon: Clapperboard,
+    },
+    {
+      title: "Viral Clipper",
+      url: "/clipper",
+      icon: Scissors,
     },
   ];
 
