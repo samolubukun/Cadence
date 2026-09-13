@@ -25,6 +25,18 @@ app = modal.App(APP_NAME)
 CACHE_DIR = "/root/.cache/studio_models"
 models_volume = modal.Volume.from_name("cadence-studio-cache", create_if_missing=True)
 
+# Direct Cloudflare R2 Mount (identical to cadence_engine)
+R2_BUCKET_NAME = "cadence"
+R2_ACCOUNT_ID = "6e63b51e6884e8e15d81a980f3fd9856"
+R2_MOUNT_PATH = "/r2"
+
+r2_bucket = modal.CloudBucketMount(
+    R2_BUCKET_NAME,
+    bucket_endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+    secret=modal.Secret.from_name("cloudflare-r2"),
+    read_only=False,
+)
+
 # ---------------------------------------------------------------------------
 # Container Image Definition
 # ---------------------------------------------------------------------------
@@ -63,7 +75,13 @@ studio_image = (
     gpu="A10G",
     scaledown_window=300,
     timeout=600,
-    volumes={CACHE_DIR: models_volume},
+    volumes={
+        CACHE_DIR: models_volume,
+        R2_MOUNT_PATH: r2_bucket,
+    },
+    secrets=[
+        modal.Secret.from_name("cloudflare-r2"),
+    ],
 )
 class CadenceStudioEngine:
     @modal.enter()
@@ -176,17 +194,46 @@ class CadenceStudioEngine:
 
         @web_app.post("/separate-stems")
         def run_stems(payload: StemPayload):
-            if not payload.audio_base64:
-                raise HTTPException(status_code=400, detail="audio_base64 is required")
-            raw_bytes = base64.b64decode(payload.audio_base64)
+            from pathlib import Path
+            raw_bytes = None
+            if payload.audio_key:
+                r2_file = Path(R2_MOUNT_PATH) / payload.audio_key
+                if r2_file.exists():
+                    raw_bytes = r2_file.read_bytes()
+            if raw_bytes is None and payload.audio_base64:
+                raw_bytes = base64.b64decode(payload.audio_base64)
+            if raw_bytes is None:
+                raise HTTPException(status_code=400, detail="Either audio_key (in R2) or audio_base64 is required")
+
             stems = self.separate_stems.local(raw_bytes)
+
+            # If audio_key was provided, also save stems directly into R2 mount
+            if payload.audio_key:
+                stem_base = Path(payload.audio_key).stem
+                out_dir = Path(R2_MOUNT_PATH) / "stems" / stem_base
+                out_dir.mkdir(parents=True, exist_ok=True)
+                for stem_name in ["vocals", "drums", "bass", "other"]:
+                    b64_val = stems.get(f"{stem_name}_base64")
+                    if b64_val:
+                        stem_file = out_dir / f"{stem_name}.wav"
+                        stem_file.write_bytes(base64.b64decode(b64_val))
+                        stems[f"{stem_name}_key"] = f"stems/{stem_base}/{stem_name}.wav"
+
             return stems
 
         @web_app.post("/convert-singing")
         def run_singing(payload: SingingPayload):
-            if not payload.audio_base64:
-                raise HTTPException(status_code=400, detail="audio_base64 is required")
-            raw_bytes = base64.b64decode(payload.audio_base64)
+            from pathlib import Path
+            raw_bytes = None
+            if payload.audio_key:
+                r2_file = Path(R2_MOUNT_PATH) / payload.audio_key
+                if r2_file.exists():
+                    raw_bytes = r2_file.read_bytes()
+            if raw_bytes is None and payload.audio_base64:
+                raw_bytes = base64.b64decode(payload.audio_base64)
+            if raw_bytes is None:
+                raise HTTPException(status_code=400, detail="Either audio_key or audio_base64 is required")
+
             stems = self.separate_stems.local(raw_bytes)
             vocal_bytes = base64.b64decode(stems["vocals_base64"])
             return {
@@ -197,13 +244,28 @@ class CadenceStudioEngine:
 
         @web_app.post("/enhance-audio")
         def run_enhance(payload: EnhancePayload):
-            if not payload.audio_base64:
-                raise HTTPException(status_code=400, detail="audio_base64 is required")
-            raw_bytes = base64.b64decode(payload.audio_base64)
+            from pathlib import Path
+            raw_bytes = None
+            if payload.audio_key:
+                r2_file = Path(R2_MOUNT_PATH) / payload.audio_key
+                if r2_file.exists():
+                    raw_bytes = r2_file.read_bytes()
+            if raw_bytes is None and payload.audio_base64:
+                raw_bytes = base64.b64decode(payload.audio_base64)
+            if raw_bytes is None:
+                raise HTTPException(status_code=400, detail="Either audio_key or audio_base64 is required")
+
             polished = self.enhance_audio.local(raw_bytes)
-            return {
+            result = {
                 "status": "success",
                 "audio_base64": base64.b64encode(polished).decode("utf-8"),
             }
+            if payload.audio_key:
+                enhanced_key = f"enhanced/{Path(payload.audio_key).name}"
+                target_file = Path(R2_MOUNT_PATH) / enhanced_key
+                target_file.parent.mkdir(parents=True, exist_ok=True)
+                target_file.write_bytes(polished)
+                result["enhanced_key"] = enhanced_key
+            return result
 
         return web_app
