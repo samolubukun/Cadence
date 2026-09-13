@@ -14,6 +14,7 @@ export const env = createEnv({
     CADENCE_SENSENOVA_API_URL: z.string().url().optional(),
     CADENCE_STUDIO_API_URL: z.string().url().optional(),
     CADENCE_SONG_API_URL: z.string().url().optional(),
+    CADENCE_CLIPPER_API_URL: z.string().url().optional(),
     CADENCE_API_KEY: z.string().min(1),
   },
   experimental__runtimeEnv: {},

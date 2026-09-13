@@ -51,6 +51,15 @@ export const cadenceStudioClient = createClient<any>({
   },
 });
 
+// Viral Clipper Client (Whisper Large-v3 + Qwen2.5-1.5B + YOLO11n + NVENC)
+export const cadenceClipper = createClient<any>({
+  baseUrl: env.CADENCE_CLIPPER_API_URL || "https://samuelolubukun--cadence-clipper-cadenceviralclipper-serve.modal.run",
+  headers: {
+    "x-api-key": env.CADENCE_API_KEY,
+  },
+});
+
 // Backward compatibility alias
 export const chatterbox = cadence;
+
 
