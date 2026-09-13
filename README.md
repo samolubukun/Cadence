@@ -41,6 +41,7 @@ Cadence is a self-hostable, full-spectrum generative audio, music, and media pla
   - **Full Songs with Vocals**: Compose complete songs with custom lyrics, verses, choruses, and singing vocals up to 240 seconds powered by **ACE-Step 1.5 Turbo**.
 - **Sound Effects Studio**: Generate photorealistic Foley effects, cinematic impacts, and ambient soundscapes powered by **Meta AudioGen**.
 - **Voice Changer & Speech-to-Speech**: Zero-shot timbre and pitch conversion powered by **MyShell OpenVoice v2**, preserving original timing, pitch dynamics, and emotion.
+- **Viral Video Clipper Studio**: Automated long-form video to 9:16 vertical shorts converter with Whisper Large-v3 timestamps, Qwen2.5 virality evaluation, YOLO11 active speaker reframing, and burned kinetic subtitles across 10 presets and 16 creator fonts.
 - **Visuals & Video Studio**: Generate high-resolution 1024x1024 album cover art with **SDXL-Turbo** and cinematic motion video visualizers with **Wan2.1 1.3B**.
 - **Curated Voice Library**: Pre-seeded broadcast-quality voice personas with instant preview audition and custom cloned voice management.
 - **Usage Accounting & Multi-Tenancy**: Deterministic credit deduction ledger backed by Convex and Clerk Organizations.
@@ -142,20 +143,28 @@ graph TD
 - **Zero-Shot Speech-to-Speech**: Powered by **MyShell OpenVoice v2**. Morph voice timbre while preserving exact emotional intonation, pitch dynamics, cadence, and pause timing.
 - **Input & Target Flexibility**: Upload or record source audio and convert it to match any target voice profile.
 
-### 6. Visuals & Video Studio (`/media`)
+### 6. Viral Video Clipper Studio (`/clipper`)
+- **Automated Long-to-Short Conversion**: Extract high-engagement viral clips from YouTube videos or uploaded files.
+- **Timestamp Grounding & Zero Hallucination**: Uses **Whisper Large-v3** for microsecond word timestamps and **Qwen2.5-1.5B** for discrete chunk virality scoring (4-pillar: Hook, Engagement, Value, Shareability).
+- **AI Visual Reframing**: **YOLO11** active speaker tracking with clamped dynamic panning, split-screen podcast layouts, and blurred background fills.
+- **Kinetic Subtitle Engine**: 10 distinct styling presets (Hormozi, MrBeast, TikTok Clean, Neon Cyber, Podcast Pill, etc.) with word-pop bounce and 16 creator fonts.
+- **Top Hook Retention Banner & Anti-Dupe Shield**: Burns attention-grabbing headline banners and applies subtle video EQ to avoid duplicate re-upload penalties.
+- **Hardware-Accelerated Export**: Real-time rendering via NVIDIA A10G NVENC with direct Cloudflare R2 streaming.
+
+### 7. Visuals & Video Studio (`/media`)
 - **Dual-Tier Image Generation**:
   - **Standard Mode (SDXL-Turbo)**: Ultra-fast 1–2 second generative artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
   - **Advanced Studio Mode (SenseNova-U1.5-8B MoT)**: 8-billion parameter mixture-of-trajectories diffusion transformer for studio releases, crisp graphic typography, and professional marketing flyers (50 credits).
 - **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
-### 7. Voice Library (`/voices`)
+### 8. Voice Library (`/voices`)
 - **Curated Catalog**: 30 distinct voice personas across narrative, conversational, character, and commercial styles.
 - **Live Audition**: Immediate preview playback for testing voices.
 - **Unified Header & Search**: Streamlined search toolbar and categorized voice counts.
 
 ---
 
-## Modal Microservice Engines: `cadence_engine.py` & `sensenova_engine.py`
+## Modal Microservice Engines
 
 Cadence organizes serverless compute into dedicated microservice engines:
 
@@ -166,6 +175,7 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | **`CadenceSongEngine`** | ACE-Step 1.5 Turbo (`torchcodec`) | NVIDIA A10G (24GB) | `/health`, `/generate-song` |
 | **`CadenceMediaEngine`** | SDXL-Turbo, Wan2.1 1.3B | NVIDIA A10G (24GB) | `/generate-image`, `/generate-video` |
 | **`CadenceStudioEngine`** | Meta Demucs v4, RVC v2, Resemble Enhance | NVIDIA A10G (24GB) | `/separate-stems`, `/convert-singing`, `/enhance-audio` |
+| **`CadenceViralClipper`** | Whisper Large-v3, Qwen2.5-1.5B, YOLO11, NVENC | NVIDIA A10G (24GB) | `/health`, `/api/clip` |
 | **`SenseNovaEngine`** | SenseNova-U1.5-8B-MoT | NVIDIA A10G / L40S (24GB+) | `/`, `/generate` |
 
 ### API Endpoints Reference
@@ -175,6 +185,7 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | `/generate` | Audio | `POST` | `prompt`, `voice_key`, `temperature`, `top_p`, `top_k`, `repetition_penalty` | `audio/wav` | Chatterbox Turbo TTS speech synthesis |
 | `/transcribe` | Audio | `POST` | `multipart/form-data` audio file or `audio_key` | JSON | Multilingual Whisper large-v3 transcription with word-level timestamps |
 | `/voice-change` | Audio | `POST` | `file` or `source_audio_key`, `target_voice_key`, `pitch_shift` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
+| `/api/clip` | Clipper | `POST` | `source_type`, `r2_source_key`, `num_clips`, `aspect_ratio`, `enable_reframe`, `reframe_mode`, `subtitle_style`, `font_family` | JSON | Viral moment extraction, YOLO reframing, kinetic subtitles, NVENC render to R2 |
 | `/generate-sound` | Sound | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
 | `/generate-beats` | Sound | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
 | `/generate-song` | Song / Sound | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition (or MusicGen fallback) |
@@ -231,6 +242,12 @@ Deploy the dedicated Audio Studio Engine (Demucs v4, RVC v2, Resemble Enhance):
 modal deploy cadence_studio_engine.py
 ```
 
+Deploy the Viral Video Clipper Engine (Whisper Large-v3, Qwen2.5-1.5B, YOLO11, NVENC):
+
+```bash
+modal deploy cadence_clipper_engine.py
+```
+
 Deploy the optional SenseNova-U1.5-8B MoT Studio Visual Engine:
 
 ```bash
@@ -243,6 +260,7 @@ modal deploy sensenova_engine.py
 - `https://<workspace>--cadence-cadencesongengine-serve.modal.run`
 - `https://<workspace>--cadence-cadencemediaengine-serve.modal.run`
 - `https://<workspace>--cadence-studio-cadencestudioengine-serve.modal.run`
+- `https://<workspace>--cadence-clipper-cadenceviralclipper-serve.modal.run`
 - `https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run`
 
 ---
