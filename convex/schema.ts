@@ -124,5 +124,45 @@ export default defineSchema({
     r2ObjectKey: v.optional(v.string()),
     status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
   }).index("by_orgId", ["orgId"]),
+
+  clipperSessions: defineTable({
+    orgId: v.string(),
+    title: v.string(),
+    sourceType: v.union(v.literal("youtube"), v.literal("upload"), v.literal("studio")),
+    sourceUrl: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    duration: v.optional(v.number()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+    errorMessage: v.optional(v.string()),
+    numClipsRequested: v.number(),
+    aspectRatio: v.union(v.literal("9:16"), v.literal("1:1"), v.literal("16:9")),
+    subtitleStyle: v.string(),
+  }).index("by_orgId", ["orgId"]),
+
+  clips: defineTable({
+    sessionId: v.id("clipperSessions"),
+    orgId: v.string(),
+    title: v.string(),
+    hookTitle: v.string(),
+    hookType: v.optional(v.string()),
+    sourceType: v.union(v.literal("youtube"), v.literal("upload"), v.literal("studio")),
+    sourceUrl: v.optional(v.string()),
+    viralScore: v.number(),
+    hookScore: v.number(),
+    engagementScore: v.number(),
+    valueScore: v.number(),
+    shareabilityScore: v.number(),
+    reasoning: v.optional(v.string()),
+    startTime: v.number(),
+    endTime: v.number(),
+    duration: v.number(),
+    transcriptText: v.string(),
+    aspectRatio: v.union(v.literal("9:16"), v.literal("1:1"), v.literal("16:9")),
+    subtitleStyle: v.string(),
+    r2ObjectKey: v.optional(v.string()),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+  })
+    .index("by_orgId", ["orgId"])
+    .index("by_sessionId", ["sessionId"]),
 });
 
