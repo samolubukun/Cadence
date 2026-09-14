@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="./public/cadence-banner.png" alt="Cadence Banner" width="100%" />
+
+<br /><br />
+
 # Cadence
 ### The open platform for every layer of voice, music, and media creation.
 
@@ -155,6 +159,10 @@ graph TD
 - **Dual-Tier Image Generation**:
   - **Standard Mode (SDXL-Turbo)**: Ultra-fast 1–2 second generative artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
   - **Advanced Studio Mode (SenseNova-U1.5-8B MoT)**: 8-billion parameter mixture-of-trajectories diffusion transformer for studio releases, crisp graphic typography, and professional marketing flyers (50 credits).
+- **AI Image Editing (SenseNova-U1.5-8B MoT)**:
+  - **Zero-Shot Image-to-Image / Inpainting**: Upload any existing photo or artwork and describe desired edits in natural language (`it2i_generate`).
+  - **Context-Aware Style & Lighting Reworks**: Add holographic elements, change backgrounds, relight scenes with studio volumetrics, or stylize into anime/sculpture aesthetics while preserving core structure.
+  - **Fine Control**: Standard (1024) or Ultra (2048) resolution modes with granular Image Guidance Scale adjustments (50 credits).
 - **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
 ### 8. Voice Library (`/voices`)
@@ -193,7 +201,8 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | `/convert-singing` | Studio | `POST` | `audio_base64`, `target_voice_key`, `pitch_shift` | `audio/wav` | RVC v2 musical singing voice conversion with pitch transpose |
 | `/enhance-audio` | Studio | `POST` | `audio_base64`, `audio_key` | `audio/wav` | Resemble Enhance 44.1kHz deep denoising and studio vocoding |
 | `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio`, `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
-| `/generate` | SenseNova | `POST` | `prompt`, `aspect_ratio`, `num_steps`, `quality` | JSON (base64) | SenseNova-U1.5-8B MoT studio-quality photorealistic rendering |
+| `/generate` (action: "generate") | SenseNova | `POST` | `prompt`, `aspect_ratio`, `num_steps`, `quality` | JSON (base64) | SenseNova-U1.5-8B MoT studio-quality photorealistic rendering |
+| `/generate` (action: "edit") | SenseNova | `POST` | `prompt`, `images` (base64), `quality`, `img_cfg_scale` | JSON (base64) | SenseNova-U1.5-8B MoT neural image editing and style transformation |
 | `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2–5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
 
 ---
