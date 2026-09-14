@@ -424,6 +424,82 @@ export const studioRouter = createTRPCRouter({
       return { id: mediaId, r2Key, url: signedUrl };
     }),
 
+  editImage: orgProcedure
+    .input(
+      z.object({
+        prompt: z.string().min(1).max(2000),
+        images: z.array(z.string()).min(1).max(4), // base64 strings
+        quality: z.enum(["standard", "ultra"]).default("standard"),
+        numSteps: z.number().min(10).max(50).default(28),
+        cfgScale: z.number().min(1).max(15).default(4.0),
+        imgCfgScale: z.number().min(0.1).max(5).default(1.0),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Deduct 50 credits for SenseNova AI image editing
+      try {
+        await convexClient.mutation(api.credits.deduct, {
+          orgId: ctx.orgId,
+          amount: 50,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("INSUFFICIENT_CREDITS")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Insufficient credits for SenseNova Image Editing (requires 50 credits)",
+          });
+        }
+      }
+
+      // Strip data URI prefix if present (e.g., "data:image/png;base64,")
+      const cleanBase64Images = input.images.map((b64) => {
+        const match = b64.match(/^data:image\/[a-zA-Z0-9+]+;base64,(.+)$/);
+        return match ? match[1] : b64;
+      });
+
+      // SenseNova-U1.5-8B MoT Image-to-Image / Multi-Image Editing
+      const res = await cadenceSenseNova.POST("/generate", {
+        body: {
+          action: "edit",
+          prompt: input.prompt,
+          images: cleanBase64Images,
+          quality: input.quality,
+          num_steps: input.numSteps,
+          cfg_scale: input.cfgScale,
+          img_cfg_scale: input.imgCfgScale,
+          timestep_shift: 3.0,
+        },
+      });
+
+      if (res.error || !res.data || !res.data.image_base64) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to edit image via SenseNova U1.5 engine",
+        });
+      }
+
+      const imageBuffer = Buffer.from(res.data.image_base64, "base64");
+
+      const mediaId = await convexClient.mutation(api.studio.createMediaGeneration, {
+        orgId: ctx.orgId,
+        type: "image",
+        prompt: `[Edit] ${input.prompt}`,
+        aspectRatio: "edited",
+        status: "completed",
+      });
+
+      const r2Key = `media/orgs/${ctx.orgId}/${mediaId}.png`;
+      await uploadAudio({
+        key: r2Key,
+        buffer: imageBuffer,
+        contentType: "image/png",
+      });
+
+      const signedUrl = await getSignedAudioUrl(r2Key);
+      return { id: mediaId, r2Key, url: signedUrl };
+    }),
+
   generateVideo: orgProcedure
     .input(
       z.object({
