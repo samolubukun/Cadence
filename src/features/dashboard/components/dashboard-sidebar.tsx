@@ -38,7 +38,11 @@ import {
   Scissors,
   Activity,
   LogOut,
+  Bot,
+  Radio,
 } from "lucide-react";
+
+
 import Link from "next/link";
 import { UsageContainer } from "@/features/billing/components/usage-container";
 
@@ -150,7 +154,13 @@ export function DashboardSidebar() {
       url: "/clipper",
       icon: Scissors,
     },
+    {
+      title: "Voice Agent",
+      url: "/agent",
+      icon: Bot,
+    },
   ];
+
 
   const othersMenuItems: MenuItem[] = [
     {
