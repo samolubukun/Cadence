@@ -47,6 +47,7 @@ Cadence is a self-hostable, full-spectrum generative audio, music, and media pla
 - **Voice Changer & Speech-to-Speech**: Zero-shot timbre and pitch conversion powered by **MyShell OpenVoice v2**, preserving original timing, pitch dynamics, and emotion.
 - **Viral Video Clipper Studio**: Automated long-form video to 9:16 vertical shorts converter with Whisper Large-v3 timestamps, Qwen2.5 virality evaluation, YOLO11 active speaker reframing, and burned kinetic subtitles across 10 presets and 16 creator fonts.
 - **Visuals & Video Studio**: Generate high-resolution 1024x1024 album cover art with **SDXL-Turbo** and cinematic motion video visualizers with **Wan2.1 1.3B**.
+- **Real-Time Voice Agent Studio (`/agent`)**: Ultra-low latency conversational AI agent powered by **Silero VAD**, **NVIDIA Parakeet / Whisper ASR**, **Qwen2.5-1.5B-Instruct**, and dual-mode TTS (sub-200ms **Kokoro-82M** speed mode + zero-shot **Chatterbox** cloned voice proxying) with barge-in interruption handling and full transcript inspection.
 - **Curated Voice Library**: Pre-seeded broadcast-quality voice personas with instant preview audition and custom cloned voice management.
 - **Usage Accounting & Multi-Tenancy**: Deterministic credit deduction ledger backed by Convex and Clerk Organizations.
 
@@ -170,6 +171,16 @@ graph TD
 - **Live Audition**: Immediate preview playback for testing voices.
 - **Unified Header & Search**: Streamlined search toolbar and categorized voice counts.
 
+### 9. Real-Time Conversational Voice Agent (`/agent`)
+- **Ultra-Low Latency Duplex Voice Pipeline**: Natural voice conversations over WebSockets utilizing the OpenAI Realtime Protocol.
+- **Silero VAD & Instant Barge-In**: Real-time voice activity detection with instantaneous audio interruption and queue eviction when the user speaks.
+- **Dual-Mode TTS Pipeline**:
+  - **Speed Mode**: Sub-200ms TTFT neural speech generation with **Kokoro-82M**.
+  - **Cloned Voice Mode**: High-fidelity zero-shot speech synthesis proxying to **Chatterbox Turbo** using your custom voice clones.
+- **Organic Liquid Visualizer**: High-frequency canvas-rendered volumetric audio orb with reactive dynamic sound wave harmonic bars.
+- **Persona Customization**: Switch instantly between Casual and fully Custom Personas with user-editable system instructions.
+- **Session History & Inspect**: Clickable session cards that open complete multi-turn conversation transcripts with TTFT latency and generation metrics.
+
 ---
 
 ## Modal Microservice Engines
@@ -185,11 +196,13 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | **`CadenceStudioEngine`** | Meta Demucs v4, RVC v2, Resemble Enhance | NVIDIA A10G (24GB) | `/separate-stems`, `/convert-singing`, `/enhance-audio` |
 | **`CadenceViralClipper`** | Whisper Large-v3, Qwen2.5-1.5B, YOLO11, NVENC | NVIDIA A10G (24GB) | `/health`, `/api/clip` |
 | **`SenseNovaEngine`** | SenseNova-U1.5-8B-MoT | NVIDIA A10G / L40S (24GB+) | `/`, `/generate` |
+| **`CadenceAgentEngine`** | Silero VAD, NVIDIA Parakeet / Whisper, Qwen2.5-1.5B, Kokoro-82M | NVIDIA A10G (24GB) | `/ws/realtime`, `/health` |
 
 ### API Endpoints Reference
 
 | Endpoint | Engine | Method | Input Parameters | Output | Description |
 | :--- | :--- | :---: | :--- | :--- | :--- |
+| `/ws/realtime` | Agent | `WebSocket` | Binary 24kHz PCM / OpenAI Realtime JSON frames | WebSocket Stream | Full-duplex conversational voice agent with VAD & barge-in |
 | `/generate` | Audio | `POST` | `prompt`, `voice_key`, `temperature`, `top_p`, `top_k`, `repetition_penalty` | `audio/wav` | Chatterbox Turbo TTS speech synthesis |
 | `/transcribe` | Audio | `POST` | `multipart/form-data` audio file or `audio_key` | JSON | Multilingual Whisper large-v3 transcription with word-level timestamps |
 | `/voice-change` | Audio | `POST` | `file` or `source_audio_key`, `target_voice_key`, `pitch_shift` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
@@ -255,6 +268,12 @@ Deploy the Viral Video Clipper Engine (Whisper Large-v3, Qwen2.5-1.5B, YOLO11, N
 
 ```bash
 modal deploy cadence_clipper_engine.py
+```
+
+Deploy the Real-Time Conversational Voice Agent Engine (Silero VAD, NVIDIA Parakeet / Whisper, Qwen2.5, Kokoro, Chatterbox proxy):
+
+```bash
+modal deploy cadence_agent_engine.py
 ```
 
 Deploy the optional SenseNova-U1.5-8B MoT Studio Visual Engine:
