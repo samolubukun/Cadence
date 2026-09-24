@@ -164,5 +164,29 @@ export default defineSchema({
   })
     .index("by_orgId", ["orgId"])
     .index("by_sessionId", ["sessionId"]),
+
+  agentSessions: defineTable({
+    orgId: v.string(),
+    title: v.optional(v.string()),
+    persona: v.string(), // "casual" | "creative" | "producer" | "coach"
+    voiceId: v.optional(v.id("voices")),
+    voiceName: v.string(),
+    voiceMode: v.union(v.literal("speed"), v.literal("cloned")),
+    durationSeconds: v.optional(v.number()),
+    messages: v.array(
+      v.object({
+        role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system")),
+        text: v.string(),
+        latencyMs: v.optional(v.number()),
+        timestamp: v.number(),
+      })
+    ),
+    status: v.union(
+      v.literal("active"),
+      v.literal("completed"),
+      v.literal("interrupted")
+    ),
+  }).index("by_orgId", ["orgId"]),
 });
+
 
