@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { cadence, cadenceMedia, cadenceSenseNova, cadenceSong, cadenceSound, cadenceStudioClient, cadenceClipper } from "@/lib/cadence-client";
+import { cadence, cadenceMedia, cadenceSenseNova, cadenceQwenImage, cadenceSong, cadenceSound, cadenceStudioClient, cadenceClipper } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio, getSignedAudioUrl } from "@/lib/r2";
 import { createTRPCRouter, orgProcedure } from "../init";
@@ -338,12 +338,15 @@ export const studioRouter = createTRPCRouter({
       z.object({
         prompt: z.string().min(1).max(2000),
         aspectRatio: z.string().default("1:1"),
-        model: z.enum(["sdxl-turbo", "sensenova"]).default("sdxl-turbo"),
+        model: z.enum(["sdxl-turbo", "sensenova", "qwen-image-2-1"]).default("qwen-image-2-1"),
+        transparent: z.boolean().default(false),
+        quality: z.enum(["standard", "ultra"]).default("standard"),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const isQwen = input.model === "qwen-image-2-1";
       const isSenseNova = input.model === "sensenova";
-      const creditCost = isSenseNova ? 50 : 20;
+      const creditCost = isQwen ? 50 : isSenseNova ? 50 : 20;
 
       // Deduct credits based on selected model tier
       try {
@@ -356,14 +359,35 @@ export const studioRouter = createTRPCRouter({
         if (msg.includes("INSUFFICIENT_CREDITS")) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: `Insufficient credits for ${isSenseNova ? "SenseNova Studio Quality (requires 50 credits)" : "image generation (requires 20 credits)"}`,
+            message: `Insufficient credits for ${isQwen ? "Qwen-Image-2.1 Engine (requires 50 credits)" : isSenseNova ? "SenseNova Studio Quality (requires 50 credits)" : "image generation (requires 20 credits)"}`,
           });
         }
       }
 
       let imageBuffer: Buffer;
 
-      if (isSenseNova) {
+      if (isQwen) {
+        // Qwen-Image-2.1 Standalone Engine (7B DiT + 8B Qwen3-VL)
+        const res = await cadenceQwenImage.POST("/generate", {
+          body: {
+            action: "generate",
+            prompt: input.prompt,
+            aspect_ratio: input.aspectRatio,
+            quality: input.quality,
+            transparent: input.transparent,
+            num_steps: 30,
+          },
+        });
+
+        if (res.error || !res.data || !res.data.image_base64) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate image via Qwen-Image-2.1 engine",
+          });
+        }
+
+        imageBuffer = Buffer.from(res.data.image_base64, "base64");
+      } else if (isSenseNova) {
         // SenseNova-U1.5-8B MoT Advanced Studio Engine
         const res = await cadenceSenseNova.POST("/generate", {
           body: {
@@ -428,15 +452,19 @@ export const studioRouter = createTRPCRouter({
     .input(
       z.object({
         prompt: z.string().min(1).max(2000),
-        images: z.array(z.string()).min(1).max(4), // base64 strings
+        images: z.array(z.string()).min(1).max(10), // base64 strings (Qwen supports up to 10 contextual images)
+        model: z.enum(["qwen-image-2-1", "sensenova"]).default("qwen-image-2-1"),
         quality: z.enum(["standard", "ultra"]).default("standard"),
-        numSteps: z.number().min(10).max(50).default(28),
+        transparent: z.boolean().default(false),
+        numSteps: z.number().min(10).max(50).default(30),
         cfgScale: z.number().min(1).max(15).default(4.0),
         imgCfgScale: z.number().min(0.1).max(5).default(1.0),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // Deduct 50 credits for SenseNova AI image editing
+      const isQwen = input.model === "qwen-image-2-1";
+
+      // Deduct 50 credits for AI image editing
       try {
         await convexClient.mutation(api.credits.deduct, {
           orgId: ctx.orgId,
@@ -447,7 +475,7 @@ export const studioRouter = createTRPCRouter({
         if (msg.includes("INSUFFICIENT_CREDITS")) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Insufficient credits for SenseNova Image Editing (requires 50 credits)",
+            message: `Insufficient credits for ${isQwen ? "Qwen-Image-2.1" : "SenseNova"} Image Editing (requires 50 credits)`,
           });
         }
       }
@@ -458,28 +486,53 @@ export const studioRouter = createTRPCRouter({
         return match ? match[1] : b64;
       });
 
-      // SenseNova-U1.5-8B MoT Image-to-Image / Multi-Image Editing
-      const res = await cadenceSenseNova.POST("/generate", {
-        body: {
-          action: "edit",
-          prompt: input.prompt,
-          images: cleanBase64Images,
-          quality: input.quality,
-          num_steps: input.numSteps,
-          cfg_scale: input.cfgScale,
-          img_cfg_scale: input.imgCfgScale,
-          timestep_shift: 3.0,
-        },
-      });
+      let imageBuffer: Buffer;
 
-      if (res.error || !res.data || !res.data.image_base64) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to edit image via SenseNova U1.5 engine",
+      if (isQwen) {
+        // Qwen-Image-2.1 Standalone Engine (Multi-image contextual editing, RGBA transparency)
+        const res = await cadenceQwenImage.POST("/generate", {
+          body: {
+            action: "edit",
+            prompt: input.prompt,
+            images: cleanBase64Images,
+            quality: input.quality,
+            transparent: input.transparent,
+            num_steps: input.numSteps,
+          },
         });
-      }
 
-      const imageBuffer = Buffer.from(res.data.image_base64, "base64");
+        if (res.error || !res.data || !res.data.image_base64) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to edit image via Qwen-Image-2.1 engine",
+          });
+        }
+
+        imageBuffer = Buffer.from(res.data.image_base64, "base64");
+      } else {
+        // SenseNova-U1.5-8B MoT Image-to-Image / Multi-Image Editing
+        const res = await cadenceSenseNova.POST("/generate", {
+          body: {
+            action: "edit",
+            prompt: input.prompt,
+            images: cleanBase64Images.slice(0, 4),
+            quality: input.quality,
+            num_steps: input.numSteps,
+            cfg_scale: input.cfgScale,
+            img_cfg_scale: input.imgCfgScale,
+            timestep_shift: 3.0,
+          },
+        });
+
+        if (res.error || !res.data || !res.data.image_base64) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to edit image via SenseNova U1.5 engine",
+          });
+        }
+
+        imageBuffer = Buffer.from(res.data.image_base64, "base64");
+      }
 
       const mediaId = await convexClient.mutation(api.studio.createMediaGeneration, {
         orgId: ctx.orgId,
