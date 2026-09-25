@@ -55,7 +55,7 @@ Cadence is a self-hostable, full-spectrum generative audio, music, and media pla
 
 ## High-Performance Microservice Architecture
 
-Cadence features a clean microservice architecture deployed on serverless NVIDIA A10G GPUs via Modal, split into four decoupled specialized engines:
+Cadence features a clean microservice architecture deployed on serverless NVIDIA A10G GPUs via Modal, split into decoupled specialized engines:
 
 ```mermaid
 graph TD
@@ -107,6 +107,12 @@ graph TD
     class SongEng songEngine;
     class MediaEng mediaEngine;
 ```
+
+<div align="center">
+  <img src="./public/cadence-architecture.jpeg" alt="Cadence Comprehensive Platform Architecture" width="100%" />
+</div>
+
+<br />
 
 ### Architectural Highlights
 1. **Decoupled Microservice Engines**: Voice synthesis/transcription, sound effects/beats, song composition, and media generation run in isolated Modal GPU containers with independent dependency stacks and dedicated memory boundaries.
