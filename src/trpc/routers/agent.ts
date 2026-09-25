@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { convexClient, api } from "@/lib/convex-server";
 import { createTRPCRouter, orgProcedure } from "../init";
 import { env } from "@/lib/env";
+import { trackGeneration } from "@/lib/langfuse";
 
 export const agentRouter = createTRPCRouter({
   // Start or configure a voice agent session & validate credits
@@ -101,7 +102,7 @@ export const agentRouter = createTRPCRouter({
         latencyMs: z.number().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       await convexClient.mutation(api.agent.appendTurn, {
         sessionId: input.sessionId as any,
         message: {
@@ -111,6 +112,28 @@ export const agentRouter = createTRPCRouter({
           timestamp: Date.now(),
         },
       });
+
+      if (input.role === "assistant") {
+        const estTokens = Math.ceil(input.text.length / 4);
+        trackGeneration({
+          name: "cadence-voice-agent-turn",
+          studio: "voice-agent",
+          actionType: "turn",
+          orgId: ctx.orgId,
+          userId: ctx.userId,
+          model: "Qwen2.5-1.5B / Kokoro-82M",
+          latencyMs: input.latencyMs ?? 150,
+          input: { sessionId: input.sessionId },
+          output: { text: input.text, latencyMs: input.latencyMs },
+          metadata: { studio: "voice-agent", latencyMs: input.latencyMs },
+          usage: {
+            promptTokens: 35,
+            completionTokens: estTokens,
+            totalTokens: 35 + estTokens,
+          },
+        }).catch((e) => console.error(e));
+      }
+
       return { success: true };
     }),
 

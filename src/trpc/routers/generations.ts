@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { cadence } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio } from "@/lib/r2";
+import { trackGeneration } from "@/lib/langfuse";
 import { TEXT_MAX_LENGTH } from "@/features/text-to-speech/data/constants";
 import { createTRPCRouter, orgProcedure } from "../init";
 import type { Id } from "convex/_generated/dataModel";
@@ -120,11 +121,7 @@ export const generationsRouter = createTRPCRouter({
         parseAs: "arrayBuffer",
       });
 
-      Sentry.logger.info("Generation started", {
-        orgId: ctx.orgId,
-        voiceId: input.voiceId,
-        textLength: input.text.length,
-      });
+
 
       if (error) {
         throw new TRPCError({
@@ -165,10 +162,40 @@ export const generationsRouter = createTRPCRouter({
           r2ObjectKey,
         });
 
-        Sentry.logger.info("Audio generated", {
+        // Dual-Stream LLM Observability Trace
+        trackGeneration({
+          name: "cadence-tts-generation",
+          studio: "tts",
+          actionType: "generate-speech",
+          userId: ctx.userId,
           orgId: ctx.orgId,
-          generationId,
-        });
+          model: "Chatterbox-Turbo",
+          input: {
+            text: input.text,
+            voiceName: voice.name,
+            voiceId: voice._id,
+            temperature: input.temperature,
+            topP: input.topP,
+            topK: input.topK,
+            repetitionPenalty: input.repetitionPenalty,
+          },
+          output: {
+            generationId,
+            r2ObjectKey,
+            sizeBytes: buffer.byteLength,
+          },
+          metadata: {
+            characterCount: input.text.length,
+            sampleRate: 24000,
+          },
+          usage: {
+            promptTokens: Math.ceil(input.text.length / 4),
+            completionTokens: Math.ceil(buffer.byteLength / 1000),
+            totalTokens: Math.ceil(input.text.length / 4) + Math.ceil(buffer.byteLength / 1000),
+            count: input.text.length,
+            unit: "characters",
+          },
+        }).catch((err) => console.error("Trace error:", err));
       } catch {
         if (generationId) {
           await convexClient.mutation(api.generations.remove, {

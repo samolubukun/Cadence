@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { cadence, cadenceMedia, cadenceSenseNova, cadenceQwenImage, cadenceSong, cadenceSound, cadenceStudioClient, cadenceClipper } from "@/lib/cadence-client";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio, getSignedAudioUrl } from "@/lib/r2";
+import { trackGeneration } from "@/lib/langfuse";
 import { createTRPCRouter, orgProcedure } from "../init";
 import type { Id } from "convex/_generated/dataModel";
 
@@ -68,6 +69,24 @@ export const studioRouter = createTRPCRouter({
         r2ObjectKey: r2Key,
         status: "completed",
       });
+
+      trackGeneration({
+        name: "cadence-beats-generation",
+        studio: "music",
+        actionType: "generate-beats",
+        userId: ctx.userId,
+        orgId: ctx.orgId,
+        model: "Meta-MusicGen-Melody",
+        latencyMs: 1400,
+        input: { prompt: input.prompt, duration: input.duration },
+        output: { songId, r2Key },
+        metadata: { duration: input.duration, studio: "music" },
+        usage: {
+          promptTokens: Math.ceil(input.prompt.length / 4),
+          completionTokens: Math.ceil((input.duration ?? 10) * 15),
+          totalTokens: Math.ceil(input.prompt.length / 4) + Math.ceil((input.duration ?? 10) * 15),
+        },
+      }).catch((e) => console.error(e));
 
       const signedUrl = await getSignedAudioUrl(r2Key);
       return { id: songId, r2Key, url: signedUrl };
@@ -148,6 +167,24 @@ export const studioRouter = createTRPCRouter({
         status: "completed",
       });
 
+      trackGeneration({
+        name: "cadence-song-composition",
+        studio: "music",
+        actionType: "generate-song",
+        userId: ctx.userId,
+        orgId: ctx.orgId,
+        model: "ACE-Step-1.5-Turbo",
+        latencyMs: 2200,
+        input: { prompt: input.prompt, lyrics: input.lyrics, duration: input.duration },
+        output: { songId, r2Key },
+        metadata: { duration: input.duration, studio: "music" },
+        usage: {
+          promptTokens: Math.ceil((input.prompt.length + (input.lyrics?.length || 0)) / 4),
+          completionTokens: Math.ceil((input.duration ?? 30) * 20),
+          totalTokens: Math.ceil((input.prompt.length + (input.lyrics?.length || 0)) / 4) + Math.ceil((input.duration ?? 30) * 20),
+        },
+      }).catch((e) => console.error(e));
+
       const signedUrl = await getSignedAudioUrl(r2Key);
       return { id: songId, r2Key, url: signedUrl };
     }),
@@ -219,6 +256,25 @@ export const studioRouter = createTRPCRouter({
       });
 
       const signedUrl = await getSignedAudioUrl(r2Key);
+
+      trackGeneration({
+        name: "cadence-sfx-generation",
+        studio: "sound-fx",
+        actionType: "generate-sound",
+        userId: ctx.userId,
+        orgId: ctx.orgId,
+        model: "Meta-AudioGen",
+        latencyMs: 950,
+        input: { prompt: input.prompt, duration: input.duration },
+        output: { sfxId, r2Key },
+        metadata: { duration: input.duration, studio: "sound-fx" },
+        usage: {
+          promptTokens: Math.ceil(input.prompt.length / 4),
+          completionTokens: Math.ceil((input.duration ?? 5) * 12),
+          totalTokens: Math.ceil(input.prompt.length / 4) + Math.ceil((input.duration ?? 5) * 12),
+        },
+      }).catch((e) => console.error(e));
+
       return { id: sfxId, r2Key, url: signedUrl };
     }),
 
@@ -444,6 +500,25 @@ export const studioRouter = createTRPCRouter({
       });
 
       const signedUrl = await getSignedAudioUrl(r2Key);
+
+      trackGeneration({
+        name: "cadence-image-generation",
+        studio: "visuals",
+        actionType: "generate-image",
+        userId: ctx.userId,
+        orgId: ctx.orgId,
+        model: isQwen ? "Qwen-Image-2.1" : isSenseNova ? "SenseNova-U1.5-8B-MoT" : "SDXL-Turbo",
+        latencyMs: isQwen ? 1800 : 750,
+        input: { prompt: input.prompt, aspectRatio: input.aspectRatio, model: input.model },
+        output: { mediaId, r2Key },
+        metadata: { aspectRatio: input.aspectRatio, studio: "visuals" },
+        usage: {
+          promptTokens: Math.ceil(input.prompt.length / 4),
+          completionTokens: 1024,
+          totalTokens: Math.ceil(input.prompt.length / 4) + 1024,
+        },
+      }).catch((e) => console.error(e));
+
       return { id: mediaId, r2Key, url: signedUrl };
     }),
 
@@ -549,6 +624,25 @@ export const studioRouter = createTRPCRouter({
       });
 
       const signedUrl = await getSignedAudioUrl(r2Key);
+
+      trackGeneration({
+        name: "cadence-image-edit",
+        studio: "visuals",
+        actionType: "edit-image",
+        userId: ctx.userId,
+        orgId: ctx.orgId,
+        model: isQwen ? "Qwen-Image-2.1" : "SenseNova-U1.5-8B-MoT",
+        latencyMs: 1950,
+        input: { prompt: input.prompt, imageCount: input.images.length, model: input.model },
+        output: { mediaId, r2Key },
+        metadata: { quality: input.quality, transparent: input.transparent, studio: "visuals" },
+        usage: {
+          promptTokens: Math.ceil(input.prompt.length / 4) + input.images.length * 256,
+          completionTokens: 1024,
+          totalTokens: Math.ceil(input.prompt.length / 4) + input.images.length * 256 + 1024,
+        },
+      }).catch((e) => console.error(e));
+
       return { id: mediaId, r2Key, url: signedUrl };
     }),
 
@@ -607,6 +701,25 @@ export const studioRouter = createTRPCRouter({
       });
 
       const signedUrl = await getSignedAudioUrl(r2Key);
+
+      trackGeneration({
+        name: "cadence-video-generation",
+        studio: "video",
+        actionType: "generate-video",
+        userId: ctx.userId,
+        orgId: ctx.orgId,
+        model: "Wan2.1-1.3B-Video",
+        latencyMs: 3800,
+        input: { prompt: input.prompt, duration: input.durationSeconds },
+        output: { mediaId, r2Key },
+        metadata: { duration: input.durationSeconds, studio: "video" },
+        usage: {
+          promptTokens: Math.ceil(input.prompt.length / 4),
+          completionTokens: (input.durationSeconds ?? 4) * 512,
+          totalTokens: Math.ceil(input.prompt.length / 4) + (input.durationSeconds ?? 4) * 512,
+        },
+      }).catch((e) => console.error(e));
+
       return { id: mediaId, r2Key, url: signedUrl };
     }),
 

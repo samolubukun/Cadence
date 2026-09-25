@@ -4,6 +4,7 @@ import { parseBuffer } from "music-metadata";
 import { env } from "@/lib/env";
 import { convexClient, api } from "@/lib/convex-server";
 import { uploadAudio } from "@/lib/r2";
+import { trackGeneration } from "@/lib/langfuse";
 import { createTRPCRouter, orgProcedure } from "../init";
 
 export const transcriptionsRouter = createTRPCRouter({
@@ -134,6 +135,25 @@ export const transcriptionsRouter = createTRPCRouter({
           status: "completed",
           segments: result.segments,
         });
+
+        const wordCount = result.text.split(/\s+/).filter(Boolean).length;
+        trackGeneration({
+          name: "cadence-whisper-transcription",
+          studio: "stt",
+          actionType: "transcribe",
+          userId: ctx.userId,
+          orgId: ctx.orgId,
+          model: "OpenAI-Whisper-Large-v3",
+          latencyMs: 850,
+          input: { fileName: input.fileName, durationSeconds: result.duration },
+          output: { text: result.text.slice(0, 500), language: result.language, segmentsCount: result.segments?.length },
+          metadata: { duration: result.duration, language: result.language, studio: "stt" },
+          usage: {
+            promptTokens: Math.ceil((result.duration ?? 5) * 50),
+            completionTokens: Math.ceil(wordCount * 1.3),
+            totalTokens: Math.ceil((result.duration ?? 5) * 50) + Math.ceil(wordCount * 1.3),
+          },
+        }).catch((e) => console.error(e));
 
         return {
           id: transcriptionId,
