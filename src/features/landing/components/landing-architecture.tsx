@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Cpu, HardDrive, Database, ShieldCheck, Layers, Mic, Music, Video, Wand2 } from "lucide-react";
+import { Cpu, HardDrive, Database, ShieldCheck, Layers, Mic, Music, Video, Wand2, Bot } from "lucide-react";
 
 export function LandingArchitecture() {
   const modalWorkloads = [
@@ -11,13 +11,6 @@ export function LandingArchitecture() {
       specs: "24kHz TTS • Word timestamps STT",
       icon: Mic,
       color: "text-indigo-600 bg-indigo-50 border-indigo-200",
-    },
-    {
-      title: "Real-Time Voice Agent",
-      models: "Silero VAD, Parakeet, Qwen2.5 & Kokoro",
-      specs: "Sub-200ms TTFT • WebSocket • Instant Barge-In",
-      icon: Mic,
-      color: "text-emerald-600 bg-emerald-50 border-emerald-200",
     },
     {
       title: "Cadence Studio Engine",
@@ -53,6 +46,13 @@ export function LandingArchitecture() {
       specs: "4s audio-reactive scene loops • 16:9 & 9:16",
       icon: Video,
       color: "text-cyan-600 bg-cyan-50 border-cyan-200",
+    },
+    {
+      title: "Real-Time Voice Agent",
+      models: "Silero VAD, Parakeet, Qwen2.5 & Kokoro",
+      specs: "Sub-200ms TTFT • WebSocket • Instant Barge-In",
+      icon: Bot,
+      color: "text-emerald-600 bg-emerald-50 border-emerald-200",
     },
   ];
 
