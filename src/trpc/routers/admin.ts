@@ -65,11 +65,22 @@ export const adminRouter = createTRPCRouter({
     }),
 
   // Get real-time KPIs from Native Convex Trace Engine
+  // Helper to verify admin status using userId + Clerk email
   getKpis: authProcedure
     .input(z.object({ timeWindow: z.string().optional() }))
     .query(async ({ ctx, input }) => {
+      let email: string | undefined;
+      try {
+        const { currentUser } = await import("@clerk/nextjs/server");
+        const clerkUser = await currentUser();
+        email = clerkUser?.emailAddresses?.[0]?.emailAddress;
+      } catch (err) {
+        // Continue
+      }
+
       const isAdmin = await convexClient.query(api.admin.checkIsAdmin, {
         userId: ctx.userId,
+        email,
       });
       if (!isAdmin) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
@@ -92,8 +103,18 @@ export const adminRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      let email: string | undefined;
+      try {
+        const { currentUser } = await import("@clerk/nextjs/server");
+        const clerkUser = await currentUser();
+        email = clerkUser?.emailAddresses?.[0]?.emailAddress;
+      } catch (err) {
+        // Continue
+      }
+
       const isAdmin = await convexClient.query(api.admin.checkIsAdmin, {
         userId: ctx.userId,
+        email,
       });
       if (!isAdmin) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
@@ -106,8 +127,18 @@ export const adminRouter = createTRPCRouter({
   pruneTraces: authProcedure
     .input(z.object({ retentionDays: z.number().optional() }))
     .mutation(async ({ ctx, input }) => {
+      let email: string | undefined;
+      try {
+        const { currentUser } = await import("@clerk/nextjs/server");
+        const clerkUser = await currentUser();
+        email = clerkUser?.emailAddresses?.[0]?.emailAddress;
+      } catch (err) {
+        // Continue
+      }
+
       const isAdmin = await convexClient.query(api.admin.checkIsAdmin, {
         userId: ctx.userId,
+        email,
       });
       if (!isAdmin) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
