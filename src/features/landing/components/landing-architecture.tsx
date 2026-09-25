@@ -35,8 +35,8 @@ export function LandingArchitecture() {
     },
     {
       title: "Studio Image Visuals",
-      models: "SenseNova-U1.5-8B MoT & SDXL-Turbo",
-      specs: "Native 1024px • MoT realism & 1-step fast",
+      models: "Qwen-Image-2.1, SenseNova & SDXL-Turbo",
+      specs: "Native 1024–2048px • English typography & MoT",
       icon: Wand2,
       color: "text-amber-600 bg-amber-50 border-amber-200",
     },

@@ -20,6 +20,7 @@ export function LandingWhy() {
     { name: "RVC v2", role: "Singing Voice Conversion", spec: "RMVPE Pitch" },
     { name: "Resemble Enhance", role: "Neural Speech Denoise", spec: "44.1kHz Clean" },
     { name: "SenseNova-U1.5", role: "Photorealistic Art", spec: "8B MoT" },
+    { name: "Qwen-Image-2.1", role: "Typography & Multi-Image Edit", spec: "7B DiT + 8B VL" },
     { name: "SDXL-Turbo", role: "Single-Step Diffusion", spec: "1024px Fast" },
     { name: "Wan2.1", role: "Cinematic Video & Visuals", spec: "4K UHD" },
     { name: "Kokoro-82M", role: "Real-Time Agent TTS", spec: "<200ms TTFT" },
