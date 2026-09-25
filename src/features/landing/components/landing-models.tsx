@@ -61,6 +61,17 @@ export function LandingModels() {
       badgeColor: "text-amber-600 bg-amber-50 border-amber-200/80",
     },
     {
+      name: "Qwen-Image-2.1",
+      provider: "Alibaba Cloud / Open Weights",
+      category: "Typography & Multi-Image Edit",
+      tag: "7B DiT + 8B VL",
+      specs: "2048px Ultra • Multi-image reference • RGBA",
+      description: "Next-gen visual foundation model specialized in flawless legible English typography, transparent PNG assets, and multi-image contextual editing.",
+      icon: Wand2,
+      logo: "/images/logos/wan.png",
+      badgeColor: "text-cyan-600 bg-cyan-50 border-cyan-200/80",
+    },
+    {
       name: "Meta Demucs v4",
       provider: "Meta AI Research",
       category: "Stem Isolation",
@@ -287,6 +298,13 @@ export function LandingModels() {
                 logo: "/images/logos/sensenova.png",
                 bg: "bg-amber-500/10 hover:bg-amber-500/15 border-amber-500/20",
                 textColor: "text-amber-900",
+              },
+              {
+                id: `qwen-image-${setIdx}`,
+                name: "Qwen-Image",
+                logo: "/images/logos/wan.png",
+                bg: "bg-cyan-500/10 hover:bg-cyan-500/15 border-cyan-500/20",
+                textColor: "text-cyan-900",
               },
               {
                 id: `acestep-${setIdx}`,

@@ -71,13 +71,13 @@ export function LandingBento() {
     },
     {
       title: "Visuals & Video",
-      badge: "SenseNova 8B & Wan2.1",
-      subtitle: "Studio Art & Motion Loops",
+      badge: "Qwen-Image-2.1 • SenseNova • Wan2.1",
+      subtitle: "Studio Art, Typography & Video Loops",
       icon: Video,
       accent: "text-cyan-600 bg-cyan-50 border-cyan-200",
       link: "/media",
-      description: "Generate photorealistic 1024px album covers with SenseNova-U1.5-8B MoT, fast SDXL-Turbo art, and Wan2.1 video visualizers.",
-      previewDetails: "SenseNova-U1.5-8B MoT • SDXL-Turbo • Wan2.1 1.3B video • 1:1, 16:9 & 9:16",
+      description: "Synthesize high-fidelity artwork with legible typography using Qwen-Image-2.1, photorealistic 8B MoT with SenseNova, and cinematic Wan2.1 motion loops.",
+      previewDetails: "Qwen-Image-2.1 (7B DiT + 8B VL) • SenseNova-U1.5-8B MoT • Wan2.1 1.3B video • RGBA PNGs",
     },
     {
       title: "Voice Agent Studio",
