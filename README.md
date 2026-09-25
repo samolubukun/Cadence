@@ -26,6 +26,10 @@ Generative voice, music, speech, and media studio. High-throughput text-to-speec
   <img src="https://img.shields.io/badge/MyShell-OpenVoice_v2-EC4899?style=for-the-badge&logo=github&logoColor=white" alt="OpenVoice" />&nbsp;
   <img src="https://img.shields.io/badge/Stability-SDXL--Turbo-06B6D4?style=for-the-badge&logo=stabilityai&logoColor=white" alt="SDXL-Turbo" />&nbsp;
   <img src="https://img.shields.io/badge/SenseNova-U1.5--8B_MoT-8B5CF6?style=for-the-badge&logo=pytorch&logoColor=white" alt="SenseNova-U1.5" />&nbsp;
+  <img src="https://img.shields.io/badge/Langfuse-LLM_Observability-000000?style=for-the-badge&logo=langfuse&logoColor=white" alt="Langfuse" />&nbsp;
+  <img src="https://img.shields.io/badge/Qwen--Image-2.1_DiT-6366F1?style=for-the-badge&logo=alibabacloud&logoColor=white" alt="Qwen-Image-2.1" />&nbsp;
+  <img src="https://img.shields.io/badge/Kokoro-82M_TTS-10B981?style=for-the-badge&logo=pytorch&logoColor=white" alt="Kokoro-82M" />&nbsp;
+  <img src="https://img.shields.io/badge/Demucs-v4_Stems-0EA5E9?style=for-the-badge&logo=meta&logoColor=white" alt="Demucs v4" />&nbsp;
   <img src="https://img.shields.io/badge/Wan-Video_2.1-A855F7?style=for-the-badge&logo=pytorch&logoColor=white" alt="Wan2.1" />
 </p>
 
@@ -144,49 +148,78 @@ graph TD
     classDef client fill:#f8fafc,stroke:#475569,stroke-width:2px,color:#0f172a;
     classDef edge fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
     classDef db fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46;
+    classDef obs fill:#faf5ff,stroke:#a855f7,stroke-width:2px,color:#581c87;
     classDef audioEngine fill:#f5f3ff,stroke:#8e75ff,stroke-width:2px,color:#5b21b6;
     classDef soundEngine fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e;
     classDef songEngine fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#3730a3;
     classDef mediaEngine fill:#ecfeff,stroke:#06b6d4,stroke-width:2px,color:#0e7490;
+    classDef visualEngine fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#86198f;
+    classDef agentEngine fill:#f0fdf4,stroke:#22c55e,stroke-width:2px,color:#14532d;
+    classDef clipperEngine fill:#fff1f2,stroke:#f43f5e,stroke-width:2px,color:#881337;
 
     subgraph Client ["Client Interface"]
         UI["Cadence Studio (Next.js 16 + React 19)"]
+        Dashboard["Observability & Analytics Dashboard"]
     end
 
-    subgraph Edge ["API Layer & Edge Proxy"]
+    subgraph Edge ["API Layer & Dual-Stream Telemetry"]
         TRPC["tRPC Routers & Edge API Routes"]
         R2_Store[("Cloudflare R2 Object Storage")]
-        Convex_DB[("Convex Real-Time Database")]
+        Convex_DB[("Convex Real-Time Database<br/>• llm_traces & credit ledger")]
+        Langfuse_Cloud[("Langfuse Cloud<br/>• Spans, tokens & latencies")]
     end
 
-    subgraph Microservices ["Modal Serverless GPU Microservices"]
-        AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS / Cloning)<br/>• Whisper large-v3 (STT Timestamps)<br/>• OpenVoice v2 (Speech-to-Speech)"]
-        SoundEng["CadenceSoundEngine<br/>• AudioGen (SFX / Foley)<br/>• MusicGen (Instrumental Beats)"]
+    subgraph Microservices ["Modal Serverless NVIDIA A10G GPU Microservices"]
+        AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS & Cloning)<br/>• Whisper large-v3 (Word STT)<br/>• OpenVoice v2 (Speech-to-Speech)"]
+        SoundEng["CadenceSoundEngine<br/>• Meta AudioGen (SFX & Foley)<br/>• Meta MusicGen (Instrumental Beats)"]
         SongEng["CadenceSongEngine<br/>• ACE-Step 1.5 Turbo (Full Vocal Songs)"]
-        MediaEng["CadenceMediaEngine<br/>• SDXL-Turbo (Images & Covers)<br/>• Wan2.1 1.3B (Cinematic Video)"]
+        MediaEng["CadenceMediaEngine<br/>• SDXL-Turbo (Rapid Diffusion)<br/>• Wan2.1 1.3B (Cinematic Video)"]
+        QwenEng["QwenImageEngine<br/>• Qwen-Image-2.1 (DiT Typography, RGBA, Context Edit)"]
+        SenseNovaEng["SenseNovaEngine<br/>• SenseNova-U1.5-8B MoT (Studio Realism & Inpaint)"]
+        StudioEng["CadenceStudioEngine<br/>• Meta Demucs v4 (4-Stem Split)<br/>• RVC v2 (Singing Voice)<br/>• Resemble Enhance (Audio Denoise)"]
+        AgentEng["CadenceAgentEngine<br/>• Silero VAD (Instant Barge-In)<br/>• NVIDIA Parakeet ASR<br/>• Qwen2.5-1.5B (Dialogue)<br/>• Kokoro-82M (Sub-200ms TTS)"]
+        ClipperEng["CadenceViralClipper<br/>• Whisper large-v3 + Qwen2.5 Virality<br/>• YOLO11 Dynamic Speaker Reframe<br/>• NVENC Hardware Render"]
     end
 
     UI -->|"User Actions & Real-Time Queries"| TRPC
     TRPC -->|"Audio Stems & Media Uploads"| R2_Store
-    TRPC -->|"State, Logs & Credit Accounting"| Convex_DB
+    TRPC -->|"Reactive State & Audit Trails"| Convex_DB
+    TRPC -->|"Stream 1: Spans & Latency"| Langfuse_Cloud
+    TRPC -->|"Stream 2: llm_traces reactive store"| Convex_DB
+    Convex_DB -.->|"Live Telemetry Waterfall & KPIs"| Dashboard
 
-    TRPC -->|"TTS, STT, Voice Changer"| AudioEng
+    TRPC -->|"TTS, STT, Voice Change"| AudioEng
     TRPC -->|"Beats & SFX Foley"| SoundEng
     TRPC -->|"Full Vocal Songs with Lyrics"| SongEng
-    TRPC -->|"Cover Art & Video Visualizers"| MediaEng
+    TRPC -->|"SDXL & Wan2.1 Video"| MediaEng
+    TRPC -->|"Typography & Multi-Image Edit"| QwenEng
+    TRPC -->|"8B MoT Studio Inpainting"| SenseNovaEng
+    TRPC -->|"Stems, Singing & Enhancer"| StudioEng
+    TRPC -->|"Duplex Realtime WebSockets"| AgentEng
+    TRPC -->|"Automated Short Clip Pipeline"| ClipperEng
 
     AudioEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
     SoundEng -->|"Weights Cache Mount"| R2_Store
     SongEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
     MediaEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    QwenEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    SenseNovaEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    StudioEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    AgentEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
+    ClipperEng -->|"NVENC Output Direct Push"| R2_Store
 
-    class UI client;
+    class UI,Dashboard client;
     class TRPC,R2_Store edge;
     class Convex_DB db;
+    class Langfuse_Cloud obs;
     class AudioEng audioEngine;
     class SoundEng soundEngine;
     class SongEng songEngine;
     class MediaEng mediaEngine;
+    class QwenEng,SenseNovaEng visualEngine;
+    class StudioEng audioEngine;
+    class AgentEng agentEngine;
+    class ClipperEng clipperEngine;
 ```
 
 <div align="center">
@@ -268,6 +301,15 @@ graph TD
 - **Organic Liquid Visualizer**: High-frequency canvas-rendered volumetric audio orb with reactive dynamic sound wave harmonic bars.
 - **Persona Customization**: Switch instantly between Casual and fully Custom Personas with user-editable system instructions.
 - **Session History & Inspect**: Clickable session cards that open complete multi-turn conversation transcripts with TTFT latency and generation metrics.
+
+### 10. AI & Model Observability Dashboard (`/observability`)
+- **Dual-Stream Telemetry Architecture**: Every studio interaction streams execution traces simultaneously to two destinations:
+  - **Langfuse Cloud**: Distributed spans, full prompts, completions, token accounting (prompt, completion, total), and latency percentiles.
+  - **Native Convex Trace Engine (`llm_traces`)**: In-database reactive telemetry for instant sub-millisecond filtering, audits, and waterfall inspection in-app.
+- **Real-Time KPIs**: Total generation volume, token burn, average generation latency (ms), and error/quota retry failure rate.
+- **Interactive Trace Waterfall**: Drill down into step-by-step spans, model identifiers, execution latency, and complete JSON input/output payloads.
+- **Multi-Dimension Filtering & Export**: Filter by time windows (24h, 7d, 30d, all), model identifiers, status (`success`, `error`, `quota_retry`), or studios, with 1-click **CSV** and **JSON** export.
+- **Automated Retention Pruning**: Configurable 7-day retention prune mutation keeping database storage lean.
 
 ---
 
@@ -432,6 +474,11 @@ CADENCE_CLIPPER_API_URL=https://<workspace>--cadence-clipper-cadenceviralclipper
 CADENCE_AGENT_API_URL=https://<workspace>--cadence-agent-cadenceagentengine-serve.modal.run
 CADENCE_AGENT_WS_URL=wss://<workspace>--cadence-agent-cadenceagentengine-serve.modal.run/ws/realtime
 CADENCE_API_KEY=your_cadence_api_key
+
+# LLMOps & Dual-Stream Observability (Langfuse)
+LANGFUSE_SECRET_KEY="sk-lf-..."
+LANGFUSE_PUBLIC_KEY="pk-lf-..."
+LANGFUSE_BASE_URL="https://cloud.langfuse.com"
 ```
 
 Sync environment variables with your Convex cloud deployment:
@@ -483,12 +530,14 @@ python scripts/run_all_endpoints_test.py
 cadence/
 ├── cadence_engine.py           # Modal serverless GPU microservices (Audio, Song, Media)
 ├── convex/                     # Convex reactive database
-│   ├── schema.ts               # Tables: users, organizations, generations, voices, studio
-│   ├── studio.ts               # Music, SFX, Voice Changer, and Media mutations
+│   ├── schema.ts               # Tables: users, generations, voices, studio, agentSessions, adminUsers, llm_traces
+│   ├── studio.ts               # Music, SFX, Voice Changer, Media, Stems, and Singing mutations
 │   ├── voices.ts               # Voice queries, canonical catalog, and custom voice mutations
-│   ├── speechToText.ts         # Whisper transcription mutation & timestamp ingestion
-│   ├── textToSpeech.ts         # Audio generation orchestration & credit checks
-│   └── billing.ts              # Credit transaction accounting ledger
+│   ├── transcriptions.ts       # Whisper transcription mutations & timestamp ingestion
+│   ├── agent.ts                # Real-time Voice Agent session & turn management
+│   ├── admin.ts                # Admin user verification & role elevations
+│   ├── traces.ts               # Native Convex Trace Engine queries, KPIs & pruning
+│   └── credits.ts              # Credit transaction accounting ledger
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── (dashboard)/        # Authenticated workspace layout
@@ -497,20 +546,28 @@ cadence/
 │   │   │   ├── music/          # Music Studio (MusicGen beats & ACE-Step songs)
 │   │   │   ├── sound-fx/       # Sound FX Studio (AudioGen Foley)
 │   │   │   ├── voice-changer/  # Voice Changer Studio (OpenVoice v2)
-│   │   │   ├── media/          # Visuals & Video Studio (SDXL & Wan2.1)
+│   │   │   ├── media/          # Visuals & Video Studio (SDXL, Qwen-Image, SenseNova, Wan2.1)
+│   │   │   ├── clipper/        # Viral Video Clipper Studio (Whisper + YOLO11 reframing)
+│   │   │   ├── agent/          # Real-time Duplex Voice Agent Studio (Silero VAD + Kokoro)
+│   │   │   ├── observability/  # AI & Model Observability Dashboard (Dual-stream waterfall)
 │   │   │   ├── voices/         # System & custom voice library
 │   │   │   ├── voice-clone/    # Dedicated voice cloning studio
-│   │   │   └── billing/        # Usage history & credit balance
+│   │   │   ├── usage/          # Usage & credit analytics ledger
+│   │   │   └── billing/        # Packs top-up & plan management
 │   │   └── api/                # Edge API routes & audio streaming proxy
 │   ├── features/               # Modular domain feature components
 │   │   ├── text-to-speech/     # TTS editor, presets, sliders, history search, audio preview
 │   │   ├── speech-to-text/     # Whisper waveform scrubber & timestamp block renderer
+│   │   ├── agent/              # Real-time voice agent visualizer, VAD & turn inspector
+│   │   ├── clipper/            # Viral clipper video player, subtitles & reframe controls
+│   │   ├── observability/      # Telemetry KPI cards, trace waterfall, filters & JSON export
+│   │   ├── usage/              # Credit breakdown charts, burn trends & audit ledger
 │   │   ├── voices/             # Voice card grid, category filters, audition players
 │   │   ├── voice-clone/        # Audio stem recorder, upload dropzone, clone wizard
 │   │   └── dashboard/          # Sidebar navigation and workspace overview
-│   ├── lib/                    # Storage, R2 S3 client, Convex clients, env schema
-│   └── trpc/                   # End-to-end typed RPC routers (voices, generations, studio)
-└── scripts/                    # Voice seeding and comprehensive Modal endpoint test suite
+│   ├── lib/                    # Storage, R2 S3 client, Convex clients, Langfuse dual-stream tracer
+│   └── trpc/                   # End-to-end typed RPC routers (voices, studio, agent, admin, billing)
+└── scripts/                    # Voice seeding, admin bootstrap, and Modal endpoint test suites
 ```
 
 ---
@@ -521,15 +578,28 @@ cadence/
 - **[CSTR VCTK Corpus (Voice Cloning Toolkit)](https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data)**: Curated corpus of English speech recorded by 110 English speakers with various accents, used to curate Cadence's 30 canonical system voices and reference timbres under the **Open Data Commons Attribution License (ODC-By v1.0)** / University of Edinburgh CSTR. Available on [Kaggle](https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data) and the [University of Edinburgh CSTR](https://datashare.ed.ac.uk/handle/10283/3443).
 
 ### AI Foundation Models & Frameworks
-- **[Chatterbox TTS](https://github.com/resemble-ai/chatterbox)** by Resemble AI: Open-source zero-shot voice synthesis.
-- **[OpenAI Whisper](https://github.com/openai/whisper)**: State-of-the-art multilingual speech recognition.
-- **[ACE-Step 1.5](https://huggingface.co/spaces/ACE-Studio/ACE-Step)**: Full vocal song generation model.
+- **[Chatterbox TTS](https://github.com/resemble-ai/chatterbox)** by Resemble AI: Open-source zero-shot voice synthesis and timbre cloning.
+- **[OpenAI Whisper & faster-whisper](https://github.com/openai/whisper)**: State-of-the-art multilingual speech recognition with CTranslate2 GPU acceleration and microsecond word-level timestamps.
+- **[NVIDIA Parakeet (NeMo)](https://github.com/NVIDIA/NeMo)**: Ultra-low latency 0.6B/1.1B parameter CTC/TDT speech recognition for real-time duplex streaming.
+- **[Qwen2.5-1.5B-Instruct](https://github.com/QwenLM/Qwen2.5)** by Alibaba Cloud: Fast conversational dialogue reasoning for real-time voice agents and automated virality candidate analysis.
+- **[ACE-Step 1.5](https://huggingface.co/spaces/ACE-Studio/ACE-Step)**: Full vocal song generation and musical synthesis with automated lyric alignment.
 - **[Meta MusicGen & AudioGen](https://github.com/facebookresearch/audiocraft)** by Meta AI: Instrumental music composition and Foley sound effects synthesis.
-- **[MyShell OpenVoice](https://github.com/myshell-ai/OpenVoice)**: Zero-shot speech-to-speech voice conversion.
-- **[Stability AI SDXL-Turbo](https://huggingface.co/stabilityai/sdxl-turbo)**: Real-time photorealistic text-to-image synthesis.
-- **[Wan2.1](https://github.com/Wan-Video/Wan2.1)**: State-of-the-art open generative video model.
+- **[MyShell OpenVoice v2](https://github.com/myshell-ai/OpenVoice)**: Zero-shot speech-to-speech voice conversion and tone-color mapping.
+- **[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M)** by Hexgrad: Sub-200ms ultra-low latency conversational voice agent speech synthesis.
+- **[Qwen-Image-2.1](https://huggingface.co/Qwen/Qwen-Image-2.1)** by Alibaba Cloud: State-of-the-art text-to-image with legible typography, native RGBA transparency, and multi-image contextual editing.
+- **[SenseNova-U1.5-8B MoT](https://huggingface.co/SenseNova)** by SenseTime: 8-billion parameter mixture-of-trajectories diffusion transformer for studio photorealism and contextual inpainting.
+- **[Stability AI SDXL-Turbo](https://huggingface.co/stabilityai/sdxl-turbo)**: Single-step real-time photorealistic text-to-image synthesis.
+- **[Wan2.1](https://github.com/Wan-Video/Wan2.1)**: State-of-the-art open generative video diffusion model.
+- **[Meta Demucs v4](https://github.com/facebookresearch/demucs)** by Meta AI: Deep neural 4-stem audio separation (Vocals, Drums, Bass, Other).
+- **[RVC v2 (Retrieval-based Voice Conversion)](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)**: Singing voice timbre morphing and pitch-shift synthesis.
+- **[Resemble Enhance](https://github.com/resemble-ai/resemble-enhance)** by Resemble AI: 44.1kHz deep neural audio denoising and vocoder enhancement.
+- **[Ultralytics YOLO11](https://github.com/ultralytics/ultralytics)**: Real-time dynamic speaker segmentation and AI camera reframing.
+- **[Silero VAD](https://github.com/snakers4/silero-vad)**: Millisecond speech activity detection with instant barge-in support.
+- **[Langfuse](https://langfuse.com)**: Open-source LLMOps and model generation observability telemetry.
+- **[yt-dlp](https://github.com/yt-dlp/yt-dlp) & [FFmpeg](https://ffmpeg.org)**: High-throughput media ingestion and hardware-accelerated NVENC video rendering.
 - **[Modal](https://modal.com)**: Serverless NVIDIA A10G GPU orchestration and auto-scaling.
-- **[Convex](https://convex.dev)**: Reactive real-time state database.
+- **[Convex](https://convex.dev)**: Reactive real-time state database and reactive trace engine.
+- **[Cloudflare R2](https://www.cloudflare.com/developer-platform/r2/)**: S3-compatible high-performance object storage with direct Linux filesystem mounting.
 - **[Clerk](https://clerk.com)**: Identity and multi-tenant organization management.
 
 ---
