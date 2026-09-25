@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { cadence } from "@/lib/cadence-client";
@@ -177,7 +176,7 @@ export const generationsRouter = createTRPCRouter({
           }).catch(() => {});
         }
 
-        Sentry.logger.error("Generation failed", {
+        console.error("Generation failed", {
           orgId: ctx.orgId,
           voiceId: input.voiceId,
         });

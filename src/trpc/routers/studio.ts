@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { cadence, cadenceMedia, cadenceSenseNova, cadenceQwenImage, cadenceSong, cadenceSound, cadenceStudioClient, cadenceClipper } from "@/lib/cadence-client";
