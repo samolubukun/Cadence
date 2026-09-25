@@ -187,6 +187,40 @@ export default defineSchema({
       v.literal("interrupted")
     ),
   }).index("by_orgId", ["orgId"]),
+
+  adminUsers: defineTable({
+    userId: v.string(), // Clerk user ID or identifier
+    email: v.optional(v.string()),
+    isAdmin: v.boolean(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_email", ["email"])
+    .index("by_isAdmin", ["isAdmin"]),
+
+  llm_traces: defineTable({
+    traceId: v.string(),
+    orgId: v.optional(v.string()),
+    userId: v.optional(v.string()),
+    studio: v.string(), // "tts" | "agent" | "stt" | "sfx" | "music" | "visuals" | "video"
+    actionType: v.string(), // e.g. "generate-speech", "turn", "transcribe", "generate-beats"
+    model: v.string(),
+    status: v.union(v.literal("success"), v.literal("error"), v.literal("quota_retry")),
+    latencyMs: v.number(),
+    promptTokens: v.optional(v.number()),
+    completionTokens: v.optional(v.number()),
+    totalTokens: v.optional(v.number()),
+    inputPayload: v.optional(v.string()), // JSON stringified
+    outputPayload: v.optional(v.string()), // JSON stringified
+    errorMessage: v.optional(v.string()),
+    stackTrace: v.optional(v.string()),
+    metadata: v.optional(v.string()), // JSON stringified
+    createdAt: v.number(), // timestamp ms
+  })
+    .index("by_createdAt", ["createdAt"])
+    .index("by_orgId", ["orgId"])
+    .index("by_model", ["model"])
+    .index("by_status", ["status"])
+    .index("by_studio", ["studio"]),
 });
 
 

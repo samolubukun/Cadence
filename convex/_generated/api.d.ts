@@ -8,10 +8,12 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
 import type * as agent from "../agent.js";
 import type * as credits from "../credits.js";
 import type * as generations from "../generations.js";
 import type * as studio from "../studio.js";
+import type * as traces from "../traces.js";
 import type * as transcriptions from "../transcriptions.js";
 import type * as voices from "../voices.js";
 
@@ -22,10 +24,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   agent: typeof agent;
   credits: typeof credits;
   generations: typeof generations;
   studio: typeof studio;
+  traces: typeof traces;
   transcriptions: typeof transcriptions;
   voices: typeof voices;
 }>;
