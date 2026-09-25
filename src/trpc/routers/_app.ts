@@ -5,6 +5,7 @@ import { voicesRouter } from './voices';
 import { transcriptionsRouter } from './transcriptions';
 import { studioRouter } from './studio';
 import { agentRouter } from './agent';
+import { adminRouter } from './admin';
 
 export const appRouter = createTRPCRouter({
   voices: voicesRouter,
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   transcriptions: transcriptionsRouter,
   studio: studioRouter,
   agent: agentRouter,
+  admin: adminRouter,
 });
 
 // export type definition of API

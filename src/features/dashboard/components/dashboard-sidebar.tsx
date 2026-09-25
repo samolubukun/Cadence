@@ -20,7 +20,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
   OrganizationSwitcher,
-  useClerk
+  useClerk,
+  useUser
 } from "@clerk/nextjs";
 import {
   type LucideIcon,
@@ -40,9 +41,11 @@ import {
   LogOut,
   Bot,
   Radio,
+  ShieldCheck,
 } from "lucide-react";
 
-
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
 import Link from "next/link";
 import { UsageContainer } from "@/features/billing/components/usage-container";
 
@@ -50,6 +53,7 @@ interface MenuItem {
   title: string;
   url?: string;
   icon: LucideIcon;
+  badge?: string;
   onClick?: () => void;
 };
 
@@ -85,14 +89,24 @@ function NavSection({ label, items, pathname }: NavSectionProps) {
                 className="h-9 px-3 py-2 text-[13px] tracking-tight font-medium border border-transparent data-[active=true]:border-border data-[active=true]:shadow-[0px_1px_1px_0px_rgba(44,54,53,0.03),inset_0px_0px_0px_2px_white]"
               >
                 {item.url ? (
-                  <Link href={item.url}>
+                  <Link href={item.url} className="flex items-center w-full">
                     <item.icon />
                     <span>{item.title}</span>
+                    {item.badge && (
+                      <span className="ml-auto text-[9px] font-medium tracking-normal px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/60 group-data-[collapsible=icon]:hidden">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 ) : (
                   <>
                     <item.icon />
                     <span>{item.title}</span>
+                    {item.badge && (
+                      <span className="ml-auto text-[9px] font-medium tracking-normal px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/60 group-data-[collapsible=icon]:hidden">
+                        {item.badge}
+                      </span>
+                    )}
                   </>
                 )}
               </SidebarMenuButton>
@@ -162,6 +176,17 @@ export function DashboardSidebar() {
   ];
 
 
+  const { user } = useUser();
+  const trpc = useTRPC();
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const { data: adminData } = useQuery(
+    trpc.admin.getIsAdmin.queryOptions(
+      { email: userEmail, username: user?.username ?? undefined },
+      { enabled: !!user }
+    )
+  );
+  const isAdmin = adminData?.isAdmin ?? false;
+
   const othersMenuItems: MenuItem[] = [
     {
       title: "Usage & Analytics",
@@ -173,6 +198,16 @@ export function DashboardSidebar() {
       url: "/billing",
       icon: CreditCard,
     },
+    ...(isAdmin
+      ? [
+          {
+            title: "Observability",
+            url: "/observability",
+            icon: ShieldCheck,
+            badge: "Admin",
+          },
+        ]
+      : []),
     {
       title: "Settings",
       icon: Settings,
