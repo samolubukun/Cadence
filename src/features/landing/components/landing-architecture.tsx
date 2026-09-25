@@ -13,6 +13,13 @@ export function LandingArchitecture() {
       color: "text-indigo-600 bg-indigo-50 border-indigo-200",
     },
     {
+      title: "Real-Time Voice Agent",
+      models: "Silero VAD, Parakeet, Qwen2.5 & Kokoro",
+      specs: "Sub-200ms TTFT • WebSocket • Instant Barge-In",
+      icon: Mic,
+      color: "text-emerald-600 bg-emerald-50 border-emerald-200",
+    },
+    {
       title: "Cadence Studio Engine",
       models: "Demucs v4, RVC v2 & Resemble Enhance",
       specs: "4-Stem split • Singing cover • 44.1kHz denoise",

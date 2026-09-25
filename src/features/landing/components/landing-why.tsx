@@ -22,6 +22,9 @@ export function LandingWhy() {
     { name: "SenseNova-U1.5", role: "Photorealistic Art", spec: "8B MoT" },
     { name: "SDXL-Turbo", role: "Single-Step Diffusion", spec: "1024px Fast" },
     { name: "Wan2.1", role: "Cinematic Video & Visuals", spec: "4K UHD" },
+    { name: "Kokoro-82M", role: "Real-Time Agent TTS", spec: "<200ms TTFT" },
+    { name: "Qwen2.5-1.5B", role: "Conversational Agent", spec: "Sub-50ms TTFT" },
+    { name: "NVIDIA Parakeet", role: "Real-Time ASR", spec: "Sub-80ms CTC" },
   ];
 
   return (

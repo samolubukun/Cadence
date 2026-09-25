@@ -79,6 +79,16 @@ export function LandingBento() {
       description: "Generate photorealistic 1024px album covers with SenseNova-U1.5-8B MoT, fast SDXL-Turbo art, and Wan2.1 video visualizers.",
       previewDetails: "SenseNova-U1.5-8B MoT • SDXL-Turbo • Wan2.1 1.3B video • 1:1, 16:9 & 9:16",
     },
+    {
+      title: "Voice Agent Studio",
+      badge: "Qwen2.5 • Parakeet • Kokoro",
+      subtitle: "Full-Duplex Conversational AI",
+      icon: Radio,
+      accent: "text-emerald-600 bg-emerald-50 border-emerald-200",
+      link: "/agent",
+      description: "Talk directly to an ultra-responsive voice assistant with instant Silero barge-in detection, sub-200ms Kokoro TTS, and zero-shot Chatterbox cloned voices.",
+      previewDetails: "Silero VAD • Realtime WebSocket • Parakeet ASR • Sub-200ms TTFT • Custom Personas",
+    },
   ];
 
   return (
@@ -87,13 +97,13 @@ export function LandingBento() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-700 shadow-xs">
-            Six Generative Studios
+            Full Production Studios
           </div>
           <h2 style={{ fontSize:"clamp(1.9rem,3.5vw,2.8rem)",fontWeight:800,color:"#0F172A",letterSpacing:"-0.04em",lineHeight:1.1,marginTop:"0.75rem",marginBottom:"1rem" }}>
             Everything you need to <span className="text-gradient-cadence">generate voice, music &amp; media</span>
           </h2>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Six dedicated production studios powered by self-hosted open source neural weights on serverless NVIDIA A10G GPUs.
+            Seven dedicated production studios powered by self-hosted open source neural weights on serverless NVIDIA A10G GPUs.
           </p>
         </div>
 
