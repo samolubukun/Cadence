@@ -7,7 +7,7 @@
 # Cadence
 ### The open platform for every layer of voice, music, and media creation.
 
-Generative voice, music, speech, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, and generative video visualizers. Built with **Next.js 16 (React 19)**, **Convex**, **Cloudflare R2**, and **Serverless NVIDIA A10G GPUs via Modal**.
+Generative voice, music, speech, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, and generative video visualizers.
 
 <br />
 
@@ -50,6 +50,87 @@ Cadence is a self-hostable, full-spectrum generative audio, music, and media pla
 - **Real-Time Voice Agent Studio (`/agent`)**: Ultra-low latency conversational AI agent powered by **Silero VAD**, **NVIDIA Parakeet / Whisper ASR**, **Qwen2.5-1.5B-Instruct**, and dual-mode TTS (sub-200ms **Kokoro-82M** speed mode + zero-shot **Chatterbox** cloned voice proxying) with barge-in interruption handling and full transcript inspection.
 - **Curated Voice Library**: Pre-seeded broadcast-quality voice personas with instant preview audition and custom cloned voice management.
 - **Usage Accounting & Multi-Tenancy**: Deterministic credit deduction ledger backed by Convex and Clerk Organizations.
+
+---
+
+## Foundation Models & Open Weights Ecosystem
+
+Cadence runs entirely on self-hosted open-weight neural models across audio, voice, music, visual, video, and agent intelligence:
+
+<table>
+  <tr>
+    <td align="center" width="130">
+      <img src="./public/images/logos/resemble.png" width="36" height="36" alt="Chatterbox Turbo" /><br />
+      <sub><b>Chatterbox Turbo</b><br/>TTS & Zero-Shot Clone</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/openai.png" width="36" height="36" alt="Whisper large-v3" /><br />
+      <sub><b>Whisper large-v3</b><br/>Word Timestamps STT</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/myshell.png" width="36" height="36" alt="OpenVoice v2" /><br />
+      <sub><b>OpenVoice v2</b><br/>Speech-to-Speech (STS)</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/kokoro.png" width="36" height="36" alt="Kokoro-82M" /><br />
+      <sub><b>Kokoro-82M</b><br/>Sub-200ms Agent TTS</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="130">
+      <img src="./public/images/logos/acestep.png" width="36" height="36" alt="ACE-Step 1.5 Turbo" /><br />
+      <sub><b>ACE-Step 1.5</b><br/>Full Vocal Songs</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/meta.png" width="36" height="36" alt="Meta MusicGen" /><br />
+      <sub><b>MusicGen Melody</b><br/>Beats & Instrumentals</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/meta.png" width="36" height="36" alt="Meta AudioGen" /><br />
+      <sub><b>AudioGen</b><br/>Photorealistic SFX</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/meta.png" width="36" height="36" alt="Meta Demucs v4" /><br />
+      <sub><b>Demucs v4</b><br/>4-Stem Audio Split</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="130">
+      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/pytorch.svg" width="36" height="36" alt="RVC v2" /><br />
+      <sub><b>RVC v2</b><br/>Singing Voice Conversion</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/resemble.png" width="36" height="36" alt="Resemble Enhance" /><br />
+      <sub><b>Resemble Enhance</b><br/>Neural Denoise & Clean</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/sensenova.png" width="36" height="36" alt="SenseNova-U1.5-8B" /><br />
+      <sub><b>SenseNova-U1.5</b><br/>8B MoT Photorealism</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/wan.png" width="36" height="36" alt="Qwen-Image-2.1" /><br />
+      <sub><b>Qwen-Image-2.1</b><br/>DiT Typography & RGBA</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="130">
+      <img src="./public/images/logos/stability.png" width="36" height="36" alt="SDXL-Turbo" /><br />
+      <sub><b>SDXL-Turbo</b><br/>1s Rapid Cover Art</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/wan.png" width="36" height="36" alt="Wan2.1 1.3B" /><br />
+      <sub><b>Wan2.1 1.3B</b><br/>Cinematic Video</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/wan.png" width="36" height="36" alt="Qwen2.5-1.5B" /><br />
+      <sub><b>Qwen2.5-1.5B</b><br/>Agent LLM & Clipper</sub>
+    </td>
+    <td align="center" width="130">
+      <img src="./public/images/logos/nvidia.svg" width="36" height="36" alt="NVIDIA Parakeet" /><br />
+      <sub><b>NVIDIA Parakeet</b><br/>Low-Latency ASR</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
