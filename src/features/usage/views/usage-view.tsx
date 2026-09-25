@@ -18,6 +18,7 @@ import {
   Volume2,
   Clapperboard,
   AudioLines,
+  Bot,
 } from "lucide-react";
 import {
   AreaChart,
@@ -82,6 +83,11 @@ const CATEGORY_META = {
     label: "AI Singing Cover",
     icon: AudioLines,
     badgeColor: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+  },
+  agent: {
+    label: "Voice Agent",
+    icon: Bot,
+    badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
   },
 } as const;
 
@@ -374,10 +380,13 @@ export function UsageView() {
                 <option value="all">All Features</option>
                 <option value="tts">TTS Speech</option>
                 <option value="stt">Transcription</option>
+                <option value="agent">Voice Agent</option>
                 <option value="beats">Instrumental Beats</option>
                 <option value="songs">Full Songs</option>
                 <option value="sfx">Sound Effects</option>
                 <option value="media">Media (Img/Vid)</option>
+                <option value="stems">Stem Separation</option>
+                <option value="singing">Singing Covers</option>
               </select>
             </div>
           </div>

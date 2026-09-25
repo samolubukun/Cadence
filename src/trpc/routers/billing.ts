@@ -17,7 +17,7 @@ export const billingRouter = createTRPCRouter({
     const orgId = ctx.orgId;
 
     // Fetch records concurrently
-    const [balance, generations, transcriptions, songs, sfxList, mediaList, stemList, singingList] =
+    const [balance, generations, transcriptions, songs, sfxList, mediaList, stemList, singingList, agentSessions] =
       await Promise.all([
         convexClient.query(api.credits.getBalance, { orgId }),
         convexClient.query(api.generations.list, { orgId }),
@@ -27,12 +27,13 @@ export const billingRouter = createTRPCRouter({
         convexClient.query(api.studio.listMediaGenerations, { orgId }),
         convexClient.query(api.studio.listStems, { orgId }),
         convexClient.query(api.studio.listSingingCovers, { orgId }),
+        convexClient.query(api.agent.listSessions, { orgId }),
       ]);
 
     // Format transaction ledger items
     type Transaction = {
       id: string;
-      category: "tts" | "stt" | "beats" | "songs" | "sfx" | "media" | "stems" | "singing";
+      category: "tts" | "stt" | "beats" | "songs" | "sfx" | "media" | "stems" | "singing" | "agent";
       title: string;
       detail: string;
       credits: number;
@@ -152,11 +153,29 @@ export const billingRouter = createTRPCRouter({
       });
     }
 
+    // 8. Voice Agent Sessions: 5 credits / turn (or duration based)
+    let agentCredits = 0;
+    if (agentSessions) {
+      for (const ag of agentSessions) {
+        const turnCount = ag.messages?.filter((m) => m.role === "assistant").length || 1;
+        const cost = Math.max(5, turnCount * 5);
+        agentCredits += cost;
+        transactions.push({
+          id: `agent-${ag._id}`,
+          category: "agent",
+          title: `Voice Agent: ${ag.title || ag.persona}`,
+          detail: `${ag.voiceName} • ${turnCount} turns • ${ag.durationSeconds || 0}s`,
+          credits: cost,
+          timestamp: ag._creationTime,
+        });
+      }
+    }
+
     // Sort transactions by newest first
     transactions.sort((a, b) => b.timestamp - a.timestamp);
 
     const totalCreditsSpent =
-      ttsCredits + sttCredits + beatsCredits + songsCredits + sfxCredits + mediaCredits + stemsCredits + singingCredits;
+      ttsCredits + sttCredits + beatsCredits + songsCredits + sfxCredits + mediaCredits + stemsCredits + singingCredits + agentCredits;
 
     const totalGenerationsCount = transactions.length;
 
@@ -184,6 +203,7 @@ export const billingRouter = createTRPCRouter({
     const categoryBreakdown = [
       { name: "TTS Speech", key: "tts", credits: ttsCredits, color: "#6366F1" },
       { name: "Transcription", key: "stt", credits: sttCredits, color: "#0EA5E9" },
+      { name: "Voice Agent", key: "agent", credits: agentCredits, color: "#10B981" },
       { name: "Instrumental Beats", key: "beats", credits: beatsCredits, color: "#8B5CF6" },
       { name: "Full Songs", key: "songs", credits: songsCredits, color: "#A855F7" },
       { name: "Sound Effects", key: "sfx", credits: sfxCredits, color: "#F59E0B" },
