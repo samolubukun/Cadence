@@ -143,83 +143,82 @@ Cadence runs entirely on self-hosted open-weight neural models across audio, voi
 Cadence features a clean microservice architecture deployed on serverless NVIDIA A10G GPUs via Modal, split into decoupled specialized engines:
 
 ```mermaid
-graph TD
+flowchart TD
     %% Styling Classes
-    classDef client fill:#f8fafc,stroke:#475569,stroke-width:2px,color:#0f172a;
-    classDef edge fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
-    classDef db fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46;
-    classDef obs fill:#faf5ff,stroke:#a855f7,stroke-width:2px,color:#581c87;
-    classDef audioEngine fill:#f5f3ff,stroke:#8e75ff,stroke-width:2px,color:#5b21b6;
-    classDef soundEngine fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e;
-    classDef songEngine fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#3730a3;
-    classDef mediaEngine fill:#ecfeff,stroke:#06b6d4,stroke-width:2px,color:#0e7490;
-    classDef visualEngine fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#86198f;
-    classDef agentEngine fill:#f0fdf4,stroke:#22c55e,stroke-width:2px,color:#14532d;
-    classDef clipperEngine fill:#fff1f2,stroke:#f43f5e,stroke-width:2px,color:#881337;
+    classDef client fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a;
+    classDef edgeLayer fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
+    classDef storage fill:#ecfeff,stroke:#0891b2,stroke-width:2px,color:#155e75;
+    classDef db fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#065f46;
+    classDef obs fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#581c87;
+    classDef audioCluster fill:#f5f3ff,stroke:#7c3aed,stroke-width:2px,color:#4c1d95;
+    classDef visualCluster fill:#fdf4ff,stroke:#c026d3,stroke-width:2px,color:#701a75;
+    classDef agentCluster fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#14532d;
 
-    subgraph Client ["Client Interface"]
-        UI["Cadence Studio (Next.js 16 + React 19)"]
-        Dashboard["Observability & Analytics Dashboard"]
+    subgraph Tier1 ["1. Client & Presentation Layer"]
+        UI["Cadence Studio Frontend<br/><i>Next.js 16 • React 19 • TailwindCSS</i>"]
+        Dashboard["Observability & Analytics Dashboard<br/><i>Live Trace Waterfall • Token Burn KPIs</i>"]
     end
 
-    subgraph Edge ["API Layer & Dual-Stream Telemetry"]
-        TRPC["tRPC Routers & Edge API Routes"]
-        R2_Store[("Cloudflare R2 Object Storage")]
-        Convex_DB[("Convex Real-Time Database<br/>• llm_traces & credit ledger")]
-        Langfuse_Cloud[("Langfuse Cloud<br/>• Spans, tokens & latencies")]
+    subgraph Tier2 ["2. Edge API Gateway & Dual-Stream Telemetry"]
+        TRPC["tRPC API Routers & Streaming Handlers"]
+        Convex_DB[("Convex Reactive Database<br/>• Reactive State & Credit Accounting<br/>• Native Trace Engine (llm_traces)")]
+        Langfuse_Cloud[("Langfuse Cloud<br/>• Distributed Spans & Latencies<br/>• Generation Token Accounting")]
     end
 
-    subgraph Microservices ["Modal Serverless NVIDIA A10G GPU Microservices"]
-        AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS & Cloning)<br/>• Whisper large-v3 (Word STT)<br/>• OpenVoice v2 (Speech-to-Speech)"]
-        SoundEng["CadenceSoundEngine<br/>• Meta AudioGen (SFX & Foley)<br/>• Meta MusicGen (Instrumental Beats)"]
-        SongEng["CadenceSongEngine<br/>• ACE-Step 1.5 Turbo (Full Vocal Songs)"]
-        MediaEng["CadenceMediaEngine<br/>• SDXL-Turbo (Rapid Diffusion)<br/>• Wan2.1 1.3B (Cinematic Video)"]
-        QwenEng["QwenImageEngine<br/>• Qwen-Image-2.1 (DiT Typography, RGBA, Context Edit)"]
-        SenseNovaEng["SenseNovaEngine<br/>• SenseNova-U1.5-8B MoT (Studio Realism & Inpaint)"]
-        StudioEng["CadenceStudioEngine<br/>• Meta Demucs v4 (4-Stem Split)<br/>• RVC v2 (Singing Voice)<br/>• Resemble Enhance (Audio Denoise)"]
-        AgentEng["CadenceAgentEngine<br/>• Silero VAD (Instant Barge-In)<br/>• NVIDIA Parakeet ASR<br/>• Qwen2.5-1.5B (Dialogue)<br/>• Kokoro-82M (Sub-200ms TTS)"]
-        ClipperEng["CadenceViralClipper<br/>• Whisper large-v3 + Qwen2.5 Virality<br/>• YOLO11 Dynamic Speaker Reframe<br/>• NVENC Hardware Render"]
+    subgraph Tier3 ["3. Serverless Modal GPU Microservice Clusters (NVIDIA A10G)"]
+        direction TB
+
+        subgraph AudioGroup ["Audio, Voice & Music Intelligence"]
+            AudioEng["CadenceAudioEngine<br/>• Chatterbox Turbo (TTS & Cloning)<br/>• Whisper large-v3 (Word STT)<br/>• OpenVoice v2 (Speech-to-Speech)"]
+            SoundEng["CadenceSoundEngine<br/>• Meta AudioGen (SFX Foley)<br/>• Meta MusicGen (Instrumentals)"]
+            SongEng["CadenceSongEngine<br/>• ACE-Step 1.5 Turbo (Vocal Songs)"]
+            StudioEng["CadenceStudioEngine<br/>• Meta Demucs v4 (4-Stem Split)<br/>• RVC v2 (Singing Voice Conversion)<br/>• Resemble Enhance (Audio Denoising)"]
+        end
+
+        subgraph VisualGroup ["Generative Vision & Video Intelligence"]
+            MediaEng["CadenceMediaEngine<br/>• SDXL-Turbo (Diffusion)<br/>• Wan2.1 1.3B (Generative Video)"]
+            QwenEng["QwenImageEngine<br/>• Qwen-Image-2.1 (Typography & RGBA)"]
+            SenseNovaEng["SenseNovaEngine<br/>• SenseNova-U1.5-8B MoT (Studio Inpainting)"]
+        end
+
+        subgraph AgentGroup ["Conversational Voice Agents & Viral Media"]
+            AgentEng["CadenceAgentEngine (WebSockets)<br/>• Silero VAD (Instant Barge-In)<br/>• NVIDIA Parakeet ASR • Kokoro-82M TTS"]
+            ClipperEng["CadenceViralClipper (NVENC)<br/>• Whisper + Qwen2.5 Virality Scoring<br/>• YOLO11 Dynamic Speaker Reframe"]
+        end
     end
 
-    UI -->|"User Actions & Real-Time Queries"| TRPC
-    TRPC -->|"Audio Stems & Media Uploads"| R2_Store
-    TRPC -->|"Reactive State & Audit Trails"| Convex_DB
-    TRPC -->|"Stream 1: Spans & Latency"| Langfuse_Cloud
-    TRPC -->|"Stream 2: llm_traces reactive store"| Convex_DB
-    Convex_DB -.->|"Live Telemetry Waterfall & KPIs"| Dashboard
+    subgraph Tier4 ["4. High-Performance Object Storage"]
+        R2_Store[("Cloudflare R2 Object Storage<br/><i>Direct Linux Filesystem Mount (/r2)</i>")]
+    end
 
-    TRPC -->|"TTS, STT, Voice Change"| AudioEng
-    TRPC -->|"Beats & SFX Foley"| SoundEng
-    TRPC -->|"Full Vocal Songs with Lyrics"| SongEng
-    TRPC -->|"SDXL & Wan2.1 Video"| MediaEng
-    TRPC -->|"Typography & Multi-Image Edit"| QwenEng
-    TRPC -->|"8B MoT Studio Inpainting"| SenseNovaEng
-    TRPC -->|"Stems, Singing & Enhancer"| StudioEng
-    TRPC -->|"Duplex Realtime WebSockets"| AgentEng
-    TRPC -->|"Automated Short Clip Pipeline"| ClipperEng
+    %% Client to Edge
+    UI -->|"tRPC Mutations & Queries"| TRPC
+    TRPC <-->|"Reactive Subscriptions"| Convex_DB
+    Convex_DB -.->|"Live Traces & Telemetry"| Dashboard
 
-    AudioEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    SoundEng -->|"Weights Cache Mount"| R2_Store
-    SongEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    MediaEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    QwenEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    SenseNovaEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    StudioEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    AgentEng -->|"Direct Filesystem Mount (/r2)"| R2_Store
-    ClipperEng -->|"NVENC Output Direct Push"| R2_Store
+    %% Telemetry Streams
+    TRPC -->|"Stream 1: Spans & Latencies"| Langfuse_Cloud
+    TRPC -->|"Stream 2: Structured Traces"| Convex_DB
+
+    %% Dispatch to Clusters
+    TRPC -->|"Speech, Foley & Stems"| AudioGroup
+    TRPC -->|"Images, Video & Inpainting"| VisualGroup
+    TRPC -->|"Full-Duplex WS & Video Pipeline"| AgentGroup
+
+    %% Storage Mounts
+    AudioGroup -->|"Mount /r2"| R2_Store
+    VisualGroup -->|"Mount /r2"| R2_Store
+    AgentGroup -->|"NVENC Stream / Mount"| R2_Store
+    TRPC -->|"Direct Uploads / Presigned URLs"| R2_Store
 
     class UI,Dashboard client;
-    class TRPC,R2_Store edge;
+    class TRPC edgeLayer;
     class Convex_DB db;
     class Langfuse_Cloud obs;
-    class AudioEng audioEngine;
-    class SoundEng soundEngine;
-    class SongEng songEngine;
-    class MediaEng mediaEngine;
-    class QwenEng,SenseNovaEng visualEngine;
-    class StudioEng audioEngine;
-    class AgentEng agentEngine;
-    class ClipperEng clipperEngine;
+    class AudioEng,SoundEng,SongEng,StudioEng audioCluster;
+    class MediaEng,QwenEng,SenseNovaEng visualCluster;
+    class AgentEng,ClipperEng agentCluster;
+    class R2_Store storage;
 ```
 
 <div align="center">

@@ -1,0 +1,8 @@
+# GitHub Linguist language detection overrides
+# Exclude standalone generated architecture visualizations and HTML artifacts from repository language stats
+*.html linguist-detectable=false
+*.html linguist-vendored=true
+
+# Exclude architecture JSON schemas/data from stats
+cadence-architecture.json linguist-detectable=false
+cadence-engines-architecture.json linguist-detectable=false
