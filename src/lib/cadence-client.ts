@@ -27,6 +27,14 @@ export const cadenceSenseNova = createClient<any>({
   },
 });
 
+// Qwen-Image-2.1 Client (7B DiT + 8B Qwen3-VL, English typography, Multi-image contextual editing, RGBA transparency)
+export const cadenceQwenImage = createClient<any>({
+  baseUrl: env.CADENCE_QWEN_IMAGE_API_URL || "https://samuelolubukun--qwen-image-2-1-qwenimageengine-serve.modal.run",
+  headers: {
+    "x-api-key": env.CADENCE_API_KEY,
+  },
+});
+
 // Song Client (ACE-Step 1.5 Turbo full vocal songs)
 export const cadenceSong = createClient<any>({
   baseUrl: env.CADENCE_SONG_API_URL || env.CADENCE_API_URL,
