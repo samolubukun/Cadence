@@ -28,6 +28,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
@@ -40,8 +47,8 @@ type VisualMode = "image" | "edit" | "video";
 interface VisualModeConfig {
   icon: React.ElementType;
   label: string;
-  badge: string;
-  badgeColor: string;
+  badge?: string;
+  badgeColor?: string;
   accentBg: string;
   accentText: string;
   accentBorder: string;
@@ -54,35 +61,29 @@ interface VisualModeConfig {
 const VISUAL_MODES: Record<VisualMode, VisualModeConfig> = {
   image: {
     icon: ImageIcon,
-    label: "4K Artwork & Covers",
-    badge: "SDXL-Turbo · SenseNova MoT",
-    badgeColor: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+    label: "AI Image Generator",
     accentBg: "bg-cyan-50 dark:bg-cyan-950/30",
     accentText: "text-cyan-600 dark:text-cyan-400",
     accentBorder: "border-cyan-200 dark:border-cyan-900/50",
     primaryColor: "bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-500/20",
     creditCost: 20,
-    description: "Generate photorealistic album artwork, vinyl sleeve designs, and promotional visuals.",
+    description: "Create studio-grade visuals, concept art, graphics, typography posters, and cover designs.",
     promptPlaceholder: "e.g. Cyberpunk neon vinyl album art with glowing typography CADENCE...",
   },
   edit: {
     icon: Sparkles,
     label: "AI Image Editor",
-    badge: "SenseNova U1.5 · 8B MoT",
-    badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
     accentBg: "bg-purple-50 dark:bg-purple-950/30",
     accentText: "text-purple-600 dark:text-purple-400",
     accentBorder: "border-purple-200 dark:border-purple-900/50",
     primaryColor: "bg-purple-600 hover:bg-purple-500 text-white shadow-purple-500/20",
     creditCost: 50,
-    description: "Transform existing artwork with natural language instructions, inpainting, and lighting reworks.",
+    description: "Transform existing artwork with natural language instructions, inpainting, multi-image references, and lighting reworks.",
     promptPlaceholder: "e.g. Change background to futuristic neon concert stage, add rim lighting and holograms...",
   },
   video: {
     icon: Video,
     label: "Video Visualizers",
-    badge: "Wan2.1 · 1.3B Diffusion",
-    badgeColor: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
     accentBg: "bg-indigo-50 dark:bg-indigo-950/30",
     accentText: "text-indigo-600 dark:text-indigo-400",
     accentBorder: "border-indigo-200 dark:border-indigo-900/50",
@@ -95,16 +96,16 @@ const VISUAL_MODES: Record<VisualMode, VisualModeConfig> = {
 
 const PRESETS: Record<VisualMode, Array<{ label: string; prompt: string; extra?: string }>> = {
   image: [
-    { label: "Cyberpunk Neon", prompt: "Cyberpunk neon vinyl album art with glowing typography CADENCE" },
-    { label: "Minimalist Vinyl", prompt: "Minimalist geometric matte vinyl sleeve with pastel gradients" },
-    { label: "80s Anime Night", prompt: "Retro 80s anime city night illustration with rain reflections" },
-    { label: "Obsidian Void", prompt: "Hyperrealistic 3D metallic liquid orb floating in obsidian void" },
+    { label: "Festival Flyer", prompt: "A stylish music festival flyer poster in English typography. Headline text 'SOUNDWAVE 2026' in bold modern 3D lettering at the top. Subheading text 'LIVE AT HYDE PARK' and date text 'OCTOBER 15-18'. Clean graphic design layout, vivid geometric shapes, hologram gradients, professional print advertising style, 8k resolution" },
+    { label: "Comic Book Panel", prompt: "A dynamic comic book panel with English speech bubbles. A superhero in glowing armor shouting into a speech bubble 'STAND BACK! I GOT THIS!' with explosive action lines, Halftone dot textures, vintage Marvel and DC comic art style, crisp ink linework, bold comic lettering" },
+    { label: "Cyberpunk Vinyl", prompt: "Cyberpunk neon vinyl album art with glowing typography CADENCE, reflective acrylic surfaces and holographic foil details" },
+    { label: "Transparent Sticker", prompt: "A cute futuristic robotic cat DJ mascot wearing glowing neon headphones with vinyl turntables, vector illustration, die-cut sticker design with crisp clean edges" },
   ],
   edit: [
-    { label: "Cyber Concert Stage", prompt: "Change background to a neon cyberpunk concert stage with crowd lasers" },
-    { label: "80s Pastel Glow", prompt: "Transform into a retro 80s anime aesthetic with soft grain and pastel glow" },
-    { label: "Cinematic Studio Rim", prompt: "Add cinematic studio rim lighting, volumetrics, and subtle rain droplets" },
-    { label: "Chrome Sculpture", prompt: "Turn into hyperrealistic dark metallic chrome sculpture with gold accents" },
+    { label: "Add Neon Armor", prompt: "Add futuristic glowing holographic power armor to the subject with energy trails and cinematic rim lighting" },
+    { label: "Cyber Concert Stage", prompt: "Change background to a neon cyberpunk concert stage with crowd lasers and stage smoke" },
+    { label: "Vintage Comic Style", prompt: "Transform into a vintage 1980s superhero comic panel with halftone ink dots, yellowed paper texture, and bold action lines" },
+    { label: "Transparent Cutout", prompt: "Isolate the main subject onto a clean transparent alpha background with perfect edge cutout" },
   ],
   video: [
     { label: "Cosmic Audio Waves", prompt: "Cinematic slow motion fluid sound waves pulsing in deep cosmic space" },
@@ -121,11 +122,13 @@ export default function MediaStudioPage() {
   // Prompt states
   const [prompt, setPrompt] = useState("");
   const [aspectRatio, setAspectRatio] = useState("1:1");
-  const [imageModel, setImageModel] = useState<"sdxl-turbo" | "sensenova">("sdxl-turbo");
+  const [imageModel, setImageModel] = useState<"sdxl-turbo" | "sensenova" | "qwen-image-2-1">("sdxl-turbo");
+  const [imageQuality, setImageQuality] = useState<"standard" | "ultra">("standard");
+  const [isTransparent, setIsTransparent] = useState(false);
 
-  // Image Edit State (SenseNova U1.5 MoT)
-  const [sourceImageBase64, setSourceImageBase64] = useState<string | null>(null);
-  const [sourceImageName, setSourceImageName] = useState<string | null>(null);
+  // Image Edit State (Qwen-Image-2.1 / SenseNova U1.5 MoT)
+  const [editModel, setEditModel] = useState<"qwen-image-2-1" | "sensenova">("qwen-image-2-1");
+  const [sourceImages, setSourceImages] = useState<Array<{ name: string; base64: string }>>([]);
   const [editQuality, setEditQuality] = useState<"standard" | "ultra">("standard");
   const [editImgCfgScale, setEditImgCfgScale] = useState(1.0);
   const [editedResultUrl, setEditedResultUrl] = useState<string | null>(null);
@@ -145,26 +148,44 @@ export default function MediaStudioPage() {
   const IconComp = cfg.icon;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file (PNG, JPG, WEBP)");
+    const maxAllowed = editModel === "qwen-image-2-1" ? 10 : 4;
+    const currentCount = sourceImages.length;
+    const remainingSlots = maxAllowed - currentCount;
+
+    if (remainingSlots <= 0) {
+      toast.error(`Maximum of ${maxAllowed} reference images reached`);
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
-      toast.error("File size must be under 15MB");
-      return;
-    }
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
 
-    setSourceImageName(file.name);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const b64 = event.target?.result as string;
-      setSourceImageBase64(b64);
-    };
-    reader.readAsDataURL(file);
+    filesToProcess.forEach((file) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not a valid image (PNG, JPG, WEBP)`);
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds 15MB limit`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const b64 = event.target?.result as string;
+        setSourceImages((prev) => {
+          if (prev.length >= maxAllowed) return prev;
+          return [...prev, { name: file.name, base64: b64 }];
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeSourceImage = (index: number) => {
+    setSourceImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const switchMode = (next: VisualMode) => {
@@ -174,8 +195,8 @@ export default function MediaStudioPage() {
 
   const handleGenerate = async () => {
     if (mode === "edit") {
-      if (!sourceImageBase64) {
-        toast.error("Please upload an image to edit first!");
+      if (sourceImages.length === 0) {
+        toast.error("Please upload at least one image to edit or reference!");
         return;
       }
       if (!prompt.trim()) {
@@ -185,11 +206,17 @@ export default function MediaStudioPage() {
 
       setIsGenerating(true);
       try {
-        toast.info("Transforming image via SenseNova-U1.5-8B MoT (Modal GPU)…");
+        if (editModel === "qwen-image-2-1") {
+          toast.info("Transforming via Qwen-Image-2.1 with multi-image contextual editing (Modal GPU)…");
+        } else {
+          toast.info("Transforming image via SenseNova-U1.5-8B MoT (Modal GPU)…");
+        }
         const res = await editMutation.mutateAsync({
           prompt,
-          images: [sourceImageBase64],
+          images: sourceImages.map((s) => s.base64),
+          model: editModel,
           quality: editQuality,
+          transparent: isTransparent,
           imgCfgScale: editImgCfgScale,
         });
 
@@ -198,7 +225,7 @@ export default function MediaStudioPage() {
           setActiveMediaUrl({ url: res.url, type: "image", title: `[Edit] ${prompt}` });
         }
         refetch();
-        toast.success("SenseNova AI edit complete!");
+        toast.success(editModel === "qwen-image-2-1" ? "Qwen-Image-2.1 AI edit complete!" : "SenseNova AI edit complete!");
       } catch (err: any) {
         toast.error(err?.message || "Failed to edit image");
       } finally {
@@ -214,15 +241,29 @@ export default function MediaStudioPage() {
       }
       setIsGenerating(true);
       try {
-        if (imageModel === "sensenova") {
+        if (imageModel === "qwen-image-2-1") {
+          toast.info("Rendering studio visual on Modal GPU via Qwen-Image-2.1 (7B DiT + 8B Qwen3-VL)…");
+        } else if (imageModel === "sensenova") {
           toast.info("Rendering studio-grade artwork via SenseNova 8B MoT (Modal GPU)…");
         } else {
           toast.info("Rendering fast 1024x1024 visual on Modal GPU via SDXL-Turbo…");
         }
-        const res = await imageMutation.mutateAsync({ prompt, aspectRatio, model: imageModel });
+        const res = await imageMutation.mutateAsync({
+          prompt,
+          aspectRatio,
+          model: imageModel,
+          quality: imageQuality,
+          transparent: isTransparent,
+        });
         if (res.url) setActiveMediaUrl({ url: res.url, type: "image", title: prompt });
         refetch();
-        toast.success(imageModel === "sensenova" ? "SenseNova visual rendered!" : "Image generated successfully!");
+        toast.success(
+          imageModel === "qwen-image-2-1"
+            ? "Qwen-Image-2.1 artwork rendered!"
+            : imageModel === "sensenova"
+            ? "SenseNova visual rendered!"
+            : "Image generated successfully!"
+        );
       } catch (err: any) {
         toast.error(err?.message || "Failed to generate image");
       } finally {
@@ -271,14 +312,9 @@ export default function MediaStudioPage() {
                   <IconComp className={cn("size-5", cfg.accentText)} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                      Visuals &amp; Video Studio
-                    </h1>
-                    <Badge variant="outline" className={cn("text-[10px] hidden sm:inline-flex", cfg.badgeColor)}>
-                      {cfg.badge}
-                    </Badge>
-                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                    Visuals &amp; Video Studio
+                  </h1>
                   <p className="text-sm text-muted-foreground mt-0.5">{cfg.description}</p>
                 </div>
               </div>
@@ -292,7 +328,7 @@ export default function MediaStudioPage() {
                 [
                   {
                     key: "image",
-                    label: "4K Artwork & Covers",
+                    label: "AI Image Generator",
                     icon: ImageIcon,
                     activeClass: "bg-cyan-600 text-white shadow-xs",
                   },
@@ -342,9 +378,15 @@ export default function MediaStudioPage() {
                     <CardTitle className="text-sm sm:text-base font-bold flex items-center gap-2">
                       <Wand2 className={cn("size-4", cfg.accentText)} />
                       {mode === "image"
-                        ? "Artwork Synthesis & Style Canvas"
+                        ? imageModel === "qwen-image-2-1"
+                          ? "Qwen-Image-2.1 Typography, Flyers & RGBA Studio"
+                          : imageModel === "sensenova"
+                          ? "SenseNova 8B MoT Studio Canvas"
+                          : "SDXL-Turbo Fast Artwork & Style Canvas"
                         : mode === "edit"
-                        ? "SenseNova Neural Image Inpainting & Transform"
+                        ? editModel === "qwen-image-2-1"
+                          ? "Qwen-Image-2.1 Contextual Multi-Image Studio Editor"
+                          : "SenseNova Neural Image Inpainting & Transform"
                         : "Cinematic Motion & Video Synthesis"}
                     </CardTitle>
                     <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
@@ -353,34 +395,283 @@ export default function MediaStudioPage() {
                   </div>
                   <CardDescription className="text-xs text-muted-foreground mt-0.5">
                     {mode === "image"
-                      ? "Describe your visual aesthetic or select curated album cover presets."
+                      ? imageModel === "qwen-image-2-1"
+                        ? "Synthesize posters, festival flyers with legible English text, comic panels, or transparent PNGs."
+                        : imageModel === "sensenova"
+                        ? "8B MoT studio-grade rendering with high dynamic range, hyper-detail, and rich textures."
+                        : "Ultra-fast 1–2s latent diffusion for rapid prototyping and vinyl album covers."
                       : mode === "edit"
-                      ? "Upload a reference visual and provide natural language editing instructions."
+                      ? editModel === "qwen-image-2-1"
+                        ? "Upload up to 10 image references for character consistency, style transfer, and background replacement."
+                        : "Upload a reference visual and provide natural language editing instructions for SenseNova 8B MoT."
                       : "Describe scene dynamics, camera movements, and audio-visual flow."}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="p-5 sm:p-6 space-y-5">
-                  {/* Mode-Specific: File Upload Dropzone for Image Editor */}
+                  {/* TOP-LEVEL ENGINE SELECTOR (Radio card layout inspired by clean UI pattern) */}
+                  {mode === "image" && (
+                    <div className="space-y-3 pb-3 border-b border-border/60">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                          <SlidersHorizontal className="size-3.5 text-cyan-400" /> Rendering Engine
+                        </label>
+                        <span className="text-[11px] font-mono text-cyan-500 font-medium">
+                          {imageModel === "sdxl-turbo"
+                            ? "SDXL-Turbo · 20 Credits"
+                            : imageModel === "sensenova"
+                            ? "SenseNova U1.5 · 50 Credits"
+                            : "Qwen-Image-2.1 · 50 Credits"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {/* 1. SDXL-Turbo */}
+                        <div
+                          role="radio"
+                          aria-checked={imageModel === "sdxl-turbo"}
+                          onClick={() => setImageModel("sdxl-turbo")}
+                          className={cn(
+                            "relative p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer group select-none h-full",
+                            imageModel === "sdxl-turbo"
+                              ? "border-cyan-500/80 bg-cyan-500/5 ring-1 ring-cyan-500/20 shadow-xs"
+                              : "border-border/70 bg-card hover:border-border hover:bg-muted/30"
+                          )}
+                        >
+                          <div className="pt-0.5 shrink-0">
+                            <div
+                              className={cn(
+                                "size-4 rounded-full border flex items-center justify-center transition-all",
+                                imageModel === "sdxl-turbo"
+                                  ? "border-cyan-500 bg-cyan-500"
+                                  : "border-muted-foreground/40 group-hover:border-muted-foreground/70"
+                              )}
+                            >
+                              {imageModel === "sdxl-turbo" && (
+                                <div className="size-1.5 rounded-full bg-white" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                                SDXL-Turbo
+                              </span>
+                              <span className="text-[10px] font-medium text-cyan-500/90">
+                                20 credits
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                              Quick prompt-to-image in seconds. Great for rough drafts, cover ideas &amp; rapid iteration.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 2. SenseNova U1.5 */}
+                        <div
+                          role="radio"
+                          aria-checked={imageModel === "sensenova"}
+                          onClick={() => setImageModel("sensenova")}
+                          className={cn(
+                            "relative p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer group select-none h-full",
+                            imageModel === "sensenova"
+                              ? "border-cyan-500/80 bg-cyan-500/5 ring-1 ring-cyan-500/20 shadow-xs"
+                              : "border-border/70 bg-card hover:border-border hover:bg-muted/30"
+                          )}
+                        >
+                          <div className="pt-0.5 shrink-0">
+                            <div
+                              className={cn(
+                                "size-4 rounded-full border flex items-center justify-center transition-all",
+                                imageModel === "sensenova"
+                                  ? "border-cyan-500 bg-cyan-500"
+                                  : "border-muted-foreground/40 group-hover:border-muted-foreground/70"
+                              )}
+                            >
+                              {imageModel === "sensenova" && (
+                                <div className="size-1.5 rounded-full bg-white" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                                SenseNova U1.5
+                              </span>
+                              <span className="text-[10px] font-medium text-cyan-500/90">
+                                50 credits
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                              8B MoT diffusion with tuned CFG &amp; timestep control. Rich detail, cinematic lighting &amp; studio-grade artwork.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 3. Qwen-Image-2.1 */}
+                        <div
+                          role="radio"
+                          aria-checked={imageModel === "qwen-image-2-1"}
+                          onClick={() => setImageModel("qwen-image-2-1")}
+                          className={cn(
+                            "relative p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer group select-none h-full",
+                            imageModel === "qwen-image-2-1"
+                              ? "border-cyan-500/80 bg-cyan-500/5 ring-1 ring-cyan-500/20 shadow-xs"
+                              : "border-border/70 bg-card hover:border-border hover:bg-muted/30"
+                          )}
+                        >
+                          <div className="pt-0.5 shrink-0">
+                            <div
+                              className={cn(
+                                "size-4 rounded-full border flex items-center justify-center transition-all",
+                                imageModel === "qwen-image-2-1"
+                                  ? "border-cyan-500 bg-cyan-500"
+                                  : "border-muted-foreground/40 group-hover:border-muted-foreground/70"
+                              )}
+                            >
+                              {imageModel === "qwen-image-2-1" && (
+                                <div className="size-1.5 rounded-full bg-white" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                                Qwen-Image-2.1
+                              </span>
+                              <span className="text-[10px] font-medium text-cyan-500/90">
+                                50 credits
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                              7B DiT + Qwen3-VL with native transparency support. Precise text rendering, posters, flyers &amp; PNG exports.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {mode === "edit" && (
-                    <div className="space-y-2.5">
+                    <div className="space-y-3 pb-3 border-b border-border/60">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                          <SlidersHorizontal className="size-3.5 text-purple-400" /> Editing Engine
+                        </label>
+                        <span className="text-[11px] font-mono text-purple-500 font-medium">
+                          {editModel === "sensenova"
+                            ? "SenseNova U1.5 · Up to 4 images"
+                            : "Qwen-Image-2.1 · Up to 10 images"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* 1. SenseNova U1.5 Edit */}
+                        <div
+                          role="radio"
+                          aria-checked={editModel === "sensenova"}
+                          onClick={() => setEditModel("sensenova")}
+                          className={cn(
+                            "relative p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer group select-none h-full",
+                            editModel === "sensenova"
+                              ? "border-purple-500/80 bg-purple-500/5 ring-1 ring-purple-500/20 shadow-xs"
+                              : "border-border/70 bg-card hover:border-border hover:bg-muted/30"
+                          )}
+                        >
+                          <div className="pt-0.5 shrink-0">
+                            <div
+                              className={cn(
+                                "size-4 rounded-full border flex items-center justify-center transition-all",
+                                editModel === "sensenova"
+                                  ? "border-purple-500 bg-purple-500"
+                                  : "border-muted-foreground/40 group-hover:border-muted-foreground/70"
+                              )}
+                            >
+                              {editModel === "sensenova" && (
+                                <div className="size-1.5 rounded-full bg-white" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                                SenseNova U1.5 Edit
+                              </span>
+                              <span className="text-[10px] font-medium text-purple-500/90">
+                                50 credits · up to 4 imgs
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                              Image-to-image editing with CFG strength control. Background swaps, style transfer &amp; inpainting on 1–4 images.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 2. Qwen-Image-2.1 Edit */}
+                        <div
+                          role="radio"
+                          aria-checked={editModel === "qwen-image-2-1"}
+                          onClick={() => setEditModel("qwen-image-2-1")}
+                          className={cn(
+                            "relative p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer group select-none h-full",
+                            editModel === "qwen-image-2-1"
+                              ? "border-purple-500/80 bg-purple-500/5 ring-1 ring-purple-500/20 shadow-xs"
+                              : "border-border/70 bg-card hover:border-border hover:bg-muted/30"
+                          )}
+                        >
+                          <div className="pt-0.5 shrink-0">
+                            <div
+                              className={cn(
+                                "size-4 rounded-full border flex items-center justify-center transition-all",
+                                editModel === "qwen-image-2-1"
+                                  ? "border-purple-500 bg-purple-500"
+                                  : "border-muted-foreground/40 group-hover:border-muted-foreground/70"
+                              )}
+                            >
+                              {editModel === "qwen-image-2-1" && (
+                                <div className="size-1.5 rounded-full bg-white" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                                Qwen-Image-2.1 Edit
+                              </span>
+                              <span className="text-[10px] font-medium text-purple-500/90">
+                                50 credits · up to 10 imgs
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                              Contextual editing across up to 10 reference images. Character consistency, compositing &amp; transparent output.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mode-Specific: Multi-Image Reference & Upload Dropzone for Image Editor */}
+                  {mode === "edit" && (
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <label className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5">
                           <UploadCloud className="size-4 text-purple-400" />
-                          Source Image to Transform
+                          Source Images &amp; References
                         </label>
-                        <span className="text-[11px] text-muted-foreground">PNG, JPG, WEBP (up to 15MB)</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {sourceImages.length} / {editModel === "qwen-image-2-1" ? 10 : 4} images
+                        </span>
                       </div>
 
                       <input
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
+                        multiple
                         onChange={handleFileUpload}
                         className="hidden"
                       />
 
-                      {!sourceImageBase64 ? (
+                      {sourceImages.length === 0 ? (
                         <div
                           onClick={() => fileInputRef.current?.click()}
                           className="border-2 border-dashed border-border/80 hover:border-purple-500/50 rounded-2xl p-6 text-center bg-muted/10 hover:bg-purple-500/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group"
@@ -390,52 +681,65 @@ export default function MediaStudioPage() {
                           </div>
                           <div>
                             <span className="text-sm font-bold text-foreground block">
-                              Click to upload image or drag &amp; drop
+                              Click to upload image references or drag &amp; drop
                             </span>
                             <span className="text-xs text-muted-foreground mt-0.5 block">
-                              Album art, portrait, background, or character sketch
+                              {editModel === "qwen-image-2-1"
+                                ? "Qwen-Image-2.1 supports up to 10 contextual images for character & scene editing"
+                                : "Upload up to 4 images for SenseNova U1.5 transformation"}
                             </span>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-between p-3.5 rounded-xl border border-purple-500/30 bg-purple-500/5">
-                          <div className="flex items-center gap-3 overflow-hidden">
-                            <img
-                              src={sourceImageBase64}
-                              alt="Source"
-                              className="size-12 rounded-lg object-cover border border-border/60 shrink-0"
-                            />
-                            <div className="truncate">
-                              <p className="text-xs font-semibold text-foreground truncate">
-                                {sourceImageName || "Uploaded Image"}
-                              </p>
-                              <span className="text-[11px] text-purple-400 font-medium flex items-center gap-1">
-                                <Sparkles className="size-3" /> Ready for SenseNova U1.5 transformation
-                              </span>
-                            </div>
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            {sourceImages.map((img, idx) => (
+                              <div
+                                key={idx}
+                                className="relative group rounded-xl overflow-hidden border border-purple-500/30 bg-purple-500/5 aspect-square flex flex-col justify-end p-2"
+                              >
+                                <img
+                                  src={img.base64}
+                                  alt={img.name}
+                                  className="absolute inset-0 size-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 opacity-80" />
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeSourceImage(idx);
+                                  }}
+                                  className="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/70 hover:bg-red-500 text-white flex items-center justify-center transition-colors cursor-pointer"
+                                >
+                                  <X className="size-3.5" />
+                                </button>
+                                <span className="relative z-10 text-[10px] font-mono text-white/90 truncate">
+                                  #{idx + 1} {img.name}
+                                </span>
+                              </div>
+                            ))}
+                            {sourceImages.length < (editModel === "qwen-image-2-1" ? 10 : 4) && (
+                              <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="border-2 border-dashed border-border/80 hover:border-purple-500/50 rounded-xl p-3 text-center bg-muted/10 hover:bg-purple-500/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 aspect-square"
+                              >
+                                <UploadCloud className="size-5 text-purple-400" />
+                                <span className="text-[11px] font-semibold text-foreground">Add More</span>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <Button
+                          <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+                            <span className="flex items-center gap-1 text-purple-400 font-medium text-[11px]">
+                              <Sparkles className="size-3" /> Ready for contextual multi-image editing
+                            </span>
+                            <button
                               type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => fileInputRef.current?.click()}
-                              className="h-8 text-xs cursor-pointer"
+                              onClick={() => setSourceImages([])}
+                              className="text-[11px] text-muted-foreground hover:text-red-400 underline cursor-pointer"
                             >
-                              Change
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                setSourceImageBase64(null);
-                                setSourceImageName(null);
-                              }}
-                              className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
-                            >
-                              <X className="size-4" />
-                            </Button>
+                              Clear all
+                            </button>
                           </div>
                         </div>
                       )}
@@ -483,83 +787,27 @@ export default function MediaStudioPage() {
                     )}
                   </div>
 
-                  {/* Mode 1 Controls: Engine Tier & Canvas Aspect Ratio for Artwork */}
+                  {/* Mode 1 Secondary Settings: Canvas Aspect Ratio & Options */}
                   {mode === "image" && (
                     <div className="space-y-4 pt-1 border-t border-border/60">
-                      {/* Engine Tier Cards */}
-                      <div className="space-y-2 pt-2">
-                        <div className="flex items-center justify-between">
-                          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Rendering Engine Tier
-                          </label>
-                          <span className="text-[11px] text-cyan-500 font-medium">
-                            {imageModel === "sensenova" ? "High-Resolution 8B MoT" : "Instant 1-Step Latent"}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            onClick={() => setImageModel("sdxl-turbo")}
-                            className={cn(
-                              "p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer",
-                              imageModel === "sdxl-turbo"
-                                ? "border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/30"
-                                : "border-border/70 bg-card hover:bg-muted/40"
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-xs font-bold text-foreground">Standard (SDXL-Turbo)</span>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                                20 credits
-                              </span>
-                            </div>
-                            <span className="text-[11px] text-muted-foreground mt-1">
-                              Ultra-fast 1–2s generation. Perfect for rapid prototyping &amp; album covers.
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setImageModel("sensenova")}
-                            className={cn(
-                              "p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer",
-                              imageModel === "sensenova"
-                                ? "border-purple-500 bg-purple-500/10 ring-1 ring-purple-500/30"
-                                : "border-border/70 bg-card hover:bg-muted/40"
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                                <Sparkles className="size-3.5 text-purple-400" /> Advanced (SenseNova U1.5)
-                              </span>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                                50 credits
-                              </span>
-                            </div>
-                            <span className="text-[11px] text-muted-foreground mt-1">
-                              8B MoT studio-grade rendering. Precise typography, hyper-detail &amp; promo flyers.
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-
                       {/* Aspect Ratio Canvas */}
                       <div className="space-y-2">
                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                           <Ratio className="size-3.5" /> Canvas Aspect Ratio
                         </label>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-4 gap-2">
                           {[
-                            { ratio: "1:1", label: "Square (1:1)", sub: "Vinyl / Album Art" },
-                            { ratio: "16:9", label: "Landscape (16:9)", sub: "YouTube / Widescreen" },
-                            { ratio: "9:16", label: "Portrait (9:16)", sub: "Reels / Stories" },
+                            { ratio: "1:1", label: "Square (1:1)", sub: "Vinyl / Album" },
+                            { ratio: "3:4", label: "Flyer (3:4)", sub: "Poster / Print" },
+                            { ratio: "16:9", label: "Landscape (16:9)", sub: "YouTube / Deck" },
+                            { ratio: "9:16", label: "Portrait (9:16)", sub: "Story / Reels" },
                           ].map((item) => (
                             <button
                               key={item.ratio}
                               type="button"
                               onClick={() => setAspectRatio(item.ratio)}
                               className={cn(
-                                "p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer",
+                                "p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer",
                                 aspectRatio === item.ratio
                                   ? imageModel === "sensenova"
                                     ? "border-purple-500 bg-purple-500/10 ring-1 ring-purple-500/30"
@@ -573,14 +821,79 @@ export default function MediaStudioPage() {
                           ))}
                         </div>
                       </div>
+
+                      {/* Qwen Specific Features: Transparency & Resolution */}
+                      {imageModel === "qwen-image-2-1" && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                          <div className="p-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5 flex items-center justify-between">
+                            <div>
+                              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                <Sparkles className="size-3.5 text-cyan-400" /> Native RGBA Transparency
+                              </span>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                Generate cutouts &amp; stickers with real transparent alpha channel
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setIsTransparent(!isTransparent)}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer shrink-0 ml-3",
+                                isTransparent
+                                  ? "bg-cyan-500 text-white border-cyan-400 shadow-xs"
+                                  : "border-border/60 text-muted-foreground hover:bg-muted/40"
+                              )}
+                            >
+                              {isTransparent ? "Enabled" : "Disabled"}
+                            </button>
+                          </div>
+
+                          <div className="p-3 rounded-xl border border-border/70 bg-card flex items-center justify-between">
+                            <div>
+                              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                <SlidersHorizontal className="size-3.5 text-cyan-400" /> Resolution Quality
+                              </span>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                Standard 1024 or Native Ultra 2048 high-res DiT
+                              </p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-1.5 shrink-0 ml-3">
+                              <button
+                                type="button"
+                                onClick={() => setImageQuality("standard")}
+                                className={cn(
+                                  "px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer",
+                                  imageQuality === "standard"
+                                    ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/40"
+                                    : "border-border/60 text-muted-foreground hover:bg-muted/40"
+                                )}
+                              >
+                                1024
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setImageQuality("ultra")}
+                                className={cn(
+                                  "px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer",
+                                  imageQuality === "ultra"
+                                    ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/40"
+                                    : "border-border/60 text-muted-foreground hover:bg-muted/40"
+                                )}
+                              >
+                                2048
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {/* Mode 2 Controls: Engine Settings for AI Image Editor */}
+                  {/* Mode 2 Secondary Settings: Fine-tuning for AI Image Editor */}
                   {mode === "edit" && (
                     <div className="space-y-4 pt-1 border-t border-border/60">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="p-3 rounded-xl border border-border/70 bg-card space-y-1.5">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                               <SlidersHorizontal className="size-3.5 text-purple-400" /> Output Quality
@@ -617,35 +930,60 @@ export default function MediaStudioPage() {
                           </div>
                         </div>
 
-                        <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                              <Layers className="size-3.5 text-purple-400" /> Image Guidance Scale
-                            </span>
-                            <span className="text-[11px] font-mono text-purple-400 font-bold">{editImgCfgScale.toFixed(1)}</span>
+                        {editModel === "qwen-image-2-1" ? (
+                          <div className="p-3 rounded-xl border border-purple-500/30 bg-purple-500/5 flex items-center justify-between">
+                            <div>
+                              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                <Sparkles className="size-3.5 text-purple-400" /> RGBA Transparent Output
+                              </span>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                Cutout background with native alpha channel
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setIsTransparent(!isTransparent)}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer shrink-0 ml-3",
+                                isTransparent
+                                  ? "bg-purple-600 text-white border-purple-400 shadow-xs"
+                                  : "border-border/60 text-muted-foreground hover:bg-muted/40"
+                              )}
+                            >
+                              {isTransparent ? "Enabled" : "Disabled"}
+                            </button>
                           </div>
-                          <div className="grid grid-cols-3 gap-1.5 pt-1">
-                            {[
-                              { val: 0.8, label: "Subtle" },
-                              { val: 1.0, label: "Balanced" },
-                              { val: 1.5, label: "Strong" },
-                            ].map((item) => (
-                              <button
-                                key={item.label}
-                                type="button"
-                                onClick={() => setEditImgCfgScale(item.val)}
-                                className={cn(
-                                  "py-1.5 rounded-lg text-xs font-medium border text-center transition cursor-pointer",
-                                  editImgCfgScale === item.val
-                                    ? "border-purple-500 bg-purple-500/10 text-purple-400 font-semibold"
-                                    : "border-border/60 text-muted-foreground hover:bg-muted/40"
-                                )}
-                              >
-                                {item.label}
-                              </button>
-                            ))}
+                        ) : (
+                          <div className="p-3 rounded-xl border border-border/70 bg-card space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                <Layers className="size-3.5 text-purple-400" /> Image Guidance Scale
+                              </span>
+                              <span className="text-[11px] font-mono text-purple-400 font-bold">{editImgCfgScale.toFixed(1)}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1.5 pt-1">
+                              {[
+                                { val: 0.8, label: "Subtle" },
+                                { val: 1.0, label: "Balanced" },
+                                { val: 1.5, label: "Strong" },
+                              ].map((item) => (
+                                <button
+                                  key={item.label}
+                                  type="button"
+                                  onClick={() => setEditImgCfgScale(item.val)}
+                                  className={cn(
+                                    "py-1.5 rounded-lg text-xs font-medium border text-center transition cursor-pointer",
+                                    editImgCfgScale === item.val
+                                      ? "border-purple-500 bg-purple-500/10 text-purple-400 font-semibold"
+                                      : "border-border/60 text-muted-foreground hover:bg-muted/40"
+                                  )}
+                                >
+                                  {item.label}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -685,7 +1023,7 @@ export default function MediaStudioPage() {
                   <div className="pt-2">
                     <Button
                       onClick={handleGenerate}
-                      disabled={isGenerating || (mode === "edit" && !sourceImageBase64)}
+                      disabled={isGenerating || (mode === "edit" && sourceImages.length === 0)}
                       className={cn(
                         "w-full h-12 text-sm sm:text-base font-bold rounded-xl transition-all shadow-md cursor-pointer",
                         cfg.primaryColor
@@ -696,11 +1034,15 @@ export default function MediaStudioPage() {
                           <Disc3 className="size-5 animate-spin" />
                           <span>
                             {mode === "image"
-                              ? imageModel === "sensenova"
+                              ? imageModel === "qwen-image-2-1"
+                                ? "Rendering Qwen-Image-2.1 Studio Visual..."
+                                : imageModel === "sensenova"
                                 ? "Rendering SenseNova 8B MoT..."
                                 : "Rendering SDXL-Turbo Visual..."
                               : mode === "edit"
-                              ? "Applying SenseNova AI Edits..."
+                              ? editModel === "qwen-image-2-1"
+                                ? "Transforming with Qwen-Image-2.1 Context..."
+                                : "Applying SenseNova AI Edits..."
                               : "Synthesizing Wan2.1 Video Clip..."}
                           </span>
                         </span>
@@ -709,15 +1051,23 @@ export default function MediaStudioPage() {
                           <IconComp className="size-5" />
                           <span>
                             {mode === "image"
-                              ? "Generate 4K Artwork"
+                              ? imageModel === "qwen-image-2-1"
+                                ? "Generate with Qwen-Image-2.1"
+                                : imageModel === "sensenova"
+                                ? "Generate with SenseNova"
+                                : "Generate Fast Visual"
                               : mode === "edit"
-                              ? "Transform Image with SenseNova"
+                              ? editModel === "qwen-image-2-1"
+                                ? "Transform with Qwen-Image-2.1"
+                                : "Transform with SenseNova"
                               : "Generate Video Visualizer"}
                           </span>
                           <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono font-semibold bg-white/20 text-white">
-                            {mode === "image" && imageModel === "sensenova"
-                              ? "50 credits"
-                              : `${cfg.creditCost} credits`}
+                            {mode === "image" && imageModel === "sdxl-turbo"
+                              ? "20 credits"
+                              : mode === "video"
+                              ? "200 credits"
+                              : "50 credits"}
                           </span>
                         </span>
                       )}
@@ -751,86 +1101,89 @@ export default function MediaStudioPage() {
                 </CardHeader>
 
                 <CardContent className="p-5 sm:p-6 space-y-4">
-                  {/* Canvas Viewport */}
-                  <div
-                    className={cn(
-                      "w-full rounded-2xl bg-muted/30 border border-dashed border-border/80 flex items-center justify-center overflow-hidden shadow-inner relative group",
-                      mode === "video" ? "aspect-video" : "aspect-square"
-                    )}
-                  >
-                    {activeMediaUrl?.type === "video" ? (
-                      <video
-                        src={activeMediaUrl.url}
-                        controls
-                        autoPlay
-                        loop
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                    ) : activeMediaUrl?.type === "image" ? (
-                      <img
-                        src={activeMediaUrl.url}
-                        alt="Active Studio Preview"
-                        className="w-full h-full object-cover rounded-xl shadow-sm"
-                      />
-                    ) : mode === "edit" && sourceImageBase64 ? (
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <img
-                          src={sourceImageBase64}
-                          alt="Original Upload"
-                          className="w-full h-full object-cover rounded-xl opacity-60"
+                    {/* Canvas Viewport with Transparency Checkerboard */}
+                    <div
+                      className={cn(
+                        "w-full rounded-2xl bg-muted/30 border border-dashed border-border/80 flex items-center justify-center overflow-hidden shadow-inner relative group",
+                        mode === "video" ? "aspect-video" : "aspect-square",
+                        isTransparent && "bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)]"
+                      )}
+                    >
+                      {activeMediaUrl?.type === "video" ? (
+                        <video
+                          src={activeMediaUrl.url}
+                          controls
+                          autoPlay
+                          loop
+                          className="w-full h-full object-cover rounded-xl"
                         />
-                        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 text-center">
-                          <ArrowRight className="size-8 text-purple-400 animate-pulse mb-2" />
-                          <span className="text-xs font-semibold text-foreground">Source Image Staged</span>
-                          <span className="text-[11px] text-muted-foreground mt-0.5">
-                            Click &quot;Transform Image&quot; to synthesize edit
+                      ) : activeMediaUrl?.type === "image" ? (
+                        <img
+                          src={activeMediaUrl.url}
+                          alt="Active Studio Preview"
+                          className="w-full h-full object-contain rounded-xl shadow-sm"
+                        />
+                      ) : mode === "edit" && sourceImages.length > 0 ? (
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <img
+                            src={sourceImages[0].base64}
+                            alt="Original Upload"
+                            className="w-full h-full object-cover rounded-xl opacity-60"
+                          />
+                          <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 text-center">
+                            <ArrowRight className="size-8 text-purple-400 animate-pulse mb-2" />
+                            <span className="text-xs font-semibold text-foreground">
+                              {sourceImages.length} Image Reference{sourceImages.length > 1 ? "s" : ""} Staged
+                            </span>
+                            <span className="text-[11px] text-muted-foreground mt-0.5">
+                              Click &quot;Transform Images&quot; to synthesize edit
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2 flex flex-col items-center text-center p-6">
+                          <div className="size-14 rounded-2xl bg-muted/60 flex items-center justify-center text-muted-foreground/60">
+                            {mode === "video" ? <Video className="size-7" /> : <ImageIcon className="size-7" />}
+                          </div>
+                          <span className="text-xs text-muted-foreground font-medium">
+                            Canvas ready for rendering
+                          </span>
+                          <span className="text-[11px] text-muted-foreground/70 max-w-xs">
+                            {mode === "image"
+                              ? "Generated artwork renders at 1024×1024 or 2048×2048 with English typography."
+                              : mode === "edit"
+                              ? "Upload reference images above to transform."
+                              : "Generated MP4 video loops will play here."}
                           </span>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 flex flex-col items-center text-center p-6">
-                        <div className="size-14 rounded-2xl bg-muted/60 flex items-center justify-center text-muted-foreground/60">
-                          {mode === "video" ? <Video className="size-7" /> : <ImageIcon className="size-7" />}
+                      )}
+                    </div>
+
+                    {/* Mode-Specific Before vs After Strip for AI Image Editor */}
+                    {mode === "edit" && editedResultUrl && sourceImages.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <div className="p-2 rounded-xl border border-border/60 bg-muted/20">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                            Primary Reference
+                          </span>
+                          <img
+                            src={sourceImages[0].base64}
+                            alt="Original"
+                            className="w-full aspect-video object-cover rounded-lg border border-border/60"
+                          />
                         </div>
-                        <span className="text-xs text-muted-foreground font-medium">
-                          Canvas ready for rendering
-                        </span>
-                        <span className="text-[11px] text-muted-foreground/70 max-w-xs">
-                          {mode === "image"
-                            ? "Generated artwork renders at 1024×1024 or 2048×2048."
-                            : mode === "edit"
-                            ? "Upload a reference image above to transform."
-                            : "Generated MP4 video loops will play here."}
-                        </span>
+                        <div className="p-2 rounded-xl border border-purple-500/40 bg-purple-500/10">
+                          <span className="text-[10px] font-bold text-purple-400 uppercase block mb-1">
+                            {editModel === "qwen-image-2-1" ? "Qwen-Image-2.1 Edit" : "SenseNova Edit"}
+                          </span>
+                          <img
+                            src={editedResultUrl}
+                            alt="Edited"
+                            className="w-full aspect-video object-contain rounded-lg border border-purple-500/50"
+                          />
+                        </div>
                       </div>
                     )}
-                  </div>
-
-                  {/* Mode-Specific Before vs After Strip for AI Image Editor */}
-                  {mode === "edit" && editedResultUrl && sourceImageBase64 && (
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <div className="p-2 rounded-xl border border-border/60 bg-muted/20">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
-                          Original Reference
-                        </span>
-                        <img
-                          src={sourceImageBase64}
-                          alt="Original"
-                          className="w-full aspect-video object-cover rounded-lg border border-border/60"
-                        />
-                      </div>
-                      <div className="p-2 rounded-xl border border-purple-500/40 bg-purple-500/10">
-                        <span className="text-[10px] font-bold text-purple-400 uppercase block mb-1">
-                          SenseNova Edit
-                        </span>
-                        <img
-                          src={editedResultUrl}
-                          alt="Edited"
-                          className="w-full aspect-video object-cover rounded-lg border border-purple-500/50"
-                        />
-                      </div>
-                    </div>
-                  )}
 
                   {/* Actions & Export Toolbar */}
                   {activeMediaUrl && (
