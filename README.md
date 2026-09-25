@@ -46,7 +46,7 @@ Cadence is a self-hostable, full-spectrum generative audio, music, and media pla
 - **Sound Effects Studio**: Generate photorealistic Foley effects, cinematic impacts, and ambient soundscapes powered by **Meta AudioGen**.
 - **Voice Changer & Speech-to-Speech**: Zero-shot timbre and pitch conversion powered by **MyShell OpenVoice v2**, preserving original timing, pitch dynamics, and emotion.
 - **Viral Video Clipper Studio**: Automated long-form video to 9:16 vertical shorts converter with Whisper Large-v3 timestamps, Qwen2.5 virality evaluation, YOLO11 active speaker reframing, and burned kinetic subtitles across 10 presets and 16 creator fonts.
-- **Visuals & Video Studio**: Generate high-resolution 1024x1024 album cover art with **SDXL-Turbo** and cinematic motion video visualizers with **Wan2.1 1.3B**.
+- **Visuals & Video Studio**: Triple-engine visual generation and dual-model editing powered by **Qwen-Image-2.1** (typography, transparent PNGs, 10-image contextual editing), **SenseNova-U1.5-8B MoT** (studio photorealism & inpainting), **SDXL-Turbo** (1s fast diffusion), and cinematic motion video visualizers with **Wan2.1 1.3B**.
 - **Real-Time Voice Agent Studio (`/agent`)**: Ultra-low latency conversational AI agent powered by **Silero VAD**, **NVIDIA Parakeet / Whisper ASR**, **Qwen2.5-1.5B-Instruct**, and dual-mode TTS (sub-200ms **Kokoro-82M** speed mode + zero-shot **Chatterbox** cloned voice proxying) with barge-in interruption handling and full transcript inspection.
 - **Curated Voice Library**: Pre-seeded broadcast-quality voice personas with instant preview audition and custom cloned voice management.
 - **Usage Accounting & Multi-Tenancy**: Deterministic credit deduction ledger backed by Convex and Clerk Organizations.
@@ -157,13 +157,14 @@ graph TD
 - **Hardware-Accelerated Export**: Real-time rendering via NVIDIA A10G NVENC with direct Cloudflare R2 streaming.
 
 ### 7. Visuals & Video Studio (`/media`)
-- **Dual-Tier Image Generation**:
-  - **Standard Mode (SDXL-Turbo)**: Ultra-fast 1–2 second generative artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
-  - **Advanced Studio Mode (SenseNova-U1.5-8B MoT)**: 8-billion parameter mixture-of-trajectories diffusion transformer for studio releases, crisp graphic typography, and professional marketing flyers (50 credits).
-- **AI Image Editing (SenseNova-U1.5-8B MoT)**:
-  - **Zero-Shot Image-to-Image / Inpainting**: Upload any existing photo or artwork and describe desired edits in natural language (`it2i_generate`).
-  - **Context-Aware Style & Lighting Reworks**: Add holographic elements, change backgrounds, relight scenes with studio volumetrics, or stylize into anime/sculpture aesthetics while preserving core structure.
-  - **Fine Control**: Standard (1024) or Ultra (2048) resolution modes with granular Image Guidance Scale adjustments (50 credits).
+- **Triple-Engine Visual Generation**:
+  - **SDXL-Turbo (Fast Mode)**: Ultra-fast 1–2 second latent diffusion for rapid visual prototyping and album artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
+  - **SenseNova-U1.5-8B MoT (Studio Quality)**: 8-billion parameter mixture-of-trajectories diffusion transformer for studio-grade realism, rich dynamic range, and hyper-detailed textures (50 credits).
+  - **Qwen-Image-2.1 (7B DiT + 8B Qwen3-VL)**: State-of-the-art text-to-image with flawless legible English typography, festival flyers, comic panels, and transparent RGBA PNG output (50 credits).
+- **Dual-Model AI Image Editing**:
+  - **SenseNova-U1.5-8B MoT Inpainting & Transform**: Natural language neural image-to-image transformation, lighting rework, and structure-preserving style modifications (50 credits).
+  - **Qwen-Image-2.1 Contextual Multi-Image Studio**: Upload up to 10 image references for character consistency, style transfer, and background replacement (50 credits).
+  - **Fine Control**: Standard (1024px) or Ultra (2048px) resolution modes with granular guidance scales and transparent background support.
 - **Cinematic Video Visualizers**: Powered by **Wan2.1 1.3B**. Render fluid video visualizers and motion backgrounds matching track moods.
 
 ### 8. Voice Library (`/voices`)
@@ -299,6 +300,8 @@ modal deploy qwen_image_engine.py
 - `https://<workspace>--cadence-studio-cadencestudioengine-serve.modal.run`
 - `https://<workspace>--cadence-clipper-cadenceviralclipper-serve.modal.run`
 - `https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run`
+- `https://<workspace>--qwen-image-2-1-qwenimageengine-serve.modal.run`
+- `https://<workspace>--cadence-agent-cadenceagentengine-serve.modal.run`
 
 ---
 
@@ -336,7 +339,11 @@ CADENCE_SOUND_API_URL=https://<workspace>--cadence-cadencesoundengine-serve.moda
 CADENCE_SONG_API_URL=https://<workspace>--cadence-cadencesongengine-serve.modal.run
 CADENCE_MEDIA_API_URL=https://<workspace>--cadence-cadencemediaengine-serve.modal.run
 CADENCE_SENSENOVA_API_URL=https://<workspace>--sensenova-u1-5-sensenovaengine-serve.modal.run
+CADENCE_QWEN_IMAGE_API_URL=https://<workspace>--qwen-image-2-1-qwenimageengine-serve.modal.run
 CADENCE_STUDIO_API_URL=https://<workspace>--cadence-studio-cadencestudioengine-serve.modal.run
+CADENCE_CLIPPER_API_URL=https://<workspace>--cadence-clipper-cadenceviralclipper-serve.modal.run
+CADENCE_AGENT_API_URL=https://<workspace>--cadence-agent-cadenceagentengine-serve.modal.run
+CADENCE_AGENT_WS_URL=wss://<workspace>--cadence-agent-cadenceagentengine-serve.modal.run/ws/realtime
 CADENCE_API_KEY=your_cadence_api_key
 ```
 
