@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { CheckCircle2, Sparkles, ArrowRight, Zap, Shield, Waves } from "lucide-react";
 
@@ -81,15 +82,16 @@ export function LandingCta() {
         {/* Top Logo Badge Emblem */}
         <div className="flex justify-center">
           <div className="relative">
-            <div className="absolute -inset-3 bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-pink-500/15 rounded-3xl blur-2xl opacity-50" />
-            <div className="relative size-18 sm:size-20 rounded-3xl bg-slate-950 border border-white/10 flex items-center justify-center shadow-xl">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" className="size-11 sm:size-12">
-                <path d="M390 112C348 78 299 60 247 60C143 60 60 144 60 247C60 350 143 434 247 434C299 434 348 416 390 382L341 319C314 340 282 351 247 351C189 351 142 305 142 247C142 189 189 143 247 143C282 143 314 154 341 175Z" fill="white" fillOpacity="0.95"/>
-                <rect x="222" y="191" width="22" height="112" rx="11" fill="white" fillOpacity="0.75"/>
-                <rect x="258" y="168" width="22" height="158" rx="11" fill="white" fillOpacity="0.95"/>
-                <rect x="294" y="190" width="22" height="114" rx="11" fill="white" fillOpacity="0.75"/>
-                <rect x="330" y="214" width="22" height="66" rx="11" fill="white" fillOpacity="0.6"/>
-              </svg>
+            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/15 via-purple-500/15 to-pink-500/15 rounded-3xl blur-2xl opacity-75" />
+            <div className="relative size-24 sm:size-28 rounded-3xl bg-white border border-slate-200/90 flex items-center justify-center shadow-xl shadow-indigo-500/10 p-2.5 sm:p-3 transition-transform duration-300 hover:scale-105">
+              <Image
+                src="/logo.svg"
+                alt="Cadence Logo"
+                width={92}
+                height={92}
+                className="w-full h-full object-contain"
+                priority
+              />
             </div>
           </div>
         </div>

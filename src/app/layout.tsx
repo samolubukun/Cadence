@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   description: "AI-powered text-to-speech, speech-to-text, and voice cloning platform",
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
+    icon: "/cadence-logo-white.svg",
+    shortcut: "/cadence-logo-white.svg",
+    apple: "/cadence-logo-white.svg",
   },
 };
 

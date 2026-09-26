@@ -81,7 +81,7 @@ export function LandingFooter() {
 
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:"1.5rem", display:"flex", flexWrap:"wrap", justifyContent:"space-between", alignItems:"center", gap:"0.75rem" }}>
           <span style={{ fontSize:"0.78rem" }} className="flex items-center gap-1.5 flex-wrap">
-            <span>2026 Cadence.</span>
+            <span>&copy; 2026 Cadence.</span>
             <span className="text-slate-500">•</span>
             <span>
               Designed &amp; Built by{" "}
