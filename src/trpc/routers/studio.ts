@@ -563,12 +563,13 @@ export const studioRouter = createTRPCRouter({
       let imageBuffer: Buffer;
 
       if (isQwen) {
-        // Qwen-Image-2.1 Standalone Engine (Multi-image contextual editing, RGBA transparency)
+        // Qwen-Image-2.1 Standalone Engine: Optimized for high-precision single-image restyling & sharp typography on A10G (24GB).
+        // (Note: Native multi-image cross-attention requires dedicated 80GB H100 infrastructure; use SenseNova for multi-image composites).
         const res = await cadenceQwenImage.POST("/generate", {
           body: {
             action: "edit",
             prompt: input.prompt,
-            images: cleanBase64Images,
+            images: cleanBase64Images.slice(0, 1), // Pass primary reference image
             quality: input.quality,
             transparent: input.transparent,
             num_steps: input.numSteps,

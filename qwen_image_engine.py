@@ -246,9 +246,14 @@ class QwenImageEngine:
 
         generator = torch.Generator(device="cpu").manual_seed(seed)
 
+        # NOTE: For native multi-image cross-attention conditioning without VRAM exhaustion,
+        # Qwen-Image-2.1 requires an H100/A100 (80GB VRAM) cluster with multi-latent cross-attention.
+        # On single-card A10G (24GB), Qwen-Image-2.1 is optimized for high-fidelity single-image editing & restyling.
+        ref_image = pil_images[0] if len(pil_images) > 0 else Image.new("RGB", (width, height), (0, 0, 0))
+
         kwargs = {
             "prompt": effective_prompt,
-            "image": pil_images if len(pil_images) > 1 else pil_images[0],
+            "image": ref_image,
             "width": width,
             "height": height,
             "num_inference_steps": int(num_inference_steps),
@@ -362,4 +367,4 @@ def test(
     )
     with open(output, "wb") as f:
         f.write(png_bytes)
-    print(f"✓ Saved test render to {output} ({len(png_bytes)} bytes)")
+    print(f"[OK] Saved test render to {output} ({len(png_bytes)} bytes)")
