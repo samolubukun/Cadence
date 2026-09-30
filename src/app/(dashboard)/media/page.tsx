@@ -151,12 +151,16 @@ export default function MediaStudioPage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const maxAllowed = editModel === "qwen-image-2-1" ? 10 : 4;
+    const maxAllowed = editModel === "sensenova" ? 4 : 1;
     const currentCount = sourceImages.length;
     const remainingSlots = maxAllowed - currentCount;
 
     if (remainingSlots <= 0) {
-      toast.error(`Maximum of ${maxAllowed} reference images reached`);
+      toast.error(
+        editModel === "qwen-image-2-1"
+          ? "Qwen-Image-2.1 is optimized for single-image precision restyling (switch to SenseNova for up to 4 images)"
+          : `Maximum of ${maxAllowed} reference images reached`
+      );
       return;
     }
 
@@ -637,11 +641,11 @@ export default function MediaStudioPage() {
                                 Qwen-Image-2.1 Edit
                               </span>
                               <span className="text-[10px] font-medium text-purple-500/90">
-                                50 credits · up to 10 imgs
+                                50 credits · Single image precision
                               </span>
                             </div>
                             <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
-                              Contextual editing across up to 10 reference images. Character consistency, compositing &amp; transparent output.
+                              High-fidelity single-image restyling, lighting &amp; sharp English typography. <span className="text-muted-foreground/80 italic">(Note: native multi-image cross-attention requires dedicated 80GB H100 infrastructure; use SenseNova for 1–4 image composites)</span>.
                             </p>
                           </div>
                         </div>
