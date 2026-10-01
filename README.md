@@ -5,7 +5,8 @@
 <br /><br />
 
 # Cadence
-### The open platform for every layer of voice, music, and media creation.
+### Make Anything Sound Possible.
+#### The open platform for every layer of voice, music, and media creation.
 
 Generative voice, music, speech, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, and generative video visualizers.
 
@@ -222,7 +223,7 @@ flowchart TD
 ```
 
 <div align="center">
-  <img src="./public/cadence-architecture.jpeg" alt="Cadence Comprehensive Platform Architecture" width="100%" />
+  <img src="./public/cadence-architecture.webp" alt="Cadence Comprehensive Platform Architecture" width="100%" />
 </div>
 
 <br />
@@ -266,7 +267,7 @@ Explore Cadence through each studio interface, ordered by dashboard sidebar navi
 
 ### 5. Voice Cloning
 [![Voice Cloning Studio](./public/screenshots/voice-cloning.jpg)](./public/screenshots/voice-cloning.jpg)
-> **Zero-Shot Voice Cloner:** Clone any voice in seconds from a 5–15s reference audio sample or microphone recording into reusable custom voice profiles.
+> **Zero-Shot Voice Cloner:** Clone any voice in seconds from a 5-15s reference audio sample or microphone recording into reusable custom voice profiles.
 
 <br />
 
@@ -323,7 +324,7 @@ Explore Cadence through each studio interface, ordered by dashboard sidebar navi
 - **Compacted Audio Preview**: Streamlined waveform player with scrubber, 10s seek forward/backward, time counter, and one-click download.
 
 ### 2. Dedicated Voice Cloning Studio (`/voice-clone`)
-- **Zero-Shot Voice Cloning**: Create permanent, personalized voice profiles from a 5–15 second audio sample without model retraining.
+- **Zero-Shot Voice Cloning**: Create permanent, personalized voice profiles from a 5-15 second audio sample without model retraining.
 - **Flexible Ingestion**: Upload audio (`WAV`, `MP3`, `M4A`, `FLAC`) or record live speech directly using the built-in microphone recorder.
 - **Cloud Persistence**: Voice profiles are cataloged in Convex and stored in Cloudflare R2 under your organization.
 
@@ -336,7 +337,7 @@ Explore Cadence through each studio interface, ordered by dashboard sidebar navi
 ### 4. Music & Sound Studio (`/music`)
 - **Beats & Instrumentals Mode**: Powered by **Meta MusicGen**. Craft hip-hop loops, electronic dance tracks, jazz chords, ambient soundscapes, or cinematic orchestral beds up to 120 seconds.
 - **Full Song with Vocals Mode**: Powered by **ACE-Step 1.5 Turbo**. Generate complete songs featuring singing, harmonies, verses, and choruses from custom prompts and lyrics up to 240 seconds.
-- **Sound Effects & Foley Mode**: Powered by **Meta AudioGen**. Synthesize photorealistic sound effects, ambient environments, and cinematic Foley from descriptive prompts (1–30s).
+- **Sound Effects & Foley Mode**: Powered by **Meta AudioGen**. Synthesize photorealistic sound effects, ambient environments, and cinematic Foley from descriptive prompts (1-30s).
 - **Custom Duration & Sliders**: Dedicated length sliders and instant in-studio waveform playback per mode.
 
 ### 5. Voice Changer Studio (`/voice-changer`)
@@ -353,7 +354,7 @@ Explore Cadence through each studio interface, ordered by dashboard sidebar navi
 
 ### 7. Visuals & Video Studio (`/media`)
 - **Triple-Engine Visual Generation**:
-  - **SDXL-Turbo (Fast Mode)**: Ultra-fast 1–2 second latent diffusion for rapid visual prototyping and album artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
+  - **SDXL-Turbo (Fast Mode)**: Ultra-fast 1-2 second latent diffusion for rapid visual prototyping and album artwork in 1:1, 16:9, or 9:16 aspect ratios (20 credits).
   - **SenseNova-U1.5-8B MoT (Studio Quality)**: 8-billion parameter mixture-of-trajectories diffusion transformer for studio-grade realism, rich dynamic range, and hyper-detailed textures (50 credits).
   - **Qwen-Image-2.1 (7B DiT + 8B Qwen3-VL)**: State-of-the-art text-to-image with flawless legible English typography, festival flyers, comic panels, and transparent RGBA PNG output (50 credits).
 - **Dual-Model AI Image Editing**:
@@ -425,16 +426,16 @@ Cadence organizes serverless compute into dedicated microservice engines:
 | `/transcribe` | Audio | `POST` | `multipart/form-data` audio file or `audio_key` | JSON | Multilingual Whisper large-v3 transcription with word-level timestamps |
 | `/voice-change` | Audio | `POST` | `file` or `source_audio_key`, `target_voice_key`, `pitch_shift` | `audio/wav` | OpenVoice v2 zero-shot timbre conversion |
 | `/api/clip` | Clipper | `POST` | `source_type`, `r2_source_key`, `num_clips`, `aspect_ratio`, `enable_reframe`, `reframe_mode`, `subtitle_style`, `font_family` | JSON | Viral moment extraction, YOLO reframing, kinetic subtitles, NVENC render to R2 |
-| `/generate-sound` | Sound | `POST` | `prompt`, `duration` (1–30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
-| `/generate-beats` | Sound | `POST` | `prompt`, `duration` (10–120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
-| `/generate-song` | Song / Sound | `POST` | `prompt`, `lyrics`, `duration` (10–240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition (or MusicGen fallback) |
+| `/generate-sound` | Sound | `POST` | `prompt`, `duration` (1-30s) | `audio/wav` | Meta AudioGen Foley and sound effect synthesis |
+| `/generate-beats` | Sound | `POST` | `prompt`, `duration` (10-120s) | `audio/wav` | Meta MusicGen instrumental beat and loop generation |
+| `/generate-song` | Song / Sound | `POST` | `prompt`, `lyrics`, `duration` (10-240s) | `audio/wav` | ACE-Step 1.5 Turbo full vocal track composition (or MusicGen fallback) |
 | `/separate-stems` | Studio | `POST` | `audio_base64`, `audio_key` | JSON (4 stems) | Meta Demucs v4 neural 4-track stem separation (Vocals, Drums, Bass, Other) |
 | `/convert-singing` | Studio | `POST` | `audio_base64`, `target_voice_key`, `pitch_shift` | `audio/wav` | RVC v2 musical singing voice conversion with pitch transpose |
 | `/enhance-audio` | Studio | `POST` | `audio_base64`, `audio_key` | `audio/wav` | Resemble Enhance 44.1kHz deep denoising and studio vocoding |
 | `/generate-image` | Media | `POST` | `prompt`, `aspect_ratio`, `num_steps` | `image/png` | SDXL-Turbo real-time 1024x1024 cover art generation |
 | `/generate` (action: "generate") | SenseNova | `POST` | `prompt`, `aspect_ratio`, `num_steps`, `quality` | JSON (base64) | SenseNova-U1.5-8B MoT studio-quality photorealistic rendering |
 | `/generate` (action: "edit") | SenseNova | `POST` | `prompt`, `images` (base64), `quality`, `img_cfg_scale` | JSON (base64) | SenseNova-U1.5-8B MoT neural image editing and style transformation |
-| `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2–5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
+| `/generate-video` | Media | `POST` | `prompt`, `duration_seconds` (2-5s), `resolution` | `video/mp4` | Wan2.1 1.3B text-to-video diffusion visualizer |
 
 ---
 
@@ -613,19 +614,19 @@ python scripts/run_all_endpoints_test.py
 
 In addition to serverless deployment on Modal, Cadence can run **100% locally on your Gaming PC, GPU Server, or Apple Silicon MacBook** using Docker Compose with full NVIDIA CUDA or Apple Silicon MPS acceleration.
 
-> **💡 Zero Code Drift Architecture:** The Docker containers copy and run the exact same `*.py` engine files as Modal. A lightweight FastAPI runner simply imports each engine class and binds it directly to standard Uvicorn—guaranteeing 100% behavioral parity between cloud and on-prem with zero duplicated code.
+> **Zero Code Drift Architecture:** The Docker containers copy and run the exact same `*.py` engine files as Modal. A lightweight FastAPI runner simply imports each engine class and binds it directly to standard Uvicorn, guaranteeing 100% behavioral parity between cloud and on-prem with zero duplicated code.
 
 ### Hardware Compatibility
 
 | Platform | Acceleration | Supported Topologies | Best For |
 | :--- | :--- | :--- | :--- |
-| **NVIDIA Gaming PC / Server** (RTX 3060–4090, A10/A100) | `CUDA 12.4` via `nvidia-container-toolkit` | **Combined** or **Modular** | Full production speed & NVENC video encoding |
+| **NVIDIA Gaming PC / Server** (RTX 3060-4090, A10/A100) | `CUDA 12.4` via `nvidia-container-toolkit` | **Combined** or **Modular** | Full production speed & NVENC video encoding |
 | **Apple Silicon MacBook** (M1/M2/M3/M4) | `MPS` (PyTorch Metal Performance Shaders) | **Combined** (MPS mode) | Local Mac development & offline generation |
 
 ### Deployment Topologies
 
 #### Option A: Combined Monolith (Port 8000)
-Bundles all 6 model engines behind a single unified FastAPI gateway with dynamic model loading—ideal for solo workstations and gaming PCs.
+Bundles all 6 model engines behind a single unified FastAPI gateway with dynamic model loading, ideal for solo workstations and gaming PCs.
 
 - **Windows Gaming PC (PowerShell)**:
   ```powershell
@@ -641,7 +642,7 @@ Bundles all 6 model engines behind a single unified FastAPI gateway with dynamic
   docker compose -f docker/docker-compose.combined.yml up --build
   ```
 
-#### Option B: Modular Microservices (Ports 8001–8009)
+#### Option B: Modular Microservices (Ports 8001-8009)
 Mirrors the Modal cloud microservice architecture with independent containers:
 - `cadence-audio` (`:8001`): Chatterbox TTS, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen, ACE-Step, SDXL, Wan2.1
 - `cadence-studio` (`:8005`): Demucs v4 4-stem split, RVC v2 singing voice conversion, Resemble Enhance
@@ -792,5 +793,5 @@ Designed & Built with precision by **[Samuel Olubukun](https://samuelolubukun.co
 ---
 
 <p align="center">
-  <sub>Built for reliable, high-performance, private generative voice, music, speech & media intelligence.</sub>
+  <sub>Cadence - Make Anything Sound Possible. Built for reliable, high-performance generative voice, music, speech & media intelligence.</sub>
 </p>

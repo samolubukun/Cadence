@@ -2,8 +2,8 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "Cadence All-in-One Comprehensive Platform Architecture",
-    "subtitle": "Full-Spectrum Generative Voice, Music, Video & Edge Microservice Infrastructure",
+    "title": "Cadence Comprehensive Platform Architecture",
+    "subtitle": "Full-Spectrum Voice, Music, Video, Agent & On-Prem Infrastructure",
     "output": "cadence-architecture.html",
     "visual_preset": "blueprint",
     "animation": "trace",
@@ -11,7 +11,7 @@
     "repository": {
       "url": "https://github.com/samolubukun/Cadence",
       "provider": "github",
-      "revision": "103cde41119061b97acacc3f99910029679f7594"
+      "revision": "51c1cb459d571aff1650f2fa846ec03eebff9180"
     },
     "views": [
       {
@@ -22,16 +22,19 @@
           "clerk_auth",
           "edge_trpc",
           "convex_db",
-          "r2_storage",
+          "langfuse_obs",
+          "s3_storage",
           "audio_engine",
           "sound_engine",
           "song_engine",
+          "studio_engine",
           "media_engine",
           "agent_engine",
           "clipper_engine",
-          "studio_engine"
+          "qwen_engine",
+          "sensenova_engine"
         ],
-        "note": "Complete topology: UI, Edge proxies, Reactive DB, R2 mounts, and all Modal GPU microservices."
+        "note": "Complete topology: UI, Edge proxies, Reactive DB, Langfuse telemetry, Universal S3, and all Modal & Docker GPU microservices."
       },
       {
         "id": "voice-and-audio",
@@ -44,9 +47,9 @@
           "song_engine",
           "studio_engine",
           "agent_engine",
-          "r2_storage"
+          "s3_storage"
         ],
-        "note": "Chatterbox TTS, Whisper v3, Meta AudioGen/MusicGen, ACE-Step 1.5, Demucs v4, RVC v2, and Silero VAD."
+        "note": "Chatterbox TTS, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen, ACE-Step 1.5, Demucs v4, RVC v2, and Silero VAD."
       },
       {
         "id": "visual-video-clipper",
@@ -55,21 +58,24 @@
           "client_ui",
           "edge_trpc",
           "media_engine",
+          "qwen_engine",
+          "sensenova_engine",
           "clipper_engine",
-          "r2_storage"
+          "s3_storage"
         ],
-        "note": "SDXL-Turbo, Qwen-Image-2.1 DiT, SenseNova MoT, Wan2.1 Video, and YOLO11 Viral Clipper."
+        "note": "SDXL-Turbo, Qwen-Image-2.1 DiT, SenseNova-U1.5 MoT, Wan2.1 Video, and YOLO11 Viral Clipper."
       },
       {
-        "id": "state-and-infrastructure",
-        "label": "Data, RBAC & GPU Infrastructure",
+        "id": "telemetry-and-storage",
+        "label": "State, Observability & Storage",
         "focus": [
           "clerk_auth",
           "convex_db",
-          "r2_storage",
+          "langfuse_obs",
+          "s3_storage",
           "edge_trpc"
         ],
-        "note": "Clerk Organizations RBAC, Convex real-time credit ledger, and Cloudflare R2 direct /r2 mounts."
+        "note": "Dual-stream telemetry (Langfuse + Convex llm_traces), Clerk Organizations RBAC, and S3 / MinIO / R2 object storage."
       }
     ]
   },
@@ -83,7 +89,7 @@
       "brand": "next-js",
       "pos": [
         40,
-        320
+        340
       ],
       "size": [
         170,
@@ -109,53 +115,93 @@
       "id": "convex_db",
       "type": "database",
       "label": "Convex Realtime DB",
-      "sublabel": "Reactive Sync & Credit Ledger",
-      "tag": "State & Billing",
+      "sublabel": "Reactive State & llm_traces",
+      "tag": "Database & Telemetry",
       "pos": [
-        270,
-        140
+        260,
+        130
       ],
       "size": [
-        175,
+        185,
         64
+      ],
+      "sources": [
+        {
+          "path": "convex/schema.ts",
+          "line": 1,
+          "end_line": 30,
+          "label": "Convex Schema & Tables"
+        }
+      ]
+    },
+    {
+      "id": "langfuse_obs",
+      "type": "backend",
+      "label": "Langfuse Cloud",
+      "sublabel": "Distributed Spans & Tokens",
+      "tag": "LLMOps Observability",
+      "pos": [
+        40,
+        500
+      ],
+      "size": [
+        170,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/langfuse.ts",
+          "line": 1,
+          "end_line": 35,
+          "label": "Dual-Stream Langfuse Tracer"
+        }
       ]
     },
     {
       "id": "edge_trpc",
       "type": "backend",
-      "label": "Next.js & tRPC Edge API",
-      "sublabel": "Edge Proxies & Orchestration",
-      "tag": "API Gateway",
+      "label": "tRPC Edge API Gateway",
+      "sublabel": "Routers, Streaming & Proxy",
+      "tag": "Edge Gateway",
+      "brand": "typescript",
       "pos": [
-        270,
-        320
+        260,
+        340
       ],
       "size": [
-        175,
-        64
-      ]
-    },
-    {
-      "id": "r2_storage",
-      "type": "cloud",
-      "label": "Cloudflare R2 Bucket",
-      "sublabel": "Audio, Models & Videos (/r2)",
-      "tag": "Direct Mount",
-      "brand": "cloudflare",
-      "pos": [
-        270,
-        500
-      ],
-      "size": [
-        175,
+        185,
         64
       ],
       "sources": [
         {
-          "path": "cadence_engine.py",
-          "line": 40,
-          "end_line": 45,
-          "label": "modal.CloudBucketMount"
+          "path": "src/lib/env.ts",
+          "line": 1,
+          "end_line": 30,
+          "label": "Edge API Gateway Routes"
+        }
+      ]
+    },
+    {
+      "id": "s3_storage",
+      "type": "cloud",
+      "label": "Universal S3 / R2 / MinIO",
+      "sublabel": "Bucket Storage & Mount (/r2)",
+      "tag": "Object Storage",
+      "brand": "cloudflare",
+      "pos": [
+        260,
+        500
+      ],
+      "size": [
+        185,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/r2.ts",
+          "line": 1,
+          "end_line": 35,
+          "label": "Universal S3 Client"
         }
       ]
     },
@@ -164,10 +210,10 @@
       "type": "backend",
       "label": "CadenceAudioEngine",
       "sublabel": "Chatterbox TTS • Whisper v3",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "tag": "A10G GPU / :8001",
+      "brand": "openai",
       "pos": [
-        520,
+        510,
         80
       ],
       "size": [
@@ -177,9 +223,9 @@
       "sources": [
         {
           "path": "cadence_engine.py",
-          "line": 1,
-          "end_line": 8,
-          "label": "Audio Engine"
+          "line": 230,
+          "end_line": 250,
+          "label": "Audio Engine Class"
         }
       ]
     },
@@ -188,11 +234,11 @@
       "type": "backend",
       "label": "CadenceSoundEngine",
       "sublabel": "AudioGen SFX • MusicGen Beats",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "tag": "A10G GPU / :8001",
+      "brand": "meta",
       "pos": [
-        520,
-        220
+        510,
+        180
       ],
       "size": [
         195,
@@ -203,7 +249,7 @@
           "path": "cadence_engine.py",
           "line": 9,
           "end_line": 12,
-          "label": "Sound Engine"
+          "label": "Sound Engine Definition"
         }
       ]
     },
@@ -212,11 +258,11 @@
       "type": "backend",
       "label": "CadenceSongEngine",
       "sublabel": "ACE-Step 1.5 Turbo Vocals",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "tag": "A10G GPU / :8001",
+      "brand": "hugging-face",
       "pos": [
-        520,
-        360
+        510,
+        280
       ],
       "size": [
         195,
@@ -227,7 +273,7 @@
           "path": "cadence_engine.py",
           "line": 13,
           "end_line": 15,
-          "label": "Song Engine"
+          "label": "Song Engine Definition"
         }
       ]
     },
@@ -236,11 +282,11 @@
       "type": "backend",
       "label": "CadenceStudioEngine",
       "sublabel": "Demucs v4 • RVC v2 Singing",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "tag": "A10G GPU / :8005",
+      "brand": "meta",
       "pos": [
-        520,
-        500
+        510,
+        400
       ],
       "size": [
         195,
@@ -250,8 +296,8 @@
         {
           "path": "cadence_studio_engine.py",
           "line": 1,
-          "end_line": 13,
-          "label": "Studio Engine"
+          "end_line": 15,
+          "label": "Studio Engine Class"
         }
       ]
     },
@@ -259,12 +305,12 @@
       "id": "media_engine",
       "type": "backend",
       "label": "CadenceMediaEngine",
-      "sublabel": "SDXL • Qwen-Image • Wan2.1",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "sublabel": "SDXL-Turbo • Wan2.1 Video",
+      "tag": "A10G GPU / :8001",
+      "brand": "hugging-face",
       "pos": [
-        780,
-        140
+        770,
+        80
       ],
       "size": [
         195,
@@ -275,7 +321,55 @@
           "path": "cadence_engine.py",
           "line": 16,
           "end_line": 19,
-          "label": "Media Engine"
+          "label": "Media Engine Definition"
+        }
+      ]
+    },
+    {
+      "id": "qwen_engine",
+      "type": "backend",
+      "label": "QwenImageEngine",
+      "sublabel": "Qwen-Image-2.1 DiT & RGBA",
+      "tag": "A10G GPU / :8008",
+      "brand": "qwen",
+      "pos": [
+        770,
+        180
+      ],
+      "size": [
+        195,
+        64
+      ],
+      "sources": [
+        {
+          "path": "qwen_image_engine.py",
+          "line": 1,
+          "end_line": 18,
+          "label": "Qwen Image Engine Class"
+        }
+      ]
+    },
+    {
+      "id": "sensenova_engine",
+      "type": "backend",
+      "label": "SenseNovaEngine",
+      "sublabel": "SenseNova-U1.5-8B MoT",
+      "tag": "A10G GPU / :8009",
+      "brand": "pytorch",
+      "pos": [
+        770,
+        280
+      ],
+      "size": [
+        195,
+        64
+      ],
+      "sources": [
+        {
+          "path": "sensenova_engine.py",
+          "line": 1,
+          "end_line": 15,
+          "label": "SenseNova Engine Class"
         }
       ]
     },
@@ -284,11 +378,11 @@
       "type": "backend",
       "label": "CadenceAgentEngine",
       "sublabel": "Silero VAD • Kokoro • Duplex WS",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "tag": "A10G GPU / :8007",
+      "brand": "fastapi",
       "pos": [
-        780,
-        320
+        770,
+        400
       ],
       "size": [
         195,
@@ -299,7 +393,7 @@
           "path": "cadence_agent_engine.py",
           "line": 1,
           "end_line": 18,
-          "label": "Voice Agent"
+          "label": "Voice Agent Engine Class"
         }
       ]
     },
@@ -308,10 +402,10 @@
       "type": "backend",
       "label": "CadenceClipperEngine",
       "sublabel": "Whisper • Qwen • YOLO11 • NVENC",
-      "tag": "A10G GPU",
-      "brand": "pytorch",
+      "tag": "A10G GPU / :8006",
+      "brand": "python",
       "pos": [
-        780,
+        770,
         500
       ],
       "size": [
@@ -323,7 +417,7 @@
           "path": "cadence_clipper_engine.py",
           "line": 1,
           "end_line": 16,
-          "label": "Viral Clipper"
+          "label": "Viral Clipper Engine Class"
         }
       ]
     }
@@ -331,24 +425,27 @@
   "boundaries": [
     {
       "kind": "region",
-      "label": "Client & Edge Cloud Infrastructure",
+      "label": "Client & Edge Cloud / Telemetry Infrastructure",
       "wraps": [
         "clerk_auth",
         "convex_db",
+        "langfuse_obs",
         "edge_trpc",
-        "r2_storage"
+        "s3_storage"
       ],
       "pad": 16
     },
     {
       "kind": "security-group",
-      "label": "Modal Serverless NVIDIA A10G GPU Microservices Cluster (Direct /r2 Mount)",
+      "label": "Serverless Modal & On-Prem Docker GPU Microservice Cluster",
       "wraps": [
         "audio_engine",
         "sound_engine",
         "song_engine",
         "studio_engine",
         "media_engine",
+        "qwen_engine",
+        "sensenova_engine",
         "agent_engine",
         "clipper_engine"
       ],
@@ -375,20 +472,27 @@
       "id": "api-to-convex",
       "from": "edge_trpc",
       "to": "convex_db",
-      "label": "ledger",
+      "label": "state",
       "fromSide": "top",
-      "toSide": "bottom",
-      "labelDy": -58
+      "toSide": "bottom"
     },
     {
-      "id": "api-to-r2",
+      "id": "api-to-langfuse",
       "from": "edge_trpc",
-      "to": "r2_storage",
+      "to": "langfuse_obs",
+      "label": "telemetry",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "api-to-s3",
+      "from": "edge_trpc",
+      "to": "s3_storage",
       "label": "presigned",
       "variant": "dashed",
       "fromSide": "bottom",
       "toSide": "top",
-      "labelDy": 58
+      "labelDy": 26
     },
     {
       "id": "api-to-audio",
@@ -431,24 +535,32 @@
       "toSide": "left"
     },
     {
-      "id": "sound-to-agent",
+      "id": "sound-to-qwen",
       "from": "sound_engine",
+      "to": "qwen_engine",
+      "variant": "default",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "song-to-sensenova",
+      "from": "song_engine",
+      "to": "sensenova_engine",
+      "variant": "default",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "studio-to-agent",
+      "from": "studio_engine",
       "to": "agent_engine",
       "variant": "default",
       "fromSide": "right",
       "toSide": "left"
     },
     {
-      "id": "studio-to-clipper",
-      "from": "studio_engine",
-      "to": "clipper_engine",
-      "variant": "default",
-      "fromSide": "right",
-      "toSide": "left"
-    },
-    {
-      "id": "r2-to-clipper",
-      "from": "r2_storage",
+      "id": "s3-to-clipper",
+      "from": "s3_storage",
       "to": "clipper_engine",
       "label": "mount /r2",
       "variant": "dashed",
@@ -464,27 +576,25 @@
       "items": [
         "Next.js 16 + React 19 UI with real-time waveform scrubbers & reactive sync",
         "Clerk Organizations RBAC with deterministic Convex credit deduction ledger",
-        "Direct Cloudflare R2 asset storage for audio assets, video files, and weights"
+        "Dual-stream telemetry streaming simultaneously to Langfuse Cloud and Convex llm_traces"
       ]
     },
     {
       "dot": "emerald",
-      "title": "Modal GPU Microservices Architecture",
+      "title": "Dual Modal Cloud & On-Prem Docker",
       "items": [
-        "cadence_engine.py: Chatterbox Turbo (TTS), Whisper v3, AudioGen & ACE-Step 1.5",
-        "cadence_agent_engine.py: Duplex WebSocket voice agent with Silero VAD barge-in",
-        "cadence_clipper_engine.py: Viral clipping, YOLO11 auto-reframe & NVENC rendering",
-        "cadence_studio_engine.py: Demucs v4 stem isolation & RVC v2 singing voice synthesis",
-        "qwen_image_engine.py & sensenova_engine.py: Qwen-Image-2.1 DiT & SenseNova-U1.5 MoT"
+        "Cloud: Serverless NVIDIA A10G (24GB) containers with 300s warm keep-alive ($0.00 idle)",
+        "On-Prem Docker: Modular microservices or combined monolith for gaming PCs & MacBooks",
+        "All 6 engines: Audio, Studio, Clipper, Agent, Qwen-Image-2.1, and SenseNova-U1.5 MoT"
       ]
     },
     {
       "dot": "violet",
-      "title": "Performance & Scale-to-Zero",
+      "title": "Storage & Memory Architecture",
       "items": [
-        "Serverless NVIDIA A10G (24GB) containers with 300s warm keep-alive ( idle)",
-        "Cloudflare R2 mounted directly into Linux container filesystem at /r2",
-        "Expandable PyTorch segments eliminating CUDA VRAM fragmentation"
+        "Universal S3 integration: Cloudflare R2, AWS S3, or embedded MinIO container",
+        "Zero-latency object storage mounted directly into Linux container filesystem at /r2",
+        "Expandable PyTorch segments eliminating CUDA VRAM memory fragmentation"
       ]
     }
   ]
