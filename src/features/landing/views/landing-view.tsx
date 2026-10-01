@@ -4,6 +4,7 @@ import { LandingDashboardPreview } from "../components/landing-dashboard-preview
 import { LandingWhy } from "../components/landing-why";
 import { LandingModels } from "../components/landing-models";
 import { LandingBento } from "../components/landing-bento";
+import { LandingCreativeShowcase } from "../components/landing-creative-showcase";
 import { LandingVoices } from "../components/landing-voices";
 import { LandingPricing } from "../components/landing-pricing";
 import { LandingArchitecture } from "../components/landing-architecture";
@@ -21,6 +22,7 @@ export function LandingView() {
         <LandingWhy />
         <LandingModels />
         <LandingBento />
+        {/* <LandingCreativeShowcase /> */}
         <LandingVoices />
         <LandingPricing />
         <LandingHowItWorks />

@@ -5,42 +5,48 @@ export function LandingFooter() {
   return (
     <footer style={{ background:"#0F172A", padding:"3.5rem 1.5rem 2rem", color:"rgba(255,255,255,0.55)" }}>
       <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-        {/* Main Grid: On mobile, brand block is full-width centered; on md it takes 1 column of 4 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-          <div className="col-span-2 md:col-span-1 flex flex-col items-center text-center md:items-start md:text-left mb-2 md:mb-0">
-            {/* Logo and Name: stacked vertically and centered on mobile, inline on md */}
-            <div className="flex flex-col items-center md:flex-row md:items-center gap-3 mb-3">
+        {/* Main Grid: On mobile (small screens), 1 clean column per group; on sm (640px+) 2 columns; on md 3 columns; on lg (1024px+) 5 columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-10 sm:gap-y-12 sm:gap-x-8 lg:gap-x-6 mb-12 sm:mb-16">
+          {/* Brand Info Column */}
+          <div className="sm:col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-start text-left">
+            {/* Logo and Name */}
+            <div className="flex items-center gap-3 mb-3.5">
               <Image 
                 src="/logo.svg" 
                 alt="Cadence" 
-                width={56} 
-                height={56} 
-                className="w-14 h-14 md:w-10 md:h-10 shrink-0 drop-shadow-md" 
+                width={40} 
+                height={40} 
+                className="size-10 shrink-0 drop-shadow-md" 
               />
-              <span className="font-extrabold text-2xl md:text-xl text-white tracking-tight">
+              <span className="font-extrabold text-2xl lg:text-xl text-white tracking-tight">
                 Cadence
               </span>
             </div>
-            <p className="text-xs sm:text-[0.83rem] leading-relaxed max-w-[280px] md:max-w-[260px] text-slate-400">
-              Open creative studio for voice cloning, speech, music generation, and media powered by open-source foundation models.
+            <p className="text-xs sm:text-[0.83rem] leading-relaxed max-w-sm lg:max-w-[220px] text-slate-400">
+              The open platform for every layer of voice, music, and media creation powered by open-source foundation models.
             </p>
           </div>
 
+          {/* Column 1: Studios & Tools */}
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Studios &amp; Tools</div>
-            <div className="flex flex-col gap-2">
+            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-indigo-500" />
+              <span>Studios &amp; Tools</span>
+            </div>
+            <div className="flex flex-col gap-2.5">
               {[
                 ["Text to Speech","/text-to-speech"],
                 ["Voice Cloning","/voice-clone"],
                 ["Speech to Text","/transcribe"],
                 ["Music & Beat Studio","/music"],
+                ["Sound FX Studio","/sound-fx"],
                 ["Voice Changer","/voice-changer"],
                 ["Viral Video Clipper","/clipper"],
                 ["Visuals & Video","/media"],
                 ["Voice Agent Studio","/agent"],
                 ["Voice Library","/voices"],
                 ["Usage & Analytics","/usage"],
-                ["Billing & Credits","/billing"],
+                ["Observability Traces","/observability"],
               ].map(([l,h]) => (
                 <Link key={l} href={h} className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
                   {l}
@@ -49,17 +55,26 @@ export function LandingFooter() {
             </div>
           </div>
 
+          {/* Column 2: Open Source Models */}
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Stack &amp; Open Source</div>
-            <div className="flex flex-col gap-2">
+            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-purple-500" />
+              <span>Open Source Models</span>
+            </div>
+            <div className="flex flex-col gap-2.5">
               {[
-                ["GitHub Repository","https://github.com/samolubukun/Cadence"],
-                ["Chatterbox TTS","https://resemble.ai"],
-                ["Whisper STT","https://openai.com/research/whisper"],
-                ["Modal GPU","https://modal.com"],
-                ["Cloudflare R2","https://cloudflare.com/developer-platform/r2"],
-                ["Convex DB","https://convex.dev"],
-                ["Voice Data (VCTK Corpus)","https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data"]
+                ["Chatterbox Turbo (TTS)","https://github.com/resemble-ai/chatterbox"],
+                ["Whisper Large-v3 (STT)","https://github.com/openai/whisper"],
+                ["ACE-Step 1.5 (Song Gen)","https://huggingface.co/spaces/ACE-Studio/ACE-Step"],
+                ["Meta MusicGen & AudioGen","https://github.com/facebookresearch/audiocraft"],
+                ["Meta Demucs v4 (Stems)","https://github.com/facebookresearch/demucs"],
+                ["MyShell OpenVoice v2","https://github.com/myshell-ai/OpenVoice"],
+                ["RVC v2 (Singing Voice)","https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI"],
+                ["Qwen-Image-2.1 DiT","https://huggingface.co/Qwen/Qwen-Image-2.1"],
+                ["SenseNova-U1.5 8B MoT","https://huggingface.co/SenseNova"],
+                ["Wan2.1 (Video Diffusion)","https://github.com/Wan-Video/Wan2.1"],
+                ["Kokoro-82M (Realtime TTS)","https://huggingface.co/hexgrad/Kokoro-82M"],
+                ["Ultralytics YOLO11","https://github.com/ultralytics/ultralytics"],
               ].map(([l,h]) => (
                 <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
                   {l}
@@ -68,14 +83,50 @@ export function LandingFooter() {
             </div>
           </div>
 
-          <div className="col-span-2 sm:col-span-1 flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Account</div>
-            <div className="flex flex-col gap-2">
+          {/* Column 3: Stack & Infrastructure */}
+          <div className="flex flex-col items-start">
+            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-cyan-500" />
+              <span>Infrastructure</span>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              {[
+                ["GitHub Repository","https://github.com/samolubukun/Cadence"],
+                ["Modal GPU Serverless","https://modal.com"],
+                ["Docker Compose Microservices","https://docs.docker.com/compose/"],
+                ["Cloudflare R2 Storage","https://cloudflare.com/developer-platform/r2"],
+                ["Convex Realtime DB","https://convex.dev"],
+                ["Langfuse Observability","https://langfuse.com"],
+                ["NVIDIA Parakeet NeMo","https://github.com/NVIDIA/NeMo"],
+                ["Silero VAD","https://github.com/snakers4/silero-vad"],
+                ["Resemble Enhance","https://github.com/resemble-ai/resemble-enhance"],
+                ["Voice Data (VCTK Corpus)","https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data"],
+              ].map(([l,h]) => (
+                <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+                  {l}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 4: Account & Access */}
+          <div className="flex flex-col items-start">
+            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              <span>Account</span>
+            </div>
+            <div className="flex flex-col gap-2.5">
               <Link href="/sign-in" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
                 Sign In
               </Link>
               <Link href="/sign-up" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
                 Create Account
+              </Link>
+              <Link href="/dashboard" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/billing" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+                Billing &amp; Credits
               </Link>
             </div>
           </div>
