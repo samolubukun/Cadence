@@ -21,9 +21,11 @@ const r2 = new S3Client({
   },
 });
 
-const convex = new ConvexHttpClient(
-  process.env.NEXT_PUBLIC_CONVEX_URL || "https://judicious-eel-519.convex.cloud"
-);
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+if (!convexUrl) {
+  throw new Error("NEXT_PUBLIC_CONVEX_URL is not set in environment");
+}
+const convex = new ConvexHttpClient(convexUrl);
 
 interface VoiceSeedEntry {
   cadenceId: string;
