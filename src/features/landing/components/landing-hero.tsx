@@ -96,16 +96,18 @@ export function LandingHero() {
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-indigo-100 shadow-[0_2px_10px_rgba(99,102,241,0.08)] mb-6 animate-fade-up">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-xs font-semibold tracking-wide uppercase text-indigo-900/80">
-            DON&apos;T JUST TALK. SPEAK WITH CADENCE.
+            Make Anything Sound Possible.
           </span>
         </div>
 
         {/* Hero Headline */}
         <h1 
-          className="animate-fade-up-delay-1 text-gradient-hero text-slate-900 tracking-tight leading-[1.12] mb-6 max-w-4xl"
-          style={{ fontSize: "clamp(2.6rem, 5vw, 4.4rem)", fontWeight: 800 }}
+          className="animate-fade-up-delay-1 text-gradient-hero text-slate-900 tracking-tight leading-[1.14] mb-6 max-w-4xl"
+          style={{ fontSize: "clamp(2.4rem, 4.4vw, 4.2rem)", fontWeight: 800 }}
         >
-          Open platform for voice,<br className="hidden sm:block" /> music, and media.
+          The open platform<br />
+          for every layer of voice,<br />
+          music, and media creation.
         </h1>
 
         {/* Hero Subtitle */}
@@ -237,11 +239,6 @@ export function LandingHero() {
             </div>
           </div>
         </div>
-
-        {/* Proof Statement Underneath */}
-        <p className="mt-8 text-xs font-medium tracking-wide text-slate-400 animate-fade-up-delay-4">
-          The open creative platform for next-generation audio, music, and media production.
-        </p>
       </div>
     </section>
   );

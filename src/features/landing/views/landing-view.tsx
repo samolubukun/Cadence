@@ -1,5 +1,6 @@
 import { LandingNavbar } from "../components/landing-navbar";
 import { LandingHero } from "../components/landing-hero";
+import { LandingDashboardPreview } from "../components/landing-dashboard-preview";
 import { LandingWhy } from "../components/landing-why";
 import { LandingModels } from "../components/landing-models";
 import { LandingBento } from "../components/landing-bento";
@@ -16,6 +17,7 @@ export function LandingView() {
       <LandingNavbar />
       <main>
         <LandingHero />
+        <LandingDashboardPreview />
         <LandingWhy />
         <LandingModels />
         <LandingBento />

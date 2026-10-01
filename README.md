@@ -243,7 +243,7 @@ Explore Cadence through each studio interface, ordered by dashboard sidebar navi
 
 ### 1. Dashboard
 [![Cadence Dashboard](./public/screenshots/dashboard.jpg)](./public/screenshots/dashboard.jpg)
-> **Unified Command Center:** Real-time credit metrics, quick launcher cards across all generation studios, live activity feeds, and recent audio productions.
+> **Unified Command Center:** Quick launcher cards across all generation studios, curated voice library browser, and recent studio generation history.
 
 <br />
 
