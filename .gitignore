@@ -55,7 +55,7 @@ endpoint_verification_outputs/
 *.mp4
 sensenova_sample.png
 cadence_flyer.png
-VOICE_AGENT_STUDIO_PLAN.md
+
 
 # Agent skills & customizations
 .agents/

@@ -4,10 +4,18 @@ import { createEnv } from "@t3-oss/env-nextjs";
 export const env = createEnv({
   server: {
     APP_URL: z.string().min(1),
-    R2_ACCOUNT_ID: z.string().min(1),
-    R2_ACCESS_KEY_ID: z.string().min(1),
-    R2_SECRET_ACCESS_KEY: z.string().min(1),
-    R2_BUCKET_NAME: z.string().min(1),
+    // Storage & S3 / R2 Configuration
+    R2_ACCOUNT_ID: z.string().optional(),
+    R2_ACCESS_KEY_ID: z.string().optional(),
+    R2_SECRET_ACCESS_KEY: z.string().optional(),
+    R2_BUCKET_NAME: z.string().optional().default("cadence"),
+    S3_ENDPOINT: z.string().optional(),
+    S3_REGION: z.string().optional().default("auto"),
+    S3_ACCESS_KEY_ID: z.string().optional(),
+    S3_SECRET_ACCESS_KEY: z.string().optional(),
+    S3_BUCKET_NAME: z.string().optional(),
+    S3_FORCE_PATH_STYLE: z.string().optional(),
+    // Generation Engine Gateway Endpoints
     CADENCE_API_URL: z.string().url(),
     CADENCE_SOUND_API_URL: z.string().url().optional(),
     CADENCE_MEDIA_API_URL: z.string().url().optional(),
