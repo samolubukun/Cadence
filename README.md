@@ -236,6 +236,87 @@ flowchart TD
 
 ---
 
+## Product Showcase & Studio Walkthrough
+
+Explore Cadence through the studio interface, ordered by the dashboard navigation:
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3 align="center">1. Dashboard</h3>
+      <a href="./public/screenshots/dashboard.jpg"><img src="./public/screenshots/dashboard.jpg" alt="Cadence Dashboard" width="100%" /></a>
+      <p><b>Unified Command Center:</b> Real-time credit metrics, quick launcher cards across all generation studios, live activity feeds, and recent audio productions.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3 align="center">2. Explore Voices</h3>
+      <a href="./public/screenshots/explore-voices.jpg"><img src="./public/screenshots/explore-voices.jpg" alt="Explore Voices" width="100%" /></a>
+      <p><b>Curated Voice Library:</b> Browse, search, filter, and instantly audition over 30 broadcast-quality voice personas, accents, genders, and custom clones.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3 align="center">3. Text to Speech</h3>
+      <a href="./public/screenshots/tts.jpg"><img src="./public/screenshots/tts.jpg" alt="Text to Speech Studio" width="100%" /></a>
+      <p><b>Expressive TTS Studio:</b> High-throughput speech synthesis powered by Chatterbox Turbo with instant style presets, audio dynamics controls, and audio player.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3 align="center">4. Speech to Text</h3>
+      <a href="./public/screenshots/stt.jpg"><img src="./public/screenshots/stt.jpg" alt="Speech to Text Studio" width="100%" /></a>
+      <p><b>Whisper Transcription:</b> Multilingual transcription powered by Whisper large-v3 featuring clickable word-level timestamps and subtitle exports (.srt, .vtt).</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3 align="center">5. Voice Cloning</h3>
+      <a href="./public/screenshots/voice-cloning.jpg"><img src="./public/screenshots/voice-cloning.jpg" alt="Voice Cloning Studio" width="100%" /></a>
+      <p><b>Zero-Shot Voice Cloner:</b> Clone any voice in seconds from a 5–15s reference audio sample or microphone recording into reusable custom voice profiles.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3 align="center">6. Music Studio</h3>
+      <a href="./public/screenshots/music-studio.jpg"><img src="./public/screenshots/music-studio.jpg" alt="Music Studio" width="100%" /></a>
+      <p><b>Beats, Songs & Foley:</b> Multi-engine music workstation creating instrumental beats (MusicGen), full vocal songs with lyrics (ACE-Step 1.5), and cinematic SFX (AudioGen).</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3 align="center">7. Voice Changer</h3>
+      <a href="./public/screenshots/voice-changer.jpg"><img src="./public/screenshots/voice-changer.jpg" alt="Voice Changer Studio" width="100%" /></a>
+      <p><b>Speech-to-Speech Conversion:</b> Real-time zero-shot timbre and pitch morphing via OpenVoice v2, preserving original emotion, rhythm, and expressive cadence.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3 align="center">8. Visuals & Video</h3>
+      <a href="./public/screenshots/visuals-video.jpg"><img src="./public/screenshots/visuals-video.jpg" alt="Visuals & Video Studio" width="100%" /></a>
+      <p><b>Generative Visual Suite:</b> Multi-engine image generation & editing (Qwen-Image-2.1, SenseNova MoT, SDXL-Turbo) alongside dynamic motion video visualizers (Wan2.1).</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3 align="center">9. Viral Clipper</h3>
+      <a href="./public/screenshots/viral-clipper.jpg"><img src="./public/screenshots/viral-clipper.jpg" alt="Viral Video Clipper" width="100%" /></a>
+      <p><b>Automated 9:16 Shorts:</b> Long-form to vertical video pipeline with AI virality scoring, YOLO11 active speaker tracking, retention banners, and kinetic subtitles.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3 align="center">10. Voice Agent</h3>
+      <a href="./public/screenshots/voice-agent.jpg"><img src="./public/screenshots/voice-agent.jpg" alt="Voice Agent Studio" width="100%" /></a>
+      <p><b>Real-Time Conversational AI:</b> Ultra-low-latency voice assistant with Silero VAD, instant barge-in interruption, liquid orb visualizer, and custom personas.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3 align="center">11. Usage & Analytics</h3>
+      <a href="./public/screenshots/usage-analytics.jpg"><img src="./public/screenshots/usage-analytics.jpg" alt="Usage and Analytics" width="100%" /></a>
+      <p><b>Resource Accounting:</b> Real-time credit consumption breakdowns, per-studio usage charts, execution counts, and team allocation metrics.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3 align="center">12. Observability</h3>
+      <a href="./public/screenshots/observability.jpg"><img src="./public/screenshots/observability.jpg" alt="Observability Dashboard" width="100%" /></a>
+      <p><b>Dual-Stream Model Telemetry:</b> Deep observability with Langfuse & Convex traces, latency percentiles, token burn KPIs, waterfall inspect, and payload exports.</p>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## Core Product Studios
 
 ### 1. Text-to-Speech Studio (`/text-to-speech`)
