@@ -8,8 +8,6 @@ import { VOICE_CATEGORY_LABELS, type VoiceCategory } from "@/features/voices/dat
 import { useAudioPlayback } from "@/hooks/use-audio-playback";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "@/trpc/client";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -25,19 +23,71 @@ function parseLanguage(locale: string) {
   return { flag, region };
 }
 
-// Fallback curated voices if DB query is loading
-const FALLBACK_SYSTEM_VOICES = [
-  { id: "vctk_p225", name: "Sienna", category: "NARRATIVE", language: "en-US", description: "Warm, articulate narrator for audiobooks & long-form stories." },
-  { id: "vctk_p226", name: "Julian", category: "PODCAST", language: "en-GB", description: "Crisp British broadcaster with resonant authoritative cadence." },
-  { id: "vctk_p227", name: "Claire", category: "CONVERSATIONAL", language: "en-US", description: "Natural, friendly conversationalist for podcasts & customer AI." },
-  { id: "vctk_p228", name: "Marcus", category: "CHARACTERS", language: "en-GB", description: "Deep cinematic timbre engineered for trailers and dramatic voiceovers." },
-  { id: "vctk_p229", name: "Elara", category: "AUDIOBOOK", language: "en-IE", description: "Melodic Irish lilt delivering poetic expressiveness." },
-  { id: "vctk_p230", name: "Silas", category: "VOICEOVER", language: "en-GB", description: "Rich Scottish storyteller voice with grounded gravitas." },
+// Curated high-fidelity system voices with local zero-latency audio assets (/public/voices/)
+interface LandingVoiceItem {
+  id: string;
+  name: string;
+  category: string;
+  language: string;
+  description: string;
+  audioFile: string;
+}
+
+const LANDING_SYSTEM_VOICES: LandingVoiceItem[] = [
+  {
+    id: "jd7cakgk8p89yr8a0pvj7z8m158e44c3",
+    name: "Sienna",
+    category: "AUDIOBOOK",
+    language: "en-US",
+    description: "Warm, expressive American female voice ideal for audiobooks and storytelling.",
+    audioFile: "sienna.wav",
+  },
+  {
+    id: "jd71x0btr9hzh4qbvk4r9qy9hd8e48pn",
+    name: "Julian",
+    category: "CONVERSATIONAL",
+    language: "en-US",
+    description: "Confident American male narrator with a natural conversational flow.",
+    audioFile: "julian.wav",
+  },
+  {
+    id: "jd7fkhasnpw4chy5k59dtjqj358e5zpp",
+    name: "Claire",
+    category: "CONVERSATIONAL",
+    language: "en-US",
+    description: "Relaxed and conversational American female tone, perfect for podcasts.",
+    audioFile: "claire.wav",
+  },
+  {
+    id: "jd78cpyzv5px9cnv6jysss3mcn8e594q",
+    name: "Marcus",
+    category: "PODCAST",
+    language: "en-AU",
+    description: "Laid-back Australian male voice from Sydney, great for casual podcasts.",
+    audioFile: "marcus.wav",
+  },
+  {
+    id: "jd793havan6twpba681hy5kc0x8e5d68",
+    name: "Elara",
+    category: "MEDITATION",
+    language: "en-US",
+    description: "Gentle and melodic American delivery, well-suited for meditation and calm narration.",
+    audioFile: "elara.wav",
+  },
+  {
+    id: "jd7fv0xby95xz7gpjeh01fchjh8e49f9",
+    name: "Silas",
+    category: "ADVERTISING",
+    language: "en-AU",
+    description: "Deep Australian male timbre suited for commercial reads and promotions.",
+    audioFile: "silas.wav",
+  },
 ];
 
-function LandingVoiceCard({ voice }: { voice: { id: string; name: string; category: string; language: string; description: string | null } }) {
+function LandingVoiceCard({ voice }: { voice: LandingVoiceItem }) {
   const { flag, region } = parseLanguage(voice.language);
-  const audioSrc = `/api/voices/${encodeURIComponent(voice.id)}`;
+  // Serve zero-latency local audio directly from /public/voices/
+  const audioSrc = `/voices/${voice.audioFile}`;
   const { isPlaying, isLoading, togglePlay } = useAudioPlayback(audioSrc);
 
   return (
@@ -104,13 +154,6 @@ function LandingVoiceCard({ voice }: { voice: { id: string; name: string; catego
 }
 
 export function LandingVoices() {
-  const trpc = useTRPC();
-  const { data: systemVoices } = useQuery(trpc.voices.getPublicSystemVoices.queryOptions());
-
-  const displayedVoices = (systemVoices && systemVoices.length > 0)
-    ? systemVoices.slice(0, 6)
-    : FALLBACK_SYSTEM_VOICES;
-
   return (
     <section id="voices" className="py-20 sm:py-28 px-4 sm:px-6 bg-[#F4F6FB] overflow-hidden border-b border-border/50">
       <div className="max-w-6xl mx-auto space-y-12">
@@ -135,9 +178,9 @@ export function LandingVoices() {
           </p>
         </div>
 
-        {/* Dynamic Voice Grid matching /voices layout */}
+        {/* Dynamic Voice Grid matching /voices layout with local zero-latency playback */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {displayedVoices.map((voice) => (
+          {LANDING_SYSTEM_VOICES.map((voice) => (
             <LandingVoiceCard key={voice.id} voice={voice} />
           ))}
         </div>

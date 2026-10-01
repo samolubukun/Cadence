@@ -52,6 +52,7 @@ __pycache__
 test_output/
 endpoint_verification_outputs/
 *.wav
+!public/voices/*.wav
 *.mp4
 sensenova_sample.png
 cadence_flyer.png
