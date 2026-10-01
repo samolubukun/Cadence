@@ -1,0 +1,102 @@
+# syntax=docker/dockerfile:1
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+ENV R2_MOUNT_PATH=/r2
+ENV CACHE_DIR=/root/.cache/cadence_models
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
+    ffmpeg \
+    git \
+    libsndfile1 \
+    pkg-config \
+    build-essential \
+    libavformat-dev \
+    libavcodec-dev \
+    libavdevice-dev \
+    libavutil-dev \
+    libswscale-dev \
+    libswresample-dev \
+    libavfilter-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python
+
+WORKDIR /app
+
+RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN python -m pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+# Core ML & Audio Suite
+RUN python -m pip install --no-cache-dir \
+    peft==0.18.0 \
+    fastapi[standard]==0.124.4 \
+    python-multipart==0.0.20 \
+    openai-whisper \
+    soundfile \
+    pydantic>=2.0.0 \
+    huggingface_hub \
+    demucs \
+    torchmetrics \
+    encodec \
+    av \
+    xformers \
+    num2words \
+    spacy \
+    flashy>=0.0.1 \
+    hydra-core>=1.1 \
+    dora-search \
+    sentencepiece \
+    protobuf \
+    librosa \
+    pydub \
+    wavmark \
+    eng-to-ipa \
+    inflect \
+    unidecode \
+    pypinyin \
+    cn2an \
+    jieba \
+    langid \
+    diffusers>=0.30.0 \
+    transformers>=4.40.0 \
+    accelerate>=0.26.0 \
+    conformer \
+    perth \
+    s3tokenizer \
+    chatterbox-tts==0.1.6 \
+    scipy \
+    faiss-cpu \
+    fairseq \
+    resampy \
+    ultralytics \
+    yt-dlp \
+    silero-vad \
+    kokoro>=0.8.4 \
+    websockets \
+    opencv-python-headless \
+    pillow \
+    uvicorn
+
+RUN python -m pip install --no-cache-dir --no-deps audiocraft
+RUN python -m pip install --no-cache-dir --no-deps "git+https://github.com/myshell-ai/OpenVoice.git"
+RUN python -m pip install --no-cache-dir resemble-enhance --no-deps
+
+COPY cadence_engine.py /app/
+COPY cadence_studio_engine.py /app/
+COPY cadence_clipper_engine.py /app/
+COPY cadence_agent_engine.py /app/
+COPY qwen_image_engine.py /app/
+COPY sensenova_engine.py /app/
+COPY docker/fastapi_app/ /app/docker/fastapi_app/
+
+EXPOSE 8000
+
+CMD ["uvicorn", "docker.fastapi_app.runner_combined:app", "--host", "0.0.0.0", "--port", "8000"]
