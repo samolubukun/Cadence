@@ -325,9 +325,9 @@ export default function MediaStudioPage() {
             </div>
           </div>
 
-          {/* Mode Selector Tabs (Mirrored from Music Studio style) */}
-          <div className="overflow-x-auto pb-1 -mb-1">
-            <div className="inline-flex p-1.5 rounded-2xl bg-muted/60 border border-border/80 gap-1.5">
+          {/* Mode Selector Tabs (Full width spanning across the workstation with breathing room) */}
+          <div className="w-full mb-8">
+            <div className="w-full p-1.5 rounded-2xl bg-muted/60 border border-border/80 grid grid-cols-1 sm:grid-cols-3 gap-1.5 shadow-2xs">
               {(
                 [
                   {
@@ -358,13 +358,13 @@ export default function MediaStudioPage() {
                     type="button"
                     onClick={() => switchMode(tab.key)}
                     className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer",
+                      "flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer text-center",
                       isSelected
                         ? tab.activeClass
                         : "text-muted-foreground hover:text-foreground hover:bg-background/80"
                     )}
                   >
-                    <TabIcon className="size-4" />
+                    <TabIcon className="size-4 shrink-0" />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -393,9 +393,6 @@ export default function MediaStudioPage() {
                           : "SenseNova Neural Image Inpainting & Transform"
                         : "Cinematic Motion & Video Synthesis"}
                     </CardTitle>
-                    <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                      Modal Accelerated
-                    </span>
                   </div>
                   <CardDescription className="text-xs text-muted-foreground mt-0.5">
                     {mode === "image"

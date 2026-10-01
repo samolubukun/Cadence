@@ -2,7 +2,7 @@
 
 import { VoiceCreateForm } from "@/features/voices/components/voice-create-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Mic, Volume2, ShieldCheck, Zap, Play, ArrowRight } from "lucide-react";
+import { Sparkles, Mic, Volume2, ShieldCheck, Zap, Play, ArrowRight, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
@@ -72,7 +72,7 @@ export function VoiceCloneView() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <Sparkles className="size-4 text-amber-500" />
+                    <UserCheck className="size-4 text-primary" />
                     Your Cloned Personas
                   </CardTitle>
                   <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">

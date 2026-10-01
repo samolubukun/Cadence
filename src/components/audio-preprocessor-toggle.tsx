@@ -40,11 +40,13 @@ export function AudioPreprocessorToggle({
         >
           {isVocalIsolation ? <Wand2 className="size-4" /> : <Sparkles className="size-4" />}
         </div>
-        <div className="flex flex-col text-left">
-          <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-            {isVocalIsolation ? "Isolate Clean Vocals" : "AI Studio Polish & Denoise"}
+        <div className="flex flex-col text-left min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 flex-nowrap">
+            <span className="text-xs font-semibold text-foreground truncate">
+              {isVocalIsolation ? "Isolate Clean Vocals" : "AI Studio Polish & Denoise"}
+            </span>
             <span
-              className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+              className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0 whitespace-nowrap ${
                 isVocalIsolation
                   ? "bg-cyan-500/20 text-cyan-400"
                   : "bg-purple-500/20 text-purple-400"
@@ -52,8 +54,8 @@ export function AudioPreprocessorToggle({
             >
               {isVocalIsolation ? "Demucs v4" : "44.1kHz"}
             </span>
-          </span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">
+          </div>
+          <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
             {isVocalIsolation
               ? "Strips background music and beats automatically before processing."
               : "Removes mic hiss, room echo, and super-resolves to studio broadcast audio."}

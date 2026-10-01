@@ -192,10 +192,8 @@ const GENRE_PRESETS: Record<Mode, Array<{ label: string; prompt: string; duratio
 export default function MusicStudioPage() {
   const trpc = useTRPC();
   const [mode, setMode] = useState<Mode>("beats");
-  const [prompt, setPrompt] = useState<string>(MODE_CONFIG.beats.defaultPrompt);
-  const [lyrics, setLyrics] = useState<string>(
-    "[Verse]\nNeon lights in the city night\nChasing dreams in the electric sky\n\n[Chorus]\nWe run until the morning glow\nLet the cadence steal the show"
-  );
+  const [prompt, setPrompt] = useState<string>("");
+  const [lyrics, setLyrics] = useState<string>("");
   const [duration, setDuration] = useState<number>(MODE_CONFIG.beats.defaultDuration);
   const [isGenerating, setIsGenerating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -287,7 +285,8 @@ export default function MusicStudioPage() {
 
   const switchMode = (next: Mode) => {
     setMode(next);
-    setPrompt(MODE_CONFIG[next].defaultPrompt);
+    setPrompt("");
+    setLyrics("");
     setDuration(MODE_CONFIG[next].defaultDuration);
     setAudioUrl(null);
     setActiveItemTitle(null);
@@ -493,9 +492,9 @@ export default function MusicStudioPage() {
             </p>
           </div>
 
-          {/* Mode Selector Tabs */}
-          <div className="overflow-x-auto pb-1 -mb-1">
-            <div className="inline-flex p-1.5 rounded-2xl bg-muted/60 border border-border/80 gap-1.5">
+          {/* Mode Selector Tabs (Full width spanning across the workstation with breathing room) */}
+          <div className="w-full mb-8">
+            <div className="w-full p-1.5 rounded-2xl bg-muted/60 border border-border/80 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 shadow-2xs">
               {(
                 [
                   { key: "beats", label: "Beats & Instrumentals", icon: Drum, activeClass: "bg-violet-600 text-white shadow-xs" },
@@ -513,14 +512,14 @@ export default function MusicStudioPage() {
                     type="button"
                     onClick={() => switchMode(tab.key)}
                     className={cn(
-                      "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer",
+                      "flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer text-center",
                       isSelected
                         ? tab.activeClass
                         : "text-muted-foreground hover:text-foreground hover:bg-background/80"
                     )}
                   >
-                    <TabIcon className="size-4" />
-                    <span>{tab.label}</span>
+                    <TabIcon className="size-4 shrink-0" />
+                    <span className="truncate">{tab.label}</span>
                   </button>
                 );
               })}
@@ -987,6 +986,19 @@ export default function MusicStudioPage() {
                               : "Generate a track or select from history below to load deck."}
                           </p>
                         </div>
+
+                        {/* Ambient EQ Visualizer Bars Silhouette */}
+                        {!audioUrl && !isGenerating && (
+                          <div className="flex items-end justify-center gap-1 h-8 pt-2 opacity-50">
+                            {[40, 75, 55, 90, 60, 80, 45, 95, 65, 50, 85, 40].map((h, i) => (
+                              <div
+                                key={i}
+                                className="w-1 bg-primary/40 rounded-full transition-all"
+                                style={{ height: `${h}%` }}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       {/* Custom Audio Scrubbing Deck Controls */}
@@ -1036,8 +1048,21 @@ export default function MusicStudioPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-border/80 p-4 text-center text-xs text-muted-foreground">
-                          {isGenerating ? "Synthesizing stream..." : "Audio deck will activate immediately upon completion."}
+                        <div className="rounded-xl border border-dashed border-border/80 p-4 text-center space-y-2 bg-muted/5">
+                          <div className="text-xs text-muted-foreground font-medium">
+                            {isGenerating ? "Synthesizing lossless audio stream on GPU..." : "Studio deck ready for playback & waveform scrubbing"}
+                          </div>
+                          <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-muted-foreground/80 flex-wrap">
+                            <span className="px-2 py-0.5 rounded-md bg-muted/60 border border-border/60">
+                              {cfg.badge}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-muted/60 border border-border/60">
+                              32kHz Stereo
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-muted/60 border border-border/60">
+                              FLAC / WAV
+                            </span>
+                          </div>
                         </div>
                       )}
                     </div>

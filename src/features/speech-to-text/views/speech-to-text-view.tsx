@@ -275,23 +275,25 @@ export function SpeechToTextView() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between gap-4">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase">Or record voice</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap tracking-wider">
+                    Or record voice
+                  </span>
                   <Button
                     variant={isRecording ? "destructive" : "outline"}
                     size="sm"
                     onClick={isRecording ? stopRecording : startRecording}
-                    className="gap-2"
+                    className="h-8 px-2 text-xs gap-1.5 shrink-0"
                   >
                     {isRecording ? (
                       <>
-                        <MicOff className="h-4 w-4 animate-pulse text-destructive" />
-                        Stop Recording
+                        <MicOff className="h-3.5 w-3.5 animate-pulse text-destructive" />
+                        <span>Stop Recording</span>
                       </>
                     ) : (
                       <>
-                        <Mic className="h-4 w-4 text-primary" />
-                        Record Microphone
+                        <Mic className="h-3.5 w-3.5 text-primary" />
+                        <span>Record Microphone</span>
                       </>
                     )}
                   </Button>

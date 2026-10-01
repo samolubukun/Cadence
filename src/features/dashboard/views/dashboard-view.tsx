@@ -33,7 +33,7 @@ const POPULAR_SERVICES = [
   {
     id: "tts",
     label: "Text to Speech",
-    description: "Generate studio-quality speech with Chatterbox Turbo",
+    description: "Natural studio-quality neural voice synthesis",
     icon: AudioLines,
     color: "bg-violet-100 text-violet-600",
     href: "/text-to-speech",
@@ -41,7 +41,7 @@ const POPULAR_SERVICES = [
   {
     id: "stt",
     label: "Speech to Text",
-    description: "Transcribe audio & timestamps with Whisper large-v3",
+    description: "High-accuracy transcription & word-level timestamps",
     icon: Headphones,
     color: "bg-sky-100 text-sky-600",
     href: "/transcribe",
@@ -65,7 +65,7 @@ const POPULAR_SERVICES = [
   {
     id: "media",
     label: "Visuals & Video",
-    description: "SDXL-Turbo cover art & Wan2.1 video visualizers",
+    description: "AI artwork, image editing & cinematic video visualizers",
     icon: Clapperboard,
     color: "bg-cyan-100 text-cyan-600",
     href: "/media",
@@ -214,7 +214,7 @@ export function DashboardView() {
               👋
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Architect, synthesize, and bring hyper-realistic voices and multi-modal audio to life.
+              Sound, voice, and vision. Composed in rhythm, produced without boundaries.
             </p>
           </div>
           <Button
@@ -250,7 +250,7 @@ export function DashboardView() {
                 Synthesize Everything
               </p>
               <p className="text-white/70 text-xs mb-4">
-                Chatterbox Turbo · ACE-Step 1.5 · MusicGen · Whisper · SDXL
+                Make anything sound possible
               </p>
               <span className="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 transition-colors text-white text-xs font-semibold rounded-full px-4 py-2">
                 Start Creating
