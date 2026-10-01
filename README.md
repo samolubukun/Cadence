@@ -609,11 +609,105 @@ python scripts/run_all_endpoints_test.py
 
 ---
 
+## Local & On-Prem Docker Deployment (NVIDIA GPU / Apple Silicon / S3)
+
+In addition to serverless deployment on Modal, Cadence can run **100% locally on your Gaming PC, GPU Server, or Apple Silicon MacBook** using Docker Compose with full NVIDIA CUDA or Apple Silicon MPS acceleration.
+
+> **💡 Zero Code Drift Architecture:** The Docker containers copy and run the exact same `*.py` engine files as Modal. A lightweight FastAPI runner simply imports each engine class and binds it directly to standard Uvicorn—guaranteeing 100% behavioral parity between cloud and on-prem with zero duplicated code.
+
+### Hardware Compatibility
+
+| Platform | Acceleration | Supported Topologies | Best For |
+| :--- | :--- | :--- | :--- |
+| **NVIDIA Gaming PC / Server** (RTX 3060–4090, A10/A100) | `CUDA 12.4` via `nvidia-container-toolkit` | **Combined** or **Modular** | Full production speed & NVENC video encoding |
+| **Apple Silicon MacBook** (M1/M2/M3/M4) | `MPS` (PyTorch Metal Performance Shaders) | **Combined** (MPS mode) | Local Mac development & offline generation |
+
+### Deployment Topologies
+
+#### Option A: Combined Monolith (Port 8000)
+Bundles all 6 model engines behind a single unified FastAPI gateway with dynamic model loading—ideal for solo workstations and gaming PCs.
+
+- **Windows Gaming PC (PowerShell)**:
+  ```powershell
+  .\scripts\docker-run.ps1 -Topology combined
+  ```
+- **macOS / Linux (Bash)**:
+  ```bash
+  chmod +x ./scripts/docker-run.sh
+  ./scripts/docker-run.sh combined
+  ```
+- **Standard Docker Compose**:
+  ```bash
+  docker compose -f docker/docker-compose.combined.yml up --build
+  ```
+
+#### Option B: Modular Microservices (Ports 8001–8009)
+Mirrors the Modal cloud microservice architecture with independent containers:
+- `cadence-audio` (`:8001`): Chatterbox TTS, Whisper large-v3, OpenVoice v2, AudioGen, MusicGen, ACE-Step, SDXL, Wan2.1
+- `cadence-studio` (`:8005`): Demucs v4 4-stem split, RVC v2 singing voice conversion, Resemble Enhance
+- `cadence-clipper` (`:8006`): Whisper + Qwen2.5 virality scoring, YOLO11 auto-reframe, NVENC shorts
+- `cadence-agent` (`:8007`): Silero VAD, NVIDIA Parakeet/Whisper, Qwen2.5, Kokoro-82M realtime voice agent
+- `cadence-qwen` (`:8008`): Qwen-Image-2.1 7B DiT + 8B Qwen3-VL typography & RGBA studio
+- `cadence-sensenova` (`:8009`): SenseNova-U1.5-8B MoT studio photorealism & inpainting
+
+Run all engines or use selective VRAM profiles on smaller cards:
+```bash
+# Run all modular engines
+docker compose -f docker/docker-compose.modular.yml --profile all up --build
+
+# Or run Audio only (~6GB VRAM)
+docker compose -f docker/docker-compose.modular.yml --profile audio up --build
+
+# Or run Realtime Voice Agent only (~8GB VRAM)
+docker compose -f docker/docker-compose.modular.yml --profile agent up --build
+```
+
+### Apple Silicon MacBook Override
+When running on Apple Silicon macOS, apply the MacBook override to enable PyTorch MPS:
+```bash
+docker compose -f docker/docker-compose.combined.yml -f docker/docker-compose.override.macbook.yml up --build
+```
+
+### S3 & MinIO Object Storage
+Both Docker Compose recipes automatically spin up an embedded **MinIO S3 service** with auto-provisioned `cadence` bucket:
+- **S3 API**: `http://localhost:9000`
+- **MinIO Web Console**: [http://localhost:9001](http://localhost:9001) (`minioadmin` / `minioadmin`)
+
+### Connecting Next.js Frontend to Local Docker
+1. Copy the Docker environment template:
+   ```bash
+   cp docker/.env.docker.example .env.local
+   ```
+2. Start the Next.js app:
+   ```bash
+   npm run dev
+   ```
+3. Open [http://localhost:3000](http://localhost:3000). All audio, music, voice, video, and agent requests will execute against your local Docker GPU containers!
+
+---
+
 ## Project Structure
 
 ```
 cadence/
 ├── cadence_engine.py           # Modal serverless GPU microservices (Audio, Song, Media)
+├── cadence_studio_engine.py    # Demucs v4 stem separator, RVC v2 singing, Resemble Enhance
+├── cadence_clipper_engine.py   # Viral clipper long-to-short video engine (YOLO11 + NVENC)
+├── cadence_agent_engine.py     # Real-time WebSocket voice agent (Silero VAD + Kokoro)
+├── qwen_image_engine.py        # Qwen-Image-2.1 DiT + Qwen3-VL typography studio
+├── sensenova_engine.py         # SenseNova-U1.5-8B MoT studio photorealism & inpainting
+├── docker/                     # Local on-prem Docker containerization suite
+│   ├── Dockerfile.audio        # Audio, Song, Beats, Media container
+│   ├── Dockerfile.studio       # Demucs, RVC v2, Resemble Enhance container
+│   ├── Dockerfile.clipper      # Video clipper container
+│   ├── Dockerfile.agent        # Real-time voice agent container
+│   ├── Dockerfile.qwen         # Qwen-Image-2.1 container
+│   ├── Dockerfile.sensenova    # SenseNova MoT container
+│   ├── Dockerfile.combined     # Monolith all-in-one container for gaming PCs/servers
+│   ├── docker-compose.modular.yml   # Modular microservices Compose
+│   ├── docker-compose.combined.yml  # Monolith Compose (port 8000 + MinIO)
+│   ├── docker-compose.override.macbook.yml # Apple Silicon MPS override
+│   └── fastapi_app/            # Local FastAPI entrypoints & runners
 ├── convex/                     # Convex reactive database
 │   ├── schema.ts               # Tables: users, generations, voices, studio, agentSessions, adminUsers, llm_traces
 │   ├── studio.ts               # Music, SFX, Voice Changer, Media, Stems, and Singing mutations
