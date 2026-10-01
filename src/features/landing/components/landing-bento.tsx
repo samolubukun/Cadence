@@ -12,7 +12,8 @@ import {
   ArrowRight,
   Sliders,
   Radio,
-  Sparkles
+  Sparkles,
+  Scissors
 } from "lucide-react";
 
 export function LandingBento() {
@@ -70,6 +71,16 @@ export function LandingBento() {
       previewDetails: "Zero-shot target audio upload • Realtime pitch tuning • 44.1kHz Resemble Enhance polish",
     },
     {
+      title: "Viral Video Clipper",
+      badge: "Whisper • Qwen • YOLO11",
+      subtitle: "Automated 9:16 Shorts Generator",
+      icon: Scissors,
+      accent: "text-rose-600 bg-rose-50 border-rose-200",
+      link: "/clipper",
+      description: "Transform podcasts and long videos into viral vertical shorts. Features Whisper timestamps, Qwen virality scoring, YOLO11 active speaker tracking, and kinetic captions.",
+      previewDetails: "YOLO11 Face Reframing • Virality Scoring • 10 Subtitle Presets • Hardware NVENC",
+    },
+    {
       title: "Visuals & Video",
       badge: "Qwen-Image-2.1 • SenseNova • Wan2.1",
       subtitle: "Studio Art, Typography & Video Loops",
@@ -103,7 +114,7 @@ export function LandingBento() {
             Everything you need to <span className="text-gradient-cadence">generate voice, music &amp; media</span>
           </h2>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Seven dedicated production studios powered by self-hosted open source neural weights on serverless NVIDIA A10G GPUs.
+            Eight dedicated production studios powered by self-hosted open source neural weights on serverless NVIDIA A10G GPUs or on-prem Docker.
           </p>
         </div>
 

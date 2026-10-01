@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Cpu, Music, Mic, FileText, Video, Sparkles, Wand2, Layers, CheckCircle2 } from "lucide-react";
+import { Cpu, Music, Mic, FileText, Video, Sparkles, Wand2, Layers, CheckCircle2, Scissors } from "lucide-react";
 
 export function LandingModels() {
   const models = [
@@ -179,6 +179,16 @@ export function LandingModels() {
       icon: FileText,
       logo: "/images/logos/nvidia.svg",
       badgeColor: "text-teal-600 bg-teal-50 border-teal-200/80",
+    },
+    {
+      name: "Ultralytics YOLO11",
+      provider: "Ultralytics / Open Weights",
+      category: "Active Speaker Tracking",
+      tag: "Vision AI",
+      specs: "Real-time face detection • Dynamic 9:16 reframe",
+      description: "High-speed computer vision model powering automatic speaker bounding box tracking and dynamic framing for viral vertical shorts.",
+      icon: Scissors,
+      badgeColor: "text-rose-600 bg-rose-50 border-rose-200/80",
     },
   ];
 

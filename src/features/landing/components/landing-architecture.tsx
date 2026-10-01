@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Cpu, HardDrive, Database, ShieldCheck, Layers, Mic, Music, Video, Wand2, Bot } from "lucide-react";
+import { Cpu, HardDrive, Database, ShieldCheck, Layers, Mic, Music, Video, Wand2, Bot, Scissors, Server } from "lucide-react";
 
 export function LandingArchitecture() {
   const modalWorkloads = [
@@ -54,6 +54,13 @@ export function LandingArchitecture() {
       icon: Bot,
       color: "text-emerald-600 bg-emerald-50 border-emerald-200",
     },
+    {
+      title: "Viral Video Clipper Engine",
+      models: "Whisper v3, Qwen2.5, YOLO11 & NVENC",
+      specs: "Automated 9:16 shorts • Dynamic reframe • Captions",
+      icon: Scissors,
+      color: "text-rose-600 bg-rose-50 border-rose-200",
+    },
   ];
 
   const cloudServices = [
@@ -61,12 +68,12 @@ export function LandingArchitecture() {
       layer: "02",
       icon: HardDrive,
       logo: "/images/logos/cloudflare.png",
-      title: "Cloudflare R2 Storage",
-      subtitle: "Private Bucket • Zero Egress Fees",
+      title: "Universal S3 / R2 / MinIO",
+      subtitle: "Private Bucket • Direct Filesystem Mount",
       badge: "Media Vault",
       color: "text-amber-600 bg-amber-50 border-amber-200",
-      desc: "All generated WAV masters, audio stems, reference recordings, album covers, and MP4 visualizer files live in your private Cloudflare R2 bucket. Access is secured by short-lived pre-signed URLs.",
-      pills: ["Zero Egress Fees", "Private Buckets", "Short-lived Signed URLs", "Global Edge Cache", "GDPR Compliant"],
+      desc: "All generated WAV masters, audio stems, reference recordings, and MP4 shorts live in private S3-compatible storage (Cloudflare R2 in cloud, MinIO container locally). Direct Linux filesystem mounting (/r2) enables zero-latency model access.",
+      pills: ["Cloudflare R2", "Local MinIO S3", "Direct /r2 Mount", "Zero Egress Fees", "Signed URLs"],
     },
     {
       layer: "03",
@@ -101,40 +108,51 @@ export function LandingArchitecture() {
             Under the Hood
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-            Self-hosted infrastructure, zero vendor lock-in
+            Dual cloud serverless and on-prem Docker
           </h2>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Every component runs on open source models and managed cloud primitives. No proprietary black boxes, transparent latency.
+            Deploy to serverless Modal NVIDIA A10G GPUs with automatic scale-to-zero, or self-host completely on your local workstation via Docker Compose.
           </p>
         </div>
 
-        {/* TOP ROW: Full-Width Dedicated Modal Serverless GPU Containers Card */}
+        {/* TOP ROW: Dedicated Compute Engine Card */}
         <div className="p-5 sm:p-8 bg-white/95 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-6 group hover:border-slate-300">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3.5">
-              <div className="size-11 sm:size-12 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 shadow-2xs">
-                <Image
-                  src="/images/logos/modal.png"
-                  alt="Modal Labs"
-                  width={36}
-                  height={36}
-                  className="size-full object-contain"
-                />
+              <div className="flex items-center -space-x-2">
+                <div className="size-11 sm:size-12 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 shadow-2xs relative z-10">
+                  <Image
+                    src="/images/logos/modal.png"
+                    alt="Modal Cloud"
+                    width={36}
+                    height={36}
+                    className="size-full object-contain"
+                  />
+                </div>
+                <div className="size-11 sm:size-12 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 shadow-2xs relative z-0">
+                  <Image
+                    src="/images/logos/docker.svg"
+                    alt="Docker On-Prem"
+                    width={36}
+                    height={36}
+                    className="size-full object-contain"
+                  />
+                </div>
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-lg sm:text-2xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
-                  Modal Serverless GPU Compute Engine
+                  Dual Modal Cloud &amp; On-Prem Docker Microservices
                 </h3>
                 <p className="text-xs sm:text-sm font-mono text-slate-500 mt-0.5">
-                  Dedicated NVIDIA A10G (24GB VRAM) • 6 Specialized GPU Microservices
+                  Serverless NVIDIA A10G (24GB) Cloud • Local Docker Modular &amp; Monolith Stacks
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 pl-14 sm:pl-0">
               <span className="text-[11px] font-mono font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                Compute Engine
+                Hybrid Compute
               </span>
               <span className="text-xs font-mono font-bold tracking-widest text-slate-400">
                 01
@@ -143,11 +161,11 @@ export function LandingArchitecture() {
           </div>
 
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-4xl">
-            Six specialized container microservices cold-start on demand (~2.5s) and terminate immediately when inference completes ($0.00 idle cost). PyTorch CUDA kernels run directly on high-bandwidth A10G GPUs:
+            Run on serverless GPU containers with scale-to-zero ($0.00 idle cost), or launch on-prem with Docker Compose across modular microservices or a unified monolith on NVIDIA RTX gaming rigs and Apple Silicon:
           </p>
 
-          {/* 6 Mini Container Cards in a Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+          {/* 8 Mini Container Cards in a Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
             {modalWorkloads.map((workload) => {
               const Icon = workload.icon;
               return (
@@ -161,7 +179,7 @@ export function LandingArchitecture() {
                         <Icon className="size-4" />
                       </div>
                       <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
-                        Container
+                        Microservice
                       </span>
                     </div>
 
@@ -187,7 +205,14 @@ export function LandingArchitecture() {
 
           {/* Bottom Pills */}
           <div className="flex flex-wrap gap-1.5 pt-4 border-t border-slate-100">
-            {["NVIDIA A10G (24GB VRAM)", "6 Specialized Microservices", "$0.00 Idle Cost", "~2.5s Cold Start", "PyTorch CUDA Native", "Auto Scale-to-Zero"].map((pill) => (
+            {[
+              "Serverless Modal A10G",
+              "Docker Compose On-Prem",
+              "Apple Silicon MPS & NVIDIA CUDA",
+              "Local MinIO S3 Container",
+              "$0.00 Idle Cost (Cloud)",
+              "Expandable PyTorch Segments",
+            ].map((pill) => (
               <span
                 key={pill}
                 className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100/80 text-slate-600 border border-slate-200/60"

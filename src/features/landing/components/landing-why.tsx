@@ -26,6 +26,7 @@ export function LandingWhy() {
     { name: "Kokoro-82M", role: "Real-Time Agent TTS", spec: "<200ms TTFT" },
     { name: "Qwen2.5-1.5B", role: "Conversational Agent", spec: "Sub-50ms TTFT" },
     { name: "NVIDIA Parakeet", role: "Real-Time ASR", spec: "Sub-80ms CTC" },
+    { name: "Ultralytics YOLO11", role: "Speaker Tracking", spec: "Real-Time 9:16" },
   ];
 
   return (
@@ -113,58 +114,69 @@ export function LandingWhy() {
             </div>
           </div>
 
-          {/* Bento Card 2: Serverless GPU Telemetry (Spans 5 cols) */}
-          <div className="md:col-span-5 p-5 sm:p-8 rounded-3xl bg-slate-950 text-white border border-slate-800 shadow-[0_16px_40px_-10px_rgba(15,23,42,0.3)] flex flex-col justify-between relative overflow-hidden">
-            {/* Terminal Header */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="flex items-center gap-1.5">
-                    <div className="size-2.5 rounded-full bg-red-500/80" />
-                    <div className="size-2.5 rounded-full bg-amber-500/80" />
-                    <div className="size-2.5 rounded-full bg-emerald-500/80" />
-                  </div>
-                  <span className="text-xs font-mono text-slate-400">telemetry</span>
+          {/* Bento Card 2: Dual Compute Architecture (Spans 5 cols) */}
+          <div className="md:col-span-5 p-6 sm:p-8 rounded-3xl bg-slate-900/95 text-white border border-slate-800 shadow-[0_12px_36px_-10px_rgba(15,23,42,0.25)] flex flex-col justify-between relative overflow-hidden group hover:border-slate-700 transition-all">
+            {/* Ambient accent background mesh */}
+            <div 
+              className="pointer-events-none absolute -right-20 -top-20 w-64 h-64 rounded-full blur-3xl opacity-20"
+              style={{ background: "radial-gradient(circle, #38BDF8, #6366F1)" }}
+            />
+
+            <div className="space-y-5 relative z-10">
+              {/* Header Badge */}
+              <div className="flex items-center justify-between">
+                <div className="size-11 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-center text-cyan-400 shadow-xs">
+                  <Cpu className="size-5" />
                 </div>
-                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/90 text-cyan-300 border border-slate-700 text-xs font-semibold">
                   <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Scale-to-Zero
-                </span>
+                  Dual Compute
+                </div>
               </div>
 
               <div>
-                <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-1.5">
-                  NVIDIA A10G On Demand
+                <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-2">
+                  Modal Cloud &amp; Docker On-Prem
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Containers initialize in ~2.4s and terminate immediately after processing. $0.00 idle cost when no generation is active.
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Run on serverless NVIDIA A10G GPUs with instant scale-to-zero, or self-host completely air-gapped using modular Docker Compose microservices.
                 </p>
               </div>
 
-              {/* Terminal Readout Box */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-900/90 border border-slate-800 font-mono text-xs space-y-2">
-                <div className="flex items-center justify-between gap-2 text-slate-400 text-[11px]">
-                  <span className="shrink-0">GPU INSTANCE</span>
-                  <span className="text-indigo-400 text-right">Modal A10G (24GB)</span>
+              {/* Modern Architecture Spec Grid */}
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
+                <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+                  <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cloud Engine</div>
+                  <div className="text-xs sm:text-sm font-bold text-white mt-0.5">Modal Serverless</div>
+                  <div className="text-[11px] text-emerald-400 font-medium mt-0.5">$0.00 idle • A10G (24GB)</div>
                 </div>
-                <div className="flex items-center justify-between gap-2 text-slate-400 text-[11px]">
-                  <span className="shrink-0">IDLE CLOUD COST</span>
-                  <span className="text-emerald-400 font-bold text-right">$0.00 / hour</span>
+
+                <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+                  <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">On-Prem Engine</div>
+                  <div className="text-xs sm:text-sm font-bold text-cyan-300 mt-0.5">Docker Compose</div>
+                  <div className="text-[11px] text-slate-300 font-medium mt-0.5">Local GPU + MinIO S3</div>
                 </div>
-                <div className="flex items-center justify-between gap-2 text-slate-400 text-[11px]">
-                  <span className="shrink-0">COLD START TIME</span>
-                  <span className="text-white text-right">~2.4s warm cached</span>
+
+                <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+                  <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cold Start</div>
+                  <div className="text-xs sm:text-sm font-bold text-white mt-0.5">~2.4s Warm Cached</div>
+                  <div className="text-[11px] text-slate-400 font-medium mt-0.5">Instant volume mounts</div>
                 </div>
-                <div className="flex items-center justify-between gap-2 text-slate-400 text-[11px]">
-                  <span className="shrink-0">CUDA RUNTIME</span>
-                  <span className="text-amber-400 text-right">PyTorch 2.4 + cu121</span>
+
+                <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+                  <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Deployment</div>
+                  <div className="text-xs sm:text-sm font-bold text-white mt-0.5">Combined or Modular</div>
+                  <div className="text-[11px] text-indigo-300 font-medium mt-0.5">FastAPI Microservices</div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Pay only for GPU seconds</span>
-              <span className="text-indigo-400 font-semibold">Zero instance waste</span>
+            <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 relative z-10 font-medium">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="size-3.5 text-cyan-400" />
+                Zero instance waste
+              </span>
+              <span className="text-slate-300 font-semibold">100% Private Workloads</span>
             </div>
           </div>
 
