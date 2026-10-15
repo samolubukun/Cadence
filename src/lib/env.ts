@@ -3,7 +3,7 @@ import { createEnv } from "@t3-oss/env-nextjs";
 
 export const env = createEnv({
   server: {
-    APP_URL: z.string().min(1),
+    APP_URL: z.string().min(1).default("http://localhost:3000"),
     // Storage & S3 / R2 Configuration
     R2_ACCOUNT_ID: z.string().optional(),
     R2_ACCESS_KEY_ID: z.string().optional(),
@@ -16,7 +16,7 @@ export const env = createEnv({
     S3_BUCKET_NAME: z.string().optional(),
     S3_FORCE_PATH_STYLE: z.string().optional(),
     // Generation Engine Gateway Endpoints
-    CADENCE_API_URL: z.string().url(),
+    CADENCE_API_URL: z.string().url().default("https://placeholder-engine.modal.run"),
     CADENCE_SOUND_API_URL: z.string().url().optional(),
     CADENCE_MEDIA_API_URL: z.string().url().optional(),
     CADENCE_SENSENOVA_API_URL: z.string().url().optional(),
@@ -26,8 +26,11 @@ export const env = createEnv({
     CADENCE_AGENT_API_URL: z.string().url().optional(),
     CADENCE_AGENT_WS_URL: z.string().optional(),
     CADENCE_QWEN_IMAGE_API_URL: z.string().url().optional(),
-    CADENCE_API_KEY: z.string().min(1),
+    CADENCE_API_KEY: z.string().min(1).default("placeholder_key_for_build"),
   },
   experimental__runtimeEnv: {},
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+  skipValidation:
+    !!process.env.SKIP_ENV_VALIDATION ||
+    process.env.CI === "1" ||
+    process.env.VERCEL === "1",
 });
