@@ -6,7 +6,9 @@ const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
 
 const isOrgSelectionRoute = createRouteMatcher(["/org-selection(.*)"]);
 
-export default clerkMiddleware(async (auth, req) => {
+const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+const middlewareHandler = clerkMiddleware(async (auth, req) => {
   const { userId, orgId } = await auth();
 
   const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
@@ -42,6 +44,13 @@ export default clerkMiddleware(async (auth, req) => {
 
   return NextResponse.next();
 });
+
+export default function proxy(req: any, ev: any) {
+  if (!hasClerkKey) {
+    return NextResponse.next();
+  }
+  return middlewareHandler(req, ev);
+}
 
 export const config = {
   matcher: [
