@@ -137,7 +137,7 @@ export function LandingFooter() {
             <span>&copy; 2026 Cadence.</span>
             <span className="text-slate-500">•</span>
             <span>
-              Designed &amp; Built by{" "}
+              Engineered &amp; Built with precision by{" "}
               <a 
                 href="https://samuelolubukun.com/" 
                 target="_blank" 

@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { label: "Models", href: "#models" },
   { label: "Voices", href: "#voices" },
   { label: "Pricing", href: "#pricing" },
-  { label: "How It Works", href: "#how-it-works" },
+  { label: "Workflow", href: "#how-it-works" },
   { label: "Architecture", href: "#architecture" },
 ];
 
@@ -37,7 +37,7 @@ export function LandingNavbar() {
           boxShadow: scrolled
             ? "0 10px 30px -10px rgba(15,23,42,0.12), 0 0 0 1px rgba(255,255,255,0.8) inset"
             : "0 4px 16px -4px rgba(15,23,42,0.06), 0 0 0 1px rgba(255,255,255,0.8) inset",
-          maxWidth: "980px",
+          maxWidth: "1020px",
           width: "100%",
         }}
       >
@@ -63,7 +63,7 @@ export function LandingNavbar() {
             <a
               key={label}
               href={href}
-              className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 rounded-full transition-all duration-150 hover:text-indigo-600 hover:bg-indigo-50/70"
+              className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 rounded-full transition-all duration-150 hover:text-indigo-600 hover:bg-indigo-50/70 whitespace-nowrap"
               style={{ textDecoration: "none" }}
             >
               {label}

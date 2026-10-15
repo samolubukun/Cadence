@@ -518,6 +518,13 @@ modal deploy qwen_image_engine.py
 - `https://<workspace>--qwen-image-2-1-qwenimageengine-serve.modal.run`
 - `https://<workspace>--cadence-agent-cadenceagentengine-serve.modal.run`
 
+<br />
+
+<div align="center">
+  <img src="./public/modal-deployments.jpg" alt="Cadence Serverless Modal GPU Microservice Deployments" width="100%" />
+  <p><sub><b>Modal Cloud Console:</b> Live serverless A10G GPU apps across <code>cadence-agent</code>, <code>cadence-clipper</code>, <code>cadence-studio</code>, <code>sensenova-u1-5</code>, and the core <code>cadence</code> suite.</sub></p>
+</div>
+
 ---
 
 ### 3. Configure Frontend Environment
@@ -786,8 +793,8 @@ cadence/
 
 ## Creator
 
-Designed & Built with precision by **[Samuel Olubukun](https://samuelolubukun.com/)**  
-[![Portfolio](https://img.shields.io/badge/Portfolio-samuelolubukun.com-black?style=for-the-badge&logo=google-chrome&logoColor=white)](https://samuelolubukun.com/)
+Engineered & Built with precision by **[Samuel Olubukun](https://samuelolubukun.com/)**  
+[![Website](https://img.shields.io/badge/Website-samuelolubukun.com-black?style=for-the-badge&logo=google-chrome&logoColor=white)](https://samuelolubukun.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-samolubukun-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/samolubukun)
 
 ---
