@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { convexClient, api, type Id } from "@/lib/convex-server";
 import { getSignedAudioUrl } from "@/lib/r2";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ generationId: string }> },

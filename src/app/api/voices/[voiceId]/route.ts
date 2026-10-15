@@ -3,6 +3,8 @@ import { convexClient, api } from "@/lib/convex-server";
 import { getSignedAudioUrl } from "@/lib/r2";
 import type { Id } from "convex/_generated/dataModel";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ voiceId: string }> },
