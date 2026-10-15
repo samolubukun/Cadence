@@ -36,10 +36,17 @@ export function useAudioPlayback(src: string | File | null) {
       setIsPlaying(false);
     } else {
       setIsLoading(true);
-      audioRef.current.play().then(() => {
-        setIsPlaying(true);
-        setIsLoading(false);
-      });
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.warn("Audio playback failed:", err);
+          setIsPlaying(false);
+          setIsLoading(false);
+        });
     }
   }, [src, isPlaying]);
 

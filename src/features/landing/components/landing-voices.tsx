@@ -155,22 +155,23 @@ function LandingVoiceCard({ voice }: { voice: LandingVoiceItem }) {
 
 export function LandingVoices() {
   return (
-    <section id="voices" className="py-20 sm:py-28 px-4 sm:px-6 bg-[#F4F6FB] overflow-hidden border-b border-border/50">
+    <section id="voices" className="py-20 sm:py-28 px-4 sm:px-6 bg-[#ffffff] overflow-hidden border-b border-[#e4e7ec]">
       <div className="max-w-6xl mx-auto space-y-12">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-700 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[7px] bg-[#ffffff] border border-[#e4e7ec] text-[12px] font-medium text-[#6f7988] shadow-[0_1px_2px_rgba(28,40,64,0.04)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#266df0]" />
             Voice Library
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1c1d1f] tracking-tight leading-[1.12]">
             Built-in System Voices
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#6f7988] text-[14px] sm:text-[15px] leading-relaxed">
             Listen to studio-grade 24kHz reference voices sourced from the{" "}
             <a 
               href="https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-indigo-600 font-semibold hover:underline"
+              className="text-[#266df0] font-medium hover:underline"
             >
               VCTK corpus
             </a>
@@ -187,16 +188,16 @@ export function LandingVoices() {
 
         {/* Footer Bar */}
         <div className="flex justify-center pt-2">
-          <div className="flex flex-col sm:flex-row items-center gap-4 p-4 sm:px-8 bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-xs text-center sm:text-left">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
-              <Sparkles className="size-4 text-indigo-600" />
+          <div className="flex flex-col sm:flex-row items-center gap-4 p-4 sm:px-7 bg-[#f6f8fa] border border-[#e4e7ec] rounded-[12px] text-center sm:text-left">
+            <div className="flex items-center gap-2 text-[13px] text-[#6f7988]">
+              <Sparkles className="size-4 text-[#266df0]" />
               <span>
                 30+ hand-curated accents across American, British, Irish, Scottish, and Australian dialects.
               </span>
             </div>
             <Link 
               href="/voices" 
-              className="btn-dark-carbon whitespace-nowrap text-xs px-4 py-2 font-semibold"
+              className="btn-dark-carbon whitespace-nowrap text-[13px] px-4 py-2 font-medium"
             >
               <span>Explore All Voices in Studio</span>
             </Link>

@@ -3,37 +3,36 @@ import Image from "next/image";
 
 export function LandingFooter() {
   return (
-    <footer style={{ background:"#0F172A", padding:"3.5rem 1.5rem 2rem", color:"rgba(255,255,255,0.55)" }}>
-      <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-        {/* Main Grid: On mobile (small screens), 1 clean column per group; on sm (640px+) 2 columns; on md 3 columns; on lg (1024px+) 5 columns */}
+    <footer style={{ background: "#000000", padding: "4.5rem 1.5rem 2.5rem", color: "#b5bdc9" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        {/* Main Grid: On mobile 1 clean column per group; sm 2 cols; md 3 cols; lg 5 cols */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-10 sm:gap-y-12 sm:gap-x-8 lg:gap-x-6 mb-12 sm:mb-16">
           {/* Brand Info Column */}
           <div className="sm:col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-start text-left">
             {/* Logo and Name */}
-            <div className="flex items-center gap-3 mb-3.5">
+            <div className="flex items-center gap-2.5 mb-3">
               <Image 
                 src="/logo.svg" 
                 alt="Cadence" 
-                width={40} 
-                height={40} 
-                className="size-10 shrink-0 drop-shadow-md" 
+                width={32} 
+                height={32} 
+                className="size-8 shrink-0" 
               />
-              <span className="font-extrabold text-2xl lg:text-xl text-white tracking-tight">
+              <span className="font-semibold text-lg text-white tracking-tight">
                 Cadence
               </span>
             </div>
-            <p className="text-xs sm:text-[0.83rem] leading-relaxed max-w-sm lg:max-w-[220px] text-slate-400">
+            <p className="text-[13px] leading-relaxed max-w-sm lg:max-w-[220px] text-[#8f99a8] font-normal">
               The open platform for every layer of voice, music, and media creation powered by open-source foundation models.
             </p>
           </div>
 
           {/* Column 1: Studios & Tools */}
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-indigo-500" />
+            <div className="text-[12px] font-semibold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
               <span>Studios &amp; Tools</span>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-2">
               {[
                 ["Text to Speech","/text-to-speech"],
                 ["Voice Cloning","/voice-clone"],
@@ -48,7 +47,7 @@ export function LandingFooter() {
                 ["Usage & Analytics","/usage"],
                 ["Observability Traces","/observability"],
               ].map(([l,h]) => (
-                <Link key={l} href={h} className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+                <Link key={l} href={h} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                   {l}
                 </Link>
               ))}
@@ -57,11 +56,10 @@ export function LandingFooter() {
 
           {/* Column 2: Open Source Models */}
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-purple-500" />
+            <div className="text-[12px] font-semibold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
               <span>Open Source Models</span>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-2 font-mono text-[12px]">
               {[
                 ["Chatterbox Turbo (TTS)","https://github.com/resemble-ai/chatterbox"],
                 ["Whisper Large-v3 (STT)","https://github.com/openai/whisper"],
@@ -76,7 +74,7 @@ export function LandingFooter() {
                 ["Kokoro-82M (Realtime TTS)","https://huggingface.co/hexgrad/Kokoro-82M"],
                 ["Ultralytics YOLO11","https://github.com/ultralytics/ultralytics"],
               ].map(([l,h]) => (
-                <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+                <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="text-[#8f99a8] hover:text-white transition-colors truncate max-w-full">
                   {l}
                 </a>
               ))}
@@ -85,11 +83,10 @@ export function LandingFooter() {
 
           {/* Column 3: Stack & Infrastructure */}
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-cyan-500" />
+            <div className="text-[12px] font-semibold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
               <span>Infrastructure</span>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-2 font-mono text-[12px]">
               {[
                 ["GitHub Repository","https://github.com/samolubukun/Cadence"],
                 ["Modal GPU Serverless","https://modal.com"],
@@ -102,7 +99,7 @@ export function LandingFooter() {
                 ["Resemble Enhance","https://github.com/resemble-ai/resemble-enhance"],
                 ["Voice Data (VCTK Corpus)","https://www.kaggle.com/datasets/pratt3000/vctk-corpus/data"],
               ].map(([l,h]) => (
-                <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+                <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="text-[#8f99a8] hover:text-white transition-colors truncate max-w-full">
                   {l}
                 </a>
               ))}
@@ -111,38 +108,37 @@ export function LandingFooter() {
 
           {/* Column 4: Account & Access */}
           <div className="flex flex-col items-start">
-            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
+            <div className="text-[12px] font-semibold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
               <span>Account</span>
             </div>
-            <div className="flex flex-col gap-2.5">
-              <Link href="/sign-in" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+            <div className="flex flex-col gap-2">
+              <Link href="/sign-in" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Sign In
               </Link>
-              <Link href="/sign-up" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+              <Link href="/sign-up" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Create Account
               </Link>
-              <Link href="/dashboard" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+              <Link href="/dashboard" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Dashboard
               </Link>
-              <Link href="/billing" className="text-xs sm:text-[0.83rem] text-slate-400 hover:text-white transition-colors">
+              <Link href="/billing" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Billing &amp; Credits
               </Link>
             </div>
           </div>
         </div>
 
-        <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:"1.5rem", display:"flex", flexWrap:"wrap", justifyContent:"space-between", alignItems:"center", gap:"0.75rem" }}>
-          <span style={{ fontSize:"0.78rem" }} className="flex items-center gap-1.5 flex-wrap">
+        <div style={{ borderTop: "1px solid #232529", paddingTop: "1.5rem", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "0.75rem" }}>
+          <span style={{ fontSize: "12px" }} className="flex items-center gap-1.5 flex-wrap text-[#8f99a8]">
             <span>&copy; 2026 Cadence.</span>
-            <span className="text-slate-500">•</span>
+            <span>•</span>
             <span>
-              Engineered &amp; Built with precision by{" "}
+              Engineered with precision by{" "}
               <a 
                 href="https://samuelolubukun.com/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-white font-medium hover:underline hover:text-indigo-400 transition-colors"
+                className="text-white hover:underline transition-colors"
               >
                 Samuel Olubukun
               </a>
@@ -153,7 +149,7 @@ export function LandingFooter() {
               href="https://github.com/samolubukun/Cadence"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 text-xs"
+              className="text-[#8f99a8] hover:text-white transition-colors flex items-center gap-1.5 text-[12px]"
               aria-label="Cadence GitHub"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -161,11 +157,6 @@ export function LandingFooter() {
               </svg>
               <span>GitHub</span>
             </a>
-            <div style={{ display:"flex", gap:"0.5rem" }}>
-              {["#6366F1","#A855F7","#0EA5E9","#10B981"].map(c => (
-                <div key={c} style={{ width:8, height:8, borderRadius:"9999px", background:c, opacity:0.65 }} />
-              ))}
-            </div>
           </div>
         </div>
       </div>

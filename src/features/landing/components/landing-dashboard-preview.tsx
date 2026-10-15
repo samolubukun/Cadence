@@ -104,29 +104,34 @@ export function LandingDashboardPreview() {
   const [selectedImage, setSelectedImage] = useState<StudioScreenshot | null>(null);
 
   return (
-    <section className="relative pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 bg-[#FAF9F6] overflow-hidden">
-      {/* Ambient background spotlight */}
-      <div 
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] rounded-full blur-3xl opacity-30"
-        style={{
-          background: "radial-gradient(ellipse at center, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.15), transparent 70%)"
-        }}
-      />
-
+    <section className="relative pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 bg-[#f6f8fa] border-y border-[#e4e7ec] overflow-hidden">
       <div className="max-w-6xl mx-auto relative z-10 space-y-6">
         {/* Section Badge Before Main Image */}
         <div className="flex flex-col items-center justify-center text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 border border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-700 shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[7px] bg-[#ffffff] border border-[#e4e7ec] text-[12px] font-medium text-[#6f7988] shadow-[0_1px_2px_rgba(28,40,64,0.04)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#266df0]" />
             Dashboard Preview
           </div>
         </div>
 
-        {/* Featured Main Dashboard Showcase Frame */}
-        <div className="relative rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white/90 p-1 sm:p-2 shadow-[0_25px_70px_-15px_rgba(15,23,42,0.15),0_0_0_1px_rgba(255,255,255,0.9)_inset] backdrop-blur-xl group overflow-hidden max-w-5xl mx-auto">
+        {/* Featured Main Dashboard Showcase Frame — Browser-Frame Style */}
+        <div className="relative rounded-[14px] border border-[#e4e7ec] bg-[#ffffff] shadow-[rgba(28,40,64,0.06)_0px_16px_36px_0px,rgba(28,40,64,0.04)_0px_2px_4px_0px] overflow-hidden max-w-5xl mx-auto">
+          {/* Browser Chrome Header Bar */}
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-[#f6f8fa] border-b border-[#e4e7ec]">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#cad0d9]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#cad0d9]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#cad0d9]" />
+            </div>
+            <div className="mx-auto flex items-center justify-center px-4 py-0.5 rounded-[6px] bg-[#ffffff] border border-[#e4e7ec] text-[11px] font-mono text-[#8f99a8]">
+              cadence.studio/dashboard
+            </div>
+            <div className="w-10" />
+          </div>
+
           <div 
             onClick={() => setSelectedImage(STUDIO_SCREENSHOTS[0])}
-            className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200/70 bg-white shadow-inner flex items-center justify-center cursor-pointer"
+            className="relative overflow-hidden bg-white flex items-center justify-center cursor-pointer group"
             title="Click to view full-resolution screenshot"
           >
             <Image
@@ -136,33 +141,33 @@ export function LandingDashboardPreview() {
               height={1533}
               priority
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
-              className="w-full h-auto object-contain object-top transition-transform duration-700 ease-out group-hover:scale-[1.008]"
+              className="w-full h-auto object-contain object-top transition-transform duration-500 ease-out group-hover:scale-[1.006]"
             />
             {/* Click-to-expand hover pill */}
-            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 backdrop-blur-md text-white text-xs font-medium shadow-md pointer-events-none">
+            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#232529] text-white text-[12px] font-medium shadow-md pointer-events-none">
               <Maximize2 className="size-3.5" />
-              <span>Expand</span>
+              <span>Expand Preview</span>
             </div>
           </div>
         </div>
 
         {/* Collapsible Trigger Bar */}
-        <div className="flex flex-col items-center justify-center pt-2">
+        <div className="flex flex-col items-center justify-center pt-3">
           <button
             onClick={() => setIsExpanded((prev) => !prev)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-xs hover:shadow-md transition-all text-xs sm:text-sm font-semibold group cursor-pointer"
+            className="btn-ghost-cadence inline-flex items-center gap-2 px-4 py-2 text-[13px] font-medium cursor-pointer"
           >
-            <LayoutGrid className="size-4 text-indigo-600 group-hover:scale-110 transition-transform" />
+            <LayoutGrid className="size-3.5 text-[#266df0]" />
             <span>
               {isExpanded ? "Collapse Studio Showcase" : "Explore All 12 Studios & Workspaces"}
             </span>
             {isExpanded ? (
-              <ChevronUp className="size-4 text-slate-500" />
+              <ChevronUp className="size-3.5 text-[#6f7988]" />
             ) : (
-              <ChevronDown className="size-4 text-slate-500 group-hover:translate-y-0.5 transition-transform" />
+              <ChevronDown className="size-3.5 text-[#6f7988]" />
             )}
           </button>
-          <span className="text-[11px] text-slate-400 mt-2 font-medium">
+          <span className="text-[12px] text-[#8f99a8] mt-2 font-normal">
             {isExpanded ? "Showing all production studio interfaces" : "Click to view screenshots of every studio interface"}
           </span>
         </div>
@@ -170,26 +175,26 @@ export function LandingDashboardPreview() {
         {/* Collapsible 3-Column Studio Showcase Grid */}
         {isExpanded && (
           <div className="pt-6 animate-fade-up">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {STUDIO_SCREENSHOTS.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setSelectedImage(item)}
-                  className="group rounded-2xl border border-slate-200/80 bg-white p-3 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer hover:border-indigo-200"
+                  className="group rounded-[12px] border border-[#e4e7ec] bg-[#ffffff] p-3 shadow-[0_1px_3px_rgba(28,40,64,0.05)] hover:shadow-[rgba(28,40,64,0.08)_0px_6px_20px_0px] transition-all flex flex-col justify-between cursor-pointer hover:border-[#bad0fa]"
                 >
                   <div className="space-y-3">
                     {/* Thumbnail Frame */}
-                    <div className="relative rounded-xl overflow-hidden border border-slate-100 bg-slate-50 aspect-[16/10] shadow-2xs">
+                    <div className="relative rounded-[8px] overflow-hidden border border-[#eeeff1] bg-[#f6f8fa] aspect-[16/10]">
                       <Image
                         src={`/screenshots/${item.filename}`}
                         alt={item.title}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                        className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                      <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors flex items-center justify-center">
-                        <div className="size-8 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Maximize2 className="size-4" />
+                      <div className="absolute inset-0 bg-[#1c1d1f]/0 group-hover:bg-[#1c1d1f]/10 transition-colors flex items-center justify-center">
+                        <div className="size-7 rounded-[7px] bg-white shadow-md flex items-center justify-center text-[#1c1d1f] opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Maximize2 className="size-3.5" />
                         </div>
                       </div>
                     </div>
@@ -197,22 +202,22 @@ export function LandingDashboardPreview() {
                     {/* Title and Category */}
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        <h4 className="text-[13px] font-semibold text-[#1c1d1f] group-hover:text-[#266df0] transition-colors">
                           {item.title}
                         </h4>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-semibold shrink-0">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-[5px] bg-[#f4f5f6] text-[#6f7988] font-medium shrink-0">
                           {item.category}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
+                      <p className="text-[12px] text-[#6f7988] leading-relaxed">
                         {item.summary}
                       </p>
                     </div>
                   </div>
 
-                  <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                    <span className="group-hover:text-indigo-600 transition-colors">Click to inspect UI</span>
-                    <Maximize2 className="size-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                  <div className="pt-2.5 mt-2.5 border-t border-[#eeeff1] flex items-center justify-between text-[11px] text-[#8f99a8] font-medium">
+                    <span className="group-hover:text-[#266df0] transition-colors">Click to inspect UI</span>
+                    <Maximize2 className="size-3 text-[#8f99a8] group-hover:text-[#266df0] transition-colors" />
                   </div>
                 </div>
               ))}
@@ -224,35 +229,35 @@ export function LandingDashboardPreview() {
       {/* Full-Resolution Modal / Lightbox */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+          className="fixed inset-0 z-50 bg-[#101113]/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-fade-in"
           onClick={() => setSelectedImage(null)}
         >
           <div 
-            className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
+            className="relative w-full max-w-5xl bg-[#ffffff] rounded-[14px] shadow-2xl overflow-hidden border border-[#e4e7ec]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-100 bg-slate-50/80">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[#eeeff1] bg-[#f6f8fa]">
               <div className="flex items-center gap-2.5">
-                <span className="size-2 rounded-full bg-indigo-600" />
-                <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                <span className="size-1.5 rounded-full bg-[#266df0]" />
+                <h3 className="text-[14px] sm:text-[15px] font-semibold text-[#1c1d1f]">
                   {selectedImage.title}
                 </h3>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold hidden sm:inline-block">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-[5px] bg-[#e4e7ec] text-[#2e3238] font-medium hidden sm:inline-block">
                   {selectedImage.category}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedImage(null)}
-                className="size-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+                className="size-7 rounded-[7px] bg-[#ffffff] hover:bg-[#f4f5f6] border border-[#e4e7ec] flex items-center justify-center text-[#6f7988] hover:text-[#1c1d1f] transition-colors"
                 title="Close"
               >
-                <X className="size-4" />
+                <X className="size-3.5" />
               </button>
             </div>
 
             {/* Modal Image View */}
-            <div className="relative max-h-[78vh] overflow-y-auto bg-slate-50/50 p-2 sm:p-5">
+            <div className="relative max-h-[78vh] overflow-y-auto bg-[#f6f8fa] p-2 sm:p-5">
               <div className="w-full flex justify-center">
                 <Image
                   src={`/screenshots/${selectedImage.filename}`}
@@ -260,13 +265,13 @@ export function LandingDashboardPreview() {
                   width={1920}
                   height={1533}
                   priority
-                  className="w-full h-auto object-contain rounded-xl border border-slate-200/90 shadow-sm"
+                  className="w-full h-auto object-contain rounded-[10px] border border-[#e4e7ec] shadow-sm"
                 />
               </div>
             </div>
 
             {/* Modal Caption */}
-            <div className="px-4 sm:px-6 py-3 bg-white border-t border-slate-100 text-xs text-slate-600 leading-relaxed">
+            <div className="px-4 sm:px-6 py-3 bg-[#ffffff] border-t border-[#eeeff1] text-[13px] text-[#6f7988] leading-relaxed">
               {selectedImage.summary}
             </div>
           </div>

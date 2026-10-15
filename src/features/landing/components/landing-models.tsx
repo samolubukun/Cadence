@@ -204,63 +204,64 @@ export function LandingModels() {
 
       <div className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50/80 border border-indigo-200/60 text-xs font-semibold uppercase tracking-wider text-indigo-900">
-            Open Weights Architecture
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[7px] bg-[#ffffff] border border-[#e4e7ec] text-[12px] font-medium text-[#6f7988] shadow-[0_1px_2px_rgba(28,40,64,0.04)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#266df0]" />
+            AI Foundation Weights
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-[#1c1d1f] leading-[1.12]">
             Powered by Foundation Open Models
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+          <p className="text-[#6f7988] text-[14px] sm:text-[15px] leading-relaxed">
             Every audio, voice, visual, and video studio in Cadence runs on vetted, self-hosted open source neural weights on serverless NVIDIA A10G GPUs.
           </p>
         </div>
 
-        {/* 8-Model Grid - Clean, light-themed luxury cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Model Grid - Attio hairline cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {models.map((m) => {
             const Icon = m.icon;
             return (
               <div
                 key={m.name}
-                className="p-5 rounded-2xl bg-white/95 border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group hover:border-indigo-300"
+                className="p-5 rounded-[12px] bg-[#ffffff] border border-[#e4e7ec] shadow-[0_1px_2px_rgba(28,40,64,0.04)] hover:shadow-[rgba(28,40,64,0.08)_0px_4px_16px_0px] transition-all flex flex-col justify-between space-y-3 group hover:border-[#bad0fa]"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className={`size-9 rounded-xl border flex items-center justify-center p-1.5 overflow-hidden ${m.badgeColor}`}>
+                    <div className="size-8 rounded-[7px] border border-[#e4e7ec] bg-[#f4f5f6] flex items-center justify-center p-1.5 overflow-hidden text-[#1c1d1f]">
                       {m.logo ? (
                         <Image
                           src={m.logo}
                           alt={m.provider}
-                          width={24}
-                          height={24}
+                          width={20}
+                          height={20}
                           className="size-full object-contain rounded-full"
                         />
                       ) : (
-                        <Icon className="size-4.5" />
+                        <Icon className="size-4" />
                       )}
                     </div>
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-[5px] bg-[#f4f5f6] text-[#6f7988] border border-[#e4e7ec]">
                       {m.tag}
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="font-bold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="font-semibold text-[14px] text-[#1c1d1f] group-hover:text-[#266df0] transition-colors">
                       {m.name}
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    <p className="text-[11px] text-[#8f99a8] font-medium mt-0.5">
                       {m.provider}
                     </p>
                   </div>
 
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-[12px] text-[#6f7988] leading-relaxed">
                     {m.description}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100">
-                  <span className="text-[10px] font-mono text-indigo-700 font-semibold block truncate">
+                <div className="pt-2.5 border-t border-[#eeeff1]">
+                  <span className="text-[10px] font-mono text-[#266df0] font-medium block truncate">
                     {m.specs}
                   </span>
                 </div>
