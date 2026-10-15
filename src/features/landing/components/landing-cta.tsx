@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { CheckCircle2, Sparkles, ArrowRight, Zap, Shield, Waves } from "lucide-react";
+import { useShowcase } from "@/components/providers/showcase-provider";
 
 const CURTAINS = [4, 12, 20, 28, 36, 44, 52, 60, 68, 76, 84, 92, 98];
 
@@ -18,6 +19,14 @@ const BIG_HORIZON_BARS = [
 export function LandingCta() {
   const { isSignedIn, isLoaded } = useAuth();
   const studioHref = isLoaded && isSignedIn ? "/dashboard" : "/sign-up";
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
+
+  const handleLaunchClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
 
   return (
     <section className="relative py-24 sm:py-32 px-4 sm:px-6 bg-[#ffffff] border-t border-[#e4e7ec] overflow-hidden">
@@ -59,20 +68,12 @@ export function LandingCta() {
         <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
           <Link
             href={studioHref}
+            onClick={handleLaunchClick}
             className="btn-dark-carbon px-6 py-3 text-[14px] font-medium rounded-[10px] flex items-center gap-2"
           >
-            <span>{isLoaded && isSignedIn ? "Go to Studio" : "Launch Studio Free"}</span>
+            <span>{isLoaded && isSignedIn && isLiveAuthEnabled ? "Go to Studio" : "Launch Studio Free"}</span>
             <ArrowRight className="size-4" />
           </Link>
-
-          {(!isLoaded || !isSignedIn) && (
-            <Link
-              href="/sign-in"
-              className="btn-ghost-cadence px-5 py-3 text-[14px] font-medium rounded-[10px]"
-            >
-              <span>Sign In</span>
-            </Link>
-          )}
         </div>
 
         {/* Trust Badges Bar */}

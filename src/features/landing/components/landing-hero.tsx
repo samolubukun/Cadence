@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { PlaySquare, BookOpen, Sparkles, Radio } from "lucide-react";
 
+import { useShowcase } from "@/components/providers/showcase-provider";
+
 const DEMO_PRESETS = [
   { id: "youtube", label: "YouTube", icon: PlaySquare, text: "Welcome back! In today's video, we're diving into the future of voice synthesis and AI audio." },
   { id: "narrative", label: "Narrative", icon: BookOpen, text: "The ancient library stood silent under starlight, its forgotten parchment murmuring with lost wisdom." },
@@ -23,6 +25,7 @@ export function LandingHero() {
   const [mode, setMode] = useState<"tts" | "upload">("tts");
   const [playing, setPlaying] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
 
   const handlePlayToggle = () => {
     if (playing) {
@@ -37,6 +40,13 @@ export function LandingHero() {
 
   const { isSignedIn, isLoaded } = useAuth();
   const studioHref = isLoaded && isSignedIn ? "/dashboard" : "/sign-up";
+
+  const handleLaunchClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
 
   return (
     <section className="relative min-h-[90vh] flex flex-col justify-center items-center bg-[#ffffff] overflow-hidden pt-32 pb-20 px-4">
@@ -100,9 +110,10 @@ export function LandingHero() {
         <div className="animate-fade-up-delay-3 flex flex-row items-center justify-center gap-3 mb-14 w-full max-w-sm sm:max-w-none px-2">
           <Link 
             href={studioHref} 
+            onClick={handleLaunchClick}
             className="btn-dark-carbon whitespace-nowrap shrink-0 px-5 py-2.5 text-[14px]"
           >
-            <span>{isLoaded && isSignedIn ? "Go to Studio" : "Open Studio Free"}</span>
+            <span>{isLoaded && isSignedIn && isLiveAuthEnabled ? "Go to Studio" : "Open Studio Free"}</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>

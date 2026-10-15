@@ -8,6 +8,7 @@ import { VOICE_CATEGORY_LABELS, type VoiceCategory } from "@/features/voices/dat
 import { useAudioPlayback } from "@/hooks/use-audio-playback";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useShowcase } from "@/components/providers/showcase-provider";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -89,6 +90,7 @@ function LandingVoiceCard({ voice }: { voice: LandingVoiceItem }) {
   // Serve zero-latency local audio directly from /public/voices/
   const audioSrc = `/voices/${voice.audioFile}`;
   const { isPlaying, isLoading, togglePlay } = useAudioPlayback(audioSrc);
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
 
   return (
     <div className="flex items-center gap-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-xs hover:shadow-md transition-all p-3 sm:p-4 group">
@@ -142,7 +144,13 @@ function LandingVoiceCard({ voice }: { voice: LandingVoiceItem }) {
 
         <Link
           href={`/text-to-speech?voiceId=${voice.id}`}
-          className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition shrink-0"
+          onClick={(e) => {
+            if (!isLiveAuthEnabled) {
+              e.preventDefault();
+              interceptAction();
+            }
+          }}
+          className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[7px] text-[12px] font-medium bg-[#f4f5f6] hover:bg-[#e4e7ec] text-[#1c1d1f] transition shrink-0"
           title="Use in Text to Speech"
         >
           <Mic className="size-3" />
@@ -154,6 +162,15 @@ function LandingVoiceCard({ voice }: { voice: LandingVoiceItem }) {
 }
 
 export function LandingVoices() {
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
+
+  const handleVoicesClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
+
   return (
     <section id="voices" className="py-20 sm:py-28 px-4 sm:px-6 bg-[#ffffff] overflow-hidden border-b border-[#e4e7ec]">
       <div className="max-w-6xl mx-auto space-y-12">
@@ -197,6 +214,7 @@ export function LandingVoices() {
             </div>
             <Link 
               href="/voices" 
+              onClick={handleVoicesClick}
               className="btn-dark-carbon whitespace-nowrap text-[13px] px-4 py-2 font-medium"
             >
               <span>Explore All Voices in Studio</span>

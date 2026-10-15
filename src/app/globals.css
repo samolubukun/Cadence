@@ -462,3 +462,28 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* Custom Modal & Terminal Scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sleek-dark-scrollbar::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+}
+.sleek-dark-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 9999px;
+}
+.sleek-dark-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+.sleek-dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
+}

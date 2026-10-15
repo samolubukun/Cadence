@@ -4,10 +4,12 @@ import { useState } from "react";
 import { Terminal, Shield, Zap, Sparkles, Cpu, Layers, HardDrive, Lock, Server, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { useShowcase } from "@/components/providers/showcase-provider";
 
 export function LandingWhy() {
   const { isSignedIn, isLoaded } = useAuth();
   const studioHref = isLoaded && isSignedIn ? "/dashboard" : "/sign-up";
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
 
   const models = [
     { name: "Chatterbox Turbo", role: "Voice Synthesis", spec: "24kHz Mono" },
@@ -252,6 +254,12 @@ export function LandingWhy() {
               <span className="text-[12px] text-[#6f7988] font-normal">Ready to build or clone your first voice?</span>
               <Link
                 href={studioHref}
+                onClick={(e) => {
+                  if (!isLiveAuthEnabled) {
+                    e.preventDefault();
+                    interceptAction();
+                  }
+                }}
                 className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#266df0] hover:underline"
               >
                 <span>Launch Studio Free</span>

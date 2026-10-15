@@ -30,6 +30,7 @@ export const metadata: Metadata = {
 };
 
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
+import { ShowcaseProvider } from "@/components/providers/showcase-provider";
 
 export default function RootLayout({
   children,
@@ -49,7 +50,9 @@ export default function RootLayout({
               className={`${inter.variable} ${geistMono.variable} antialiased`}
             >
               <NuqsAdapter>
-                {children}
+                <ShowcaseProvider>
+                  {children}
+                </ShowcaseProvider>
               </NuqsAdapter>
               <Toaster />
             </body>
