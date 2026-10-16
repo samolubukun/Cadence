@@ -45,7 +45,7 @@ const middlewareHandler = clerkMiddleware(async (auth, req) => {
   return NextResponse.next();
 });
 
-export default function proxy(req: any, ev: any) {
+export default function middleware(req: any, ev: any) {
   if (!hasClerkKey) {
     return NextResponse.next();
   }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { useShowcase } from "@/components/providers/showcase-provider";
 import { Mic, Music, Disc3, Radio, AudioWaveform, Film, Sparkles, Play, Sliders, Cpu, Cloud, Layers, CheckCircle2 } from "lucide-react";
 
 interface WorkflowStep {
@@ -323,10 +324,18 @@ export function LandingHowItWorks() {
   const [selectedStudioId, setSelectedStudioId] = useState<string>("tts");
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
   const { isSignedIn, isLoaded } = useAuth();
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
 
   const currentStudio = STUDIOS.find((s) => s.id === selectedStudioId) || STUDIOS[0];
   const activeStep = currentStudio.steps[activeStepIndex] || currentStudio.steps[0];
   const studioHref = isLoaded && isSignedIn ? currentStudio.studioHref : "/sign-up";
+
+  const handleLaunchClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
 
   return (
     <section id="how-it-works" className="relative py-20 sm:py-28 px-4 sm:px-6 bg-[#F8FAFC] border-y border-slate-200/60 overflow-hidden">
@@ -535,6 +544,7 @@ export function LandingHowItWorks() {
           <div className="shrink-0 w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <Link
               href={studioHref}
+              onClick={handleLaunchClick}
               className="btn-dark-carbon whitespace-nowrap flex-shrink-0 text-center justify-center text-xs sm:text-sm px-5 py-2.5 flex items-center gap-2"
             >
               <span>{currentStudio.ctaText}</span>

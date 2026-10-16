@@ -1,7 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useShowcase } from "@/components/providers/showcase-provider";
 
 export function LandingFooter() {
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
+
   return (
     <footer style={{ background: "#000000", padding: "4.5rem 1.5rem 2.5rem", color: "#b5bdc9" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
@@ -47,7 +59,7 @@ export function LandingFooter() {
                 ["Usage & Analytics","/usage"],
                 ["Observability Traces","/observability"],
               ].map(([l,h]) => (
-                <Link key={l} href={h} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
+                <Link key={l} href={h} onClick={handleLinkClick} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                   {l}
                 </Link>
               ))}
@@ -112,16 +124,16 @@ export function LandingFooter() {
               <span>Account</span>
             </div>
             <div className="flex flex-col gap-2">
-              <Link href="/sign-in" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
+              <Link href="/sign-in" onClick={handleLinkClick} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Sign In
               </Link>
-              <Link href="/sign-up" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
+              <Link href="/sign-up" onClick={handleLinkClick} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Create Account
               </Link>
-              <Link href="/dashboard" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
+              <Link href="/dashboard" onClick={handleLinkClick} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Dashboard
               </Link>
-              <Link href="/billing" className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
+              <Link href="/billing" onClick={handleLinkClick} className="text-[13px] text-[#8f99a8] hover:text-white transition-colors">
                 Billing &amp; Credits
               </Link>
             </div>

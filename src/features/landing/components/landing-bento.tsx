@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useShowcase } from "@/components/providers/showcase-provider";
 import { 
   Mic, 
   Layers, 
@@ -18,6 +19,14 @@ import {
 
 export function LandingBento() {
   const [activeTab, setActiveTab] = useState<number>(0);
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
+
+  const handleStudioClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
 
   const studios = [
     {
@@ -159,6 +168,7 @@ export function LandingBento() {
 
                   <Link 
                     href={studio.link}
+                    onClick={handleStudioClick}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"
                   >
                     <span>Open {studio.title}</span>

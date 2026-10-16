@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useShowcase } from "@/components/providers/showcase-provider";
 import { Mic, Music, Scissors, ArrowUpRight } from "lucide-react";
 
 interface StoryCard {
@@ -53,6 +54,15 @@ const CREATIVE_STORIES: StoryCard[] = [
 ];
 
 export function LandingCreativeShowcase() {
+  const { interceptAction, isLiveAuthEnabled } = useShowcase();
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (!isLiveAuthEnabled) {
+      e.preventDefault();
+      interceptAction();
+    }
+  };
+
   return (
     <section className="py-20 sm:py-28 px-4 sm:px-6 bg-[#FAF9F6] border-b border-border/50 relative overflow-hidden">
       {/* Ambient background glow */}
@@ -131,6 +141,7 @@ export function LandingCreativeShowcase() {
                     {/* Action link */}
                     <Link
                       href={story.link}
+                      onClick={handleLinkClick}
                       className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 hover:text-indigo-600 transition-colors"
                     >
                       <span>Explore Studio</span>
