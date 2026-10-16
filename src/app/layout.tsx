@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Cadence",
+    default: "Cadence - Open Platform for Voice, Music & Media",
     template: "%s | Cadence"
   },
-  description: "AI-powered text-to-speech, speech-to-text, and voice cloning platform",
+  description: "The open platform for every layer of voice, music, and media creation.",
   icons: {
     icon: "/cadence-logo-white.svg",
     shortcut: "/cadence-logo-white.svg",
