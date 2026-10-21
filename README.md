@@ -69,7 +69,7 @@ Cadence runs entirely on self-hosted open-weight neural models across audio, voi
       <sub><b>Chatterbox Turbo</b><br/>TTS & Zero-Shot Clone</sub>
     </td>
     <td align="center" width="130">
-      <img src="./public/images/logos/openai.png" width="36" height="36" alt="Whisper large-v3" style="background: #ffffff; border-radius: 6px; padding: 3px;" /><br />
+      <img src="./public/images/logos/openai.svg" width="36" height="36" alt="Whisper large-v3" /><br />
       <sub><b>Whisper large-v3</b><br/>Word Timestamps STT</sub>
     </td>
     <td align="center" width="130">
@@ -101,7 +101,7 @@ Cadence runs entirely on self-hosted open-weight neural models across audio, voi
   </tr>
   <tr>
     <td align="center" width="130">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/pytorch.svg" width="36" height="36" alt="RVC v2" style="background: #ffffff; border-radius: 6px; padding: 3px;" /><br />
+      <img src="./public/images/logos/pytorch.svg" width="36" height="36" alt="RVC v2" /><br />
       <sub><b>RVC v2</b><br/>Singing Voice Conversion</sub>
     </td>
     <td align="center" width="130">
