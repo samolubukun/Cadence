@@ -1,8 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { ChevronDown, ChevronUp, Maximize2, X, LayoutGrid } from "lucide-react";
+import { 
+  ChevronDown, 
+  ChevronUp, 
+  Maximize2, 
+  X, 
+  LayoutGrid, 
+  Play, 
+  Pause, 
+  Volume2, 
+  VolumeX, 
+  RotateCcw,
+  Sparkles 
+} from "lucide-react";
 
 interface StudioScreenshot {
   id: string;
@@ -99,56 +111,333 @@ const STUDIO_SCREENSHOTS: StudioScreenshot[] = [
   },
 ];
 
+function formatTime(seconds: number): string {
+  if (isNaN(seconds) || seconds < 0) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
+const DEMO_VIDEO_URL = "https://xxr2q8wqbj.ufs.sh/f/5VP3IsRxk7FSpLNPv5fRjWv9tcVkZlNzTgO61mSfKYh2J8n5";
+
 export function LandingDashboardPreview() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState<StudioScreenshot | null>(null);
+  const [viewMode, setViewMode] = useState<"video" | "screenshot">("video");
+  const [isTheaterOpen, setIsTheaterOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(10);
+  const [duration, setDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const theaterVideoRef = useRef<HTMLVideoElement>(null);
+  const hasStartedPlaying = useRef(false);
+
+  useEffect(() => {
+    if (videoRef.current && !hasStartedPlaying.current) {
+      try {
+        videoRef.current.currentTime = 10;
+        setCurrentTime(10);
+      } catch {}
+    }
+
+    const handlePlayDemo = () => {
+      setViewMode("video");
+      if (videoRef.current) {
+        hasStartedPlaying.current = true;
+        setHasStarted(true);
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+    };
+    window.addEventListener("cadence:play-demo-video", handlePlayDemo);
+    return () => window.removeEventListener("cadence:play-demo-video", handlePlayDemo);
+  }, []);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      if (!hasStartedPlaying.current) {
+        hasStartedPlaying.current = true;
+        videoRef.current.currentTime = 0;
+      }
+      setHasStarted(true);
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const restartVideo = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    hasStartedPlaying.current = true;
+    setHasStarted(true);
+    videoRef.current.currentTime = 0;
+    videoRef.current.play().catch(() => {});
+    setIsPlaying(true);
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (!videoRef.current || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+    const newTime = ratio * duration;
+    hasStartedPlaying.current = true;
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+    if (videoRef.current.paused) {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  };
 
   return (
-    <section className="relative pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 bg-[#f6f8fa] border-y border-[#e4e7ec] overflow-hidden">
+    <section id="demo-preview" className="relative pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 bg-[#f6f8fa] border-y border-[#e4e7ec] overflow-hidden scroll-mt-20">
       <div className="max-w-6xl mx-auto relative z-10 space-y-6">
         {/* Section Badge Before Main Image */}
         <div className="flex flex-col items-center justify-center text-center space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[7px] bg-[#ffffff] border border-[#e4e7ec] text-[12px] font-medium text-[#6f7988] shadow-[0_1px_2px_rgba(28,40,64,0.04)]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#266df0]" />
-            Dashboard Preview
+            Dashboard &amp; Video Tour
           </div>
         </div>
 
         {/* Featured Main Dashboard Showcase Frame — Browser-Frame Style */}
         <div className="relative rounded-[14px] border border-[#e4e7ec] bg-[#ffffff] shadow-[rgba(28,40,64,0.06)_0px_16px_36px_0px,rgba(28,40,64,0.04)_0px_2px_4px_0px] overflow-hidden max-w-5xl mx-auto">
           {/* Browser Chrome Header Bar */}
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-[#f6f8fa] border-b border-[#e4e7ec]">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-[#f6f8fa] border-b border-[#e4e7ec]">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#cad0d9]" />
               <span className="w-2.5 h-2.5 rounded-full bg-[#cad0d9]" />
               <span className="w-2.5 h-2.5 rounded-full bg-[#cad0d9]" />
             </div>
-            <div className="mx-auto flex items-center justify-center px-4 py-0.5 rounded-[6px] bg-[#ffffff] border border-[#e4e7ec] text-[11px] font-mono text-[#8f99a8]">
-              cadence.studio/dashboard
+
+            <div className="order-last sm:order-none mx-auto sm:mx-0 flex items-center justify-center px-4 py-0.5 rounded-[6px] bg-[#ffffff] border border-[#e4e7ec] text-[11px] font-mono text-[#8f99a8]">
+              {viewMode === "video" ? "cadence.studio/demo-preview.mp4" : "cadence.studio/dashboard"}
             </div>
-            <div className="w-10" />
+
+            {/* Mode Switcher Tabs */}
+            <div className="flex items-center gap-1 bg-[#ffffff] p-0.5 rounded-[8px] border border-[#e4e7ec] text-[11px] font-medium">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode("video");
+                  if (videoRef.current) {
+                    if (!hasStartedPlaying.current) {
+                      hasStartedPlaying.current = true;
+                      videoRef.current.currentTime = 0;
+                    }
+                    videoRef.current.play().catch(() => {});
+                    setIsPlaying(true);
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] transition-all cursor-pointer ${
+                  viewMode === "video"
+                    ? "bg-[#266df0] text-white shadow-xs font-semibold"
+                    : "text-[#6f7988] hover:text-[#1c1d1f]"
+                }`}
+              >
+                <Play className="size-3 fill-current" />
+                <span>Product Tour</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (videoRef.current) {
+                    videoRef.current.pause();
+                    setIsPlaying(false);
+                  }
+                  setViewMode("screenshot");
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] transition-all cursor-pointer ${
+                  viewMode === "screenshot"
+                    ? "bg-[#1c1d1f] text-white shadow-xs font-semibold"
+                    : "text-[#6f7988] hover:text-[#1c1d1f]"
+                }`}
+              >
+                <LayoutGrid className="size-3" />
+                <span>Screenshot</span>
+              </button>
+            </div>
           </div>
 
-          <div 
-            onClick={() => setSelectedImage(STUDIO_SCREENSHOTS[0])}
-            className="relative overflow-hidden bg-white flex items-center justify-center cursor-pointer group"
-            title="Click to view full-resolution screenshot"
-          >
-            <Image
-              src="/screenshots/dashboard.jpg"
-              alt="Cadence Audio & Media Production Suite Dashboard"
-              width={1920}
-              height={1533}
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
-              className="w-full h-auto object-contain object-top transition-transform duration-500 ease-out group-hover:scale-[1.006]"
-            />
-            {/* Click-to-expand hover pill */}
-            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#232529] text-white text-[12px] font-medium shadow-md pointer-events-none">
-              <Maximize2 className="size-3.5" />
-              <span>Expand Preview</span>
+          {/* Main Frame Content */}
+          {viewMode === "video" ? (
+            <div 
+              onClick={togglePlay}
+              className="relative bg-[#0d0f12] overflow-hidden aspect-[16/10] sm:aspect-[16/9.5] flex items-center justify-center group cursor-pointer select-none"
+            >
+              <video
+                ref={videoRef}
+                src={DEMO_VIDEO_URL}
+                playsInline
+                preload="metadata"
+                onTimeUpdate={(e) => {
+                  setCurrentTime(e.currentTarget.currentTime);
+                }}
+                onDurationChange={(e) => {
+                  setDuration(e.currentTarget.duration);
+                }}
+                onLoadedMetadata={(e) => {
+                  setDuration(e.currentTarget.duration);
+                  if (!hasStartedPlaying.current) {
+                    try {
+                      e.currentTarget.currentTime = 10;
+                      setCurrentTime(10);
+                    } catch {}
+                  }
+                }}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => {
+                  hasStartedPlaying.current = false;
+                  setHasStarted(false);
+                  setIsPlaying(false);
+                  try {
+                    if (videoRef.current) {
+                      videoRef.current.currentTime = 10;
+                    }
+                    setCurrentTime(10);
+                  } catch {}
+                }}
+                className="w-full h-full object-contain pointer-events-none"
+              />
+
+              {/* Big Center Play Button Overlay (when paused or idle) */}
+              {!isPlaying && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/35 backdrop-blur-[1px] transition-all duration-300">
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute -inset-4 rounded-full bg-[#266df0]/35 blur-xl animate-pulse" />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePlay();
+                      }}
+                      className="relative size-16 sm:size-20 rounded-full bg-[#266df0] hover:bg-[#1f5cd4] text-white shadow-[0_8px_32px_rgba(38,109,240,0.55)] border border-white/30 flex items-center justify-center transition-transform duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+                      aria-label="Play Product Tour"
+                    >
+                      <Play className="size-7 sm:size-8 fill-white translate-x-0.5" />
+                    </button>
+                  </div>
+                  <div className="mt-4 px-3.5 py-1.5 rounded-full bg-[#1c1d1f]/85 backdrop-blur-md border border-white/15 text-white text-[12px] font-medium flex items-center gap-2 shadow-lg">
+                    <Sparkles className="size-3.5 text-[#bad0fa]" />
+                    <span>Watch Cadence in Action • 2 min</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Sleek Bottom Custom Floating Controls Bar (Only visible once playback has started) */}
+              {hasStarted && (
+                <div 
+                  onClick={(e) => e.stopPropagation()}
+                  className={`absolute bottom-3 left-3 right-3 z-30 transition-all duration-300 ${
+                    isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+                  }`}
+                >
+                  <div className="bg-[#101216]/90 backdrop-blur-md border border-white/15 rounded-[10px] px-3.5 py-2.5 flex flex-col gap-2 shadow-2xl">
+                    {/* Progress / Scrubber Bar */}
+                    <div 
+                      onClick={handleProgressClick}
+                      className="relative w-full h-1.5 hover:h-2 bg-white/20 rounded-full cursor-pointer transition-all group/scrubber"
+                    >
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#266df0] to-[#5a95ff] rounded-full relative"
+                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                      >
+                        <span className="absolute right-0 top-1/2 -translate-y-1/2 size-3 rounded-full bg-white shadow-md opacity-0 group-hover/scrubber:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+
+                    {/* Controls Row */}
+                    <div className="flex items-center justify-between text-white text-[12px]">
+                      <div className="flex items-center gap-2">
+                        <button 
+                          type="button" 
+                          onClick={togglePlay}
+                          className="p-1 rounded-[6px] hover:bg-white/10 text-white transition-colors cursor-pointer"
+                          title={isPlaying ? "Pause" : "Play"}
+                        >
+                          {isPlaying ? <Pause className="size-4 fill-white" /> : <Play className="size-4 fill-white" />}
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={restartVideo}
+                          className="p-1 rounded-[6px] hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          title="Restart from beginning"
+                        >
+                          <RotateCcw className="size-3.5" />
+                        </button>
+                        <span className="text-[11px] font-mono text-slate-300 tabular-nums ml-1">
+                          {formatTime(currentTime)} / {formatTime(duration)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button 
+                          type="button" 
+                          onClick={toggleMute}
+                          className="p-1 rounded-[6px] hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          title={isMuted ? "Unmute" : "Mute"}
+                        >
+                          {isMuted ? <VolumeX className="size-4 text-red-400" /> : <Volume2 className="size-4" />}
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            if (videoRef.current) videoRef.current.pause();
+                            setIsPlaying(false);
+                            setIsTheaterOpen(true);
+                          }}
+                          className="p-1 rounded-[6px] hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-[11px]"
+                          title="Theater Mode"
+                        >
+                          <Maximize2 className="size-3.5" />
+                          <span className="hidden sm:inline">Theater</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          ) : (
+            <div 
+              onClick={() => setSelectedImage(STUDIO_SCREENSHOTS[0])}
+              className="relative overflow-hidden bg-white flex items-center justify-center cursor-pointer group"
+              title="Click to view full-resolution screenshot"
+            >
+              <Image
+                src="/screenshots/dashboard.jpg"
+                alt="Cadence Audio & Media Production Suite Dashboard"
+                width={1920}
+                height={1533}
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
+                className="w-full h-auto object-contain object-top transition-transform duration-500 ease-out group-hover:scale-[1.006]"
+              />
+              {/* Click-to-expand hover pill */}
+              <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#232529] text-white text-[12px] font-medium shadow-md pointer-events-none">
+                <Maximize2 className="size-3.5" />
+                <span>Expand Preview</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Collapsible Trigger Bar */}
@@ -225,6 +514,53 @@ export function LandingDashboardPreview() {
           </div>
         )}
       </div>
+
+      {/* Full-Screen Theater Video Modal */}
+      {isTheaterOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-[#090a0c]/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+          onClick={() => {
+            if (theaterVideoRef.current) theaterVideoRef.current.pause();
+            setIsTheaterOpen(false);
+          }}
+        >
+          <div 
+            className="relative w-full max-w-5xl bg-[#14161a] rounded-[16px] shadow-2xl overflow-hidden border border-[#2b303a]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[#242832] bg-[#101216]">
+              <div className="flex items-center gap-2.5">
+                <span className="size-2 rounded-full bg-[#266df0] animate-pulse" />
+                <h3 className="text-[14px] sm:text-[15px] font-semibold text-white">
+                  Cadence Platform Walkthrough &amp; Demo
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  if (theaterVideoRef.current) theaterVideoRef.current.pause();
+                  setIsTheaterOpen(false);
+                }}
+                className="size-7 rounded-[7px] bg-[#1e2229] hover:bg-[#282d37] border border-[#2e3442] flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+                title="Close Theater Mode"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+            {/* Video View */}
+            <div className="relative aspect-video w-full bg-black flex items-center justify-center">
+              <video
+                ref={theaterVideoRef}
+                src={DEMO_VIDEO_URL}
+                autoPlay
+                controls
+                playsInline
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Full-Resolution Modal / Lightbox */}
       {selectedImage && (

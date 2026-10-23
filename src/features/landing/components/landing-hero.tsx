@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
-import { PlaySquare, BookOpen, Sparkles, Radio } from "lucide-react";
+import { PlaySquare, BookOpen, Sparkles, Radio, Play } from "lucide-react";
 
 import { useShowcase } from "@/components/providers/showcase-provider";
 
@@ -107,7 +107,7 @@ export function LandingHero() {
         </p>
 
         {/* Action Buttons */}
-        <div className="animate-fade-up-delay-3 flex flex-row items-center justify-center gap-3 mb-14 w-full max-w-sm sm:max-w-none px-2">
+        <div className="animate-fade-up-delay-3 flex flex-row items-center justify-center gap-3 mb-14 w-full max-w-sm sm:max-w-none px-2 flex-wrap">
           <Link 
             href={studioHref} 
             onClick={handleLaunchClick}
@@ -118,6 +118,20 @@ export function LandingHero() {
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("demo-preview");
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+              window.dispatchEvent(new CustomEvent("cadence:play-demo-video"));
+            }}
+            className="btn-ghost-cadence whitespace-nowrap shrink-0 px-4 py-2.5 text-[14px] flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Play className="size-3.5 text-[#266df0] fill-[#266df0]" />
+            <span>Watch Demo</span>
+          </button>
           <a 
             href="https://github.com/samolubukun/Cadence" 
             target="_blank" 
