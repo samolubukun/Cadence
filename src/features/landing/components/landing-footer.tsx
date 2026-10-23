@@ -20,21 +20,21 @@ export function LandingFooter() {
         {/* Main Grid: On mobile 1 clean column per group; sm 2 cols; md 3 cols; lg 5 cols */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-10 sm:gap-y-12 sm:gap-x-8 lg:gap-x-6 mb-12 sm:mb-16">
           {/* Brand Info Column */}
-          <div className="sm:col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-start text-left">
-            {/* Logo and Name */}
-            <div className="flex items-center gap-2.5 mb-3">
+          <div className="sm:col-span-2 md:col-span-3 lg:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
+            {/* Logo and Name: stacked vertically on mobile, same line side-by-side on desktop */}
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3 mb-3.5">
               <Image 
                 src="/logo.svg" 
                 alt="Cadence" 
-                width={32} 
-                height={32} 
-                className="size-8 shrink-0" 
+                width={64} 
+                height={64} 
+                className="w-16 h-16 sm:w-11 sm:h-11 md:w-12 md:h-12 shrink-0 transition-transform duration-200 hover:scale-105" 
               />
-              <span className="font-semibold text-lg text-white tracking-tight">
+              <span className="font-bold text-2xl sm:text-xl md:text-2xl text-white tracking-tight">
                 Cadence
               </span>
             </div>
-            <p className="text-[13px] leading-relaxed max-w-sm lg:max-w-[220px] text-[#8f99a8] font-normal">
+            <p className="text-[13px] leading-relaxed max-w-sm lg:max-w-[240px] text-[#8f99a8] font-normal mx-auto sm:mx-0">
               The open platform for every layer of voice, music, and media creation powered by open-source foundation models.
             </p>
           </div>
@@ -140,8 +140,8 @@ export function LandingFooter() {
           </div>
         </div>
 
-        <div style={{ borderTop: "1px solid #232529", paddingTop: "1.5rem", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "0.75rem" }}>
-          <span style={{ fontSize: "12px" }} className="flex items-center gap-1.5 flex-wrap text-[#8f99a8]">
+        <div style={{ borderTop: "1px solid #232529", paddingTop: "1.5rem" }} className="flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
+          <span style={{ fontSize: "12px" }} className="flex items-center justify-center sm:justify-start gap-1.5 flex-wrap text-[#8f99a8]">
             <span>&copy; 2026 Cadence.</span>
             <span>•</span>
             <span>

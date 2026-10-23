@@ -8,7 +8,7 @@
 ### Make Anything Sound Possible.
 #### The open platform for every layer of voice, music, and media creation.
 
-Generative voice, music, speech, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, and generative video visualizers.
+Generative voice, music, speech, image, video, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, AI image generation & editing, text-to-video generation, and generative video visualizers.
 
 <br />
 
@@ -800,5 +800,5 @@ Engineered & Built with precision by **[Samuel Olubukun](https://samuelolubukun.
 ---
 
 <p align="center">
-  <sub>Cadence - Make Anything Sound Possible. Built for reliable, high-performance generative voice, music, speech & media intelligence.</sub>
+  <sub>Cadence - Make Anything Sound Possible. Built for reliable, high-performance generative voice, music, speech, image, video & media intelligence.</sub>
 </p>
