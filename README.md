@@ -8,7 +8,7 @@
 ### Make Anything Sound Possible.
 #### The open platform for every layer of voice, music, and media creation.
 
-Generative voice, music, speech, image, video, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, AI image generation & editing, text-to-video generation, and generative video visualizers.
+Generative voice, music, speech, and media studio. High-throughput text-to-speech, zero-shot voice cloning, word-accurate transcription, full vocal song composition, cinematic sound effects, speech-to-speech conversion, AI image generation, editing, and text-to-video generation, and low latency voice agent.
 
 <br />
 
